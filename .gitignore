@@ -1,0 +1,120 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Mono Auto Generated Files
+mono_crash.*
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# VS Code specific
+.vscode/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Configuration files
+appsettings*.json
+
+# Microsoft Visual Studio generated files
+.vs/
+*.vscode/
+
+# Rider specific files
+.idea/
+
+# Local history for JetBrains Rider
+.idea/.idea/
+.idea/.idea_modules/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/.rider/
+
+# Windows installer files
+*.msi
+*.msm
+*.msp
+
+# Microsoft Office temporary files
+~$*
+
+# IIS Logs
+*.log
+
+# Tooling files
+.vscode/
+.vst/
+.vstprojects/
+
+# DotNet project specific
+project.lock.json
+project.fragment.lock.json
+artifacts/
+logs/
+
+# NUGET Packages
+*.nupkg
+*.snupkg
+.nuget/
+.nuget/packages/
+*.nuget.props
+*.nuget.targets
+
+# DotNet restore cache
+# Nuget Packages
+**/packages/*/
+*.nupkg
+.nuget/
+
+# Rider files
+.idea/
+
+# npm package files (if using frontend in .NET projects)
+node_modules/
+package-lock.json
+yarn.lock
+
+# MacOS specific files
+.DS_Store
+._*
+
+# Coverage files
+*.coverage
+*.coveragexml
+*.codecoverage
+TestResults/
+
+# Azure Pipelines logs
+*.log
+
+# Web-related
+clientbin/
+compiled/
+.bundle/
+.env.local
+.env.*.local
+
+# Resharper files
+_ReSharper*/
