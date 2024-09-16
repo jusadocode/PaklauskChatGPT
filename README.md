@@ -1,2 +1,2 @@
 # PaklauskChatGPT
-Paklausk chat gpt
+KTU 4 kursas OPP Game
