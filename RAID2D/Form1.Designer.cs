@@ -44,7 +44,7 @@
             this.txtAmmo.AutoSize = true;
             this.txtAmmo.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtAmmo.ForeColor = System.Drawing.Color.White;
-            this.txtAmmo.Location = new System.Drawing.Point(12, 627);
+            this.txtAmmo.Location = new System.Drawing.Point(12, 953);
             this.txtAmmo.Name = "txtAmmo";
             this.txtAmmo.Size = new System.Drawing.Size(93, 24);
             this.txtAmmo.TabIndex = 0;
@@ -55,7 +55,7 @@
             this.txtScore.AutoSize = true;
             this.txtScore.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtScore.ForeColor = System.Drawing.Color.White;
-            this.txtScore.Location = new System.Drawing.Point(360, 9);
+            this.txtScore.Location = new System.Drawing.Point(832, 9);
             this.txtScore.Name = "txtScore";
             this.txtScore.Size = new System.Drawing.Size(71, 24);
             this.txtScore.TabIndex = 0;
@@ -67,7 +67,7 @@
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.ForeColor = System.Drawing.Color.White;
-            this.label1.Location = new System.Drawing.Point(637, 628);
+            this.label1.Location = new System.Drawing.Point(1613, 953);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 24);
             this.label1.TabIndex = 0;
@@ -76,7 +76,7 @@
             // 
             // healthBar
             // 
-            this.healthBar.Location = new System.Drawing.Point(716, 628);
+            this.healthBar.Location = new System.Drawing.Point(1701, 954);
             this.healthBar.Name = "healthBar";
             this.healthBar.Size = new System.Drawing.Size(187, 23);
             this.healthBar.TabIndex = 1;
@@ -94,7 +94,7 @@
             this.valueLabel.AutoSize = true;
             this.valueLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.valueLabel.ForeColor = System.Drawing.Color.White;
-            this.valueLabel.Location = new System.Drawing.Point(461, 9);
+            this.valueLabel.Location = new System.Drawing.Point(943, 9);
             this.valueLabel.Name = "valueLabel";
             this.valueLabel.Size = new System.Drawing.Size(87, 24);
             this.valueLabel.TabIndex = 3;
@@ -116,7 +116,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.DarkOliveGreen;
-            this.ClientSize = new System.Drawing.Size(924, 661);
+            this.ClientSize = new System.Drawing.Size(1904, 1041);
             this.Controls.Add(this.valueLabel);
             this.Controls.Add(this.player);
             this.Controls.Add(this.healthBar);
