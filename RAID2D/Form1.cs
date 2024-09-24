@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RAID2D.Resources;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -13,6 +14,7 @@ namespace RAID2D
     public partial class Form1 : Form
     {
 
+        public static Form1 instance;
         bool goLeft, goRight, goUp, goDown, gameOver;
         string facing = "up";
         int playerHealth = 100;
@@ -22,14 +24,32 @@ namespace RAID2D
         int zombieSpeed = 3;
         Random randNum = new Random();
         int score;
-        List<PictureBox> zombiesList = new List<PictureBox>();
+        private List<PictureBox> zombiesList = new List<PictureBox>();
 
+        private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
+        {
+            { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
+            { "rolex", new ValuableItem("rolex", 60, 20, Properties.Resources.rolex) },
+            { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
+            { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
+        };
+
+
+        private Dictionary<string, MedicalItem> medicalItems = new Dictionary<string, MedicalItem>
+        {
+            { "small_medkit", new MedicalItem("small_medkit", 20, 50, Properties.Resources.small_medkit) },
+            { "large_medkit", new MedicalItem("large_medkit", 50, 30, Properties.Resources.large_medkit) },
+            { "health_potion", new MedicalItem("health_potion", 100, 20, Properties.Resources.health_potion) }
+        };
 
 
         public Form1()
         {
             InitializeComponent();
             RestartGame();
+
+            if(instance == null)
+                instance = this;
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
@@ -45,9 +65,10 @@ namespace RAID2D
                 GameTimer.Stop();
             }
 
+
             txtAmmo.Text = "Ammo: " + ammo;
             txtScore.Text = "Kills: " + score;
-            valueLabel.Text = "Value: " + value;
+            valueLabel.Text = "Value: " + value + "$";
 
             // Player movement logic
             if (goLeft && player.Left > 0) player.Left -= speed;
@@ -75,9 +96,27 @@ namespace RAID2D
                 // Player picking up valuable item
                 if (x is PictureBox && (string)x.Tag == "valuable" && player.Bounds.IntersectsWith(x.Bounds))
                 {
-                    this.Controls.Remove(x);
-                    ((PictureBox)x).Dispose();
-                    value += 10; // Add value score
+                    if (valuableItems.TryGetValue(x.Name, out ValuableItem item))
+                    {
+                        this.Controls.Remove(x);
+                        ((PictureBox)x).Dispose();
+                        value += item.value; // Add value score
+                    }
+                }
+
+                // Player taking medical item
+                if (x is PictureBox && (string)x.Tag == "medical" && player.Bounds.IntersectsWith(x.Bounds))
+                {
+                    if (medicalItems.TryGetValue(x.Name, out MedicalItem item))
+                    {
+                        this.Controls.Remove(x);
+                        ((PictureBox)x).Dispose();
+
+                        if (item.name == "health_potion")
+                            playerHealth = 100;
+                        else
+                            playerHealth += item.healthSize;
+                    }
                 }
 
 
@@ -89,6 +128,9 @@ namespace RAID2D
                     if (player.Bounds.IntersectsWith(x.Bounds))
                     {
                         playerHealth -= 1;
+
+                        if (playerHealth == 20)
+                            SpawnRandomMedicalItem();
                     }
 
                     // Move zombie towards player
@@ -296,27 +338,76 @@ namespace RAID2D
 
         private void DropValuableItem(Point location)
         {
-            PictureBox item = new PictureBox
+            // Calculate the total chance based on the values in the dictionary
+            int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
+            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+
+            int cumulativeChance = 0;
+            ValuableItem selectedItem = null;
+
+            // Loop through the dictionary to find the one to drop based on cumulative probability
+            foreach (var itemPair in valuableItems)
             {
-                Image = Properties.Resources.rolex, 
+                ValuableItem item = itemPair.Value;
+                cumulativeChance += item.spawnChance;
+
+                if (randomValue < cumulativeChance)
+                {
+                    selectedItem = item;
+                    break;
+                }
+            }
+
+            // If an item is selected, drop it at the given location
+            if (selectedItem != null)
+            {
+                PictureBox itemPictureBox = new PictureBox
+                {
+                    Image = selectedItem.image,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Tag = "valuable",
+                    Size = new Size(50, 50),
+                    Name = selectedItem.name // Using the Name property to identify the item
+                };
+
+                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
+                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
+
+                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
+                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
+
+                this.Controls.Add(itemPictureBox);
+
+                itemPictureBox.BringToFront();
+                player.BringToFront();
+            }
+        }
+
+        private void SpawnRandomMedicalItem()
+        {
+            // Randomly select a medical item from the dictionary
+            var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
+            MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
+
+            PictureBox itemPictureBox = new PictureBox
+            {
+                Image = selectedMedicalItem.image,
                 SizeMode = PictureBoxSizeMode.StretchImage,
-                Tag = "valuable"
+                Tag = "medical",
+                Size = new Size(50, 50),
+                Name = selectedMedicalItem.name
             };
 
-            item.Size = new Size(50, 50);
+            // Position the item randomly on the screen
+            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
 
-
-            int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
-            int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
-
-            item.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - item.Width - 10));
-            item.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - item.Height - 10));
-
-            this.Controls.Add(item);
-
-            item.BringToFront();
-            player.BringToFront();
+            // Add the item to the controls
+            this.Controls.Add(itemPictureBox);
+            itemPictureBox.BringToFront();
         }
+
+
 
 
         private void RestartGame()
