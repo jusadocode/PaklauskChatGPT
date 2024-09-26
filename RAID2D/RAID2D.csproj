@@ -116,6 +116,8 @@
   <ItemGroup>
     <None Include="Resources\small_medkit.png" />
     <None Include="Resources\cigarettes.png" />
+    <Content Include="Resources\down3-removebg-preview.png" />
+    <Content Include="Resources\down3.png" />
     <Content Include="Resources\gold.png" />
     <None Include="Resources\parcel_box.jpg" />
     <None Include="Resources\health_potion.png" />

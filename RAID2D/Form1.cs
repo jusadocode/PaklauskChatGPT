@@ -37,9 +37,9 @@ namespace RAID2D
 
         private Dictionary<string, MedicalItem> medicalItems = new Dictionary<string, MedicalItem>
         {
-            { "small_medkit", new MedicalItem("small_medkit", 20, 50, Properties.Resources.small_medkit) },
-            { "large_medkit", new MedicalItem("large_medkit", 50, 30, Properties.Resources.large_medkit) },
-            { "health_potion", new MedicalItem("health_potion", 100, 20, Properties.Resources.health_potion) }
+            { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },
+            { "large_medkit", new MedicalItem("large_medkit", 50, 90, Properties.Resources.large_medkit) },
+            { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.health_potion) }
         };
 
 
@@ -111,11 +111,17 @@ namespace RAID2D
                     {
                         this.Controls.Remove(x);
                         ((PictureBox)x).Dispose();
-
-                        if (item.name == "health_potion")
-                            playerHealth = 100;
-                        else
-                            playerHealth += item.healthSize;
+                        if(playerHealth != 100)
+                        {
+                            if (playerHealth + item.healthSize > 100)
+                            {
+                                playerHealth = 100;
+                            }
+                            else
+                                playerHealth += item.healthSize;
+                            
+                        }
+                        
                     }
                 }
 
@@ -308,6 +314,12 @@ namespace RAID2D
             shootBullet.MakeBullet(this);
         }
 
+        private void SpawnAnimals()
+        {
+            PictureBox roar = new PictureBox();
+            roar.Tag = "roar";
+            roar.Image = Properties.Resources.ro
+        }
         private void MakeZombies()
         {
             PictureBox zombie = new PictureBox();
