@@ -29,9 +29,9 @@ namespace RAID2D
         private Timer animalMovementTimer = new Timer();
         Random randomAnimals = new Random();
 
-        private List<PictureBox> animalsList = new List<PictureBox>();
-        private Timer animalMovementTimer = new Timer();
-        Random randomAnimals = new Random();
+        
+  
+       
 
         private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
         {
@@ -41,10 +41,7 @@ namespace RAID2D
             { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
         };
 
-        private Dictionary<string, AnimalDrop> animaldrops = new Dictionary<string, AnimalDrop>
-        {
-            {"pork", new AnimalDrop("pork", 100, 10, Properties.Resources.boarMeat)},
-        };
+      
 
 
         private Dictionary<string, AnimalDrop> animaldrops = new Dictionary<string, AnimalDrop>
@@ -561,49 +558,11 @@ namespace RAID2D
                 player.BringToFront();
             }
 
-            // Calculate the total chance based on the values in the dictionary
-            int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
-            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+            
 
-            int cumulativeChance = 0;
-            ValuableItem selectedItem = null;
-
-            // Loop through the dictionary to find the one to drop based on cumulative probability
-            foreach (var itemPair in valuableItems)
-            {
-                ValuableItem item = itemPair.Value;
-                cumulativeChance += item.spawnChance;
-
-                if (randomValue < cumulativeChance)
-                {
-                    selectedItem = item;
-                    break;
-                }
-            }
-
-            // If an item is selected, drop it at the given location
-            if (selectedItem != null)
-            {
-                PictureBox itemPictureBox = new PictureBox
-                {
-                    Image = selectedItem.image,
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    Tag = "valuable",
-                    Size = new Size(50, 50),
-                    Name = selectedItem.name // Using the Name property to identify the item
-                };
-
-                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
-                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
-
-                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
-                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
-
-                this.Controls.Add(itemPictureBox);
-
-                itemPictureBox.BringToFront();
-                player.BringToFront();
-            }
+   
+           
+            
         }
 
         private void SpawnRandomMedicalItem()
@@ -679,77 +638,9 @@ namespace RAID2D
             }
         }
 
-        private void DropAnimal(Point location, string name)
-        {
+        
 
-            // Calculate the total chance based on the values in the dictionary
-            int totalChance = animaldrops.Values.Sum(item => item.spawnChance); // Sum of all drop chances
-            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
-
-            int cumulativeChance = 0;
-            AnimalDrop selectedItem = null;
-
-            // Loop through the dictionary to find the one to drop based on cumulative probability
-            foreach (var itemPair in animaldrops)
-            {
-                AnimalDrop item = itemPair.Value;
-                cumulativeChance += item.spawnChance;
-
-                if (randomValue < cumulativeChance)
-                {
-                    selectedItem = item;
-                    break;
-                }
-            }
-
-            // If an item is selected, drop it at the given location
-            if (selectedItem != null)
-            {
-                PictureBox itemPictureBox = new PictureBox
-                {
-                    Image = selectedItem.image,
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    Tag = "animaldrop",
-                    Size = new Size(50, 50),
-                    Name = selectedItem.name // Using the Name property to identify the item
-                };
-
-                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
-                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
-
-                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
-                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
-
-                this.Controls.Add(itemPictureBox);
-
-                itemPictureBox.BringToFront();
-                player.BringToFront();
-            }
-        }
-
-        private void SpawnRandomMedicalItem()
-        {
-            // Randomly select a medical item from the dictionary
-            var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
-            MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
-
-            PictureBox itemPictureBox = new PictureBox
-            {
-                Image = selectedMedicalItem.image,
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Tag = "medical",
-                Size = new Size(50, 50),
-                Name = selectedMedicalItem.name
-            };
-
-            // Position the item randomly on the screen
-            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
-            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
-
-            // Add the item to the controls
-            this.Controls.Add(itemPictureBox);
-            itemPictureBox.BringToFront();
-        }
+       
 
 
 
