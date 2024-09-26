@@ -25,7 +25,9 @@ namespace RAID2D
         Random randNum = new Random();
         int score;
         private List<PictureBox> zombiesList = new List<PictureBox>();
-
+        private List<PictureBox> animalsList = new List<PictureBox>();
+        private Timer animalMovementTimer = new Timer();
+        Random randomAnimals = new Random();
         private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
         {
             { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
@@ -39,7 +41,7 @@ namespace RAID2D
         {
             { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },
             { "large_medkit", new MedicalItem("large_medkit", 50, 90, Properties.Resources.large_medkit) },
-            { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.health_potion) }
+            { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
         };
 
 
@@ -50,6 +52,10 @@ namespace RAID2D
 
             if(instance == null)
                 instance = this;
+            // Initialize the animal movement timer
+            animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
+            animalMovementTimer.Tick += MoveAnimals;
+            animalMovementTimer.Start();
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
@@ -198,6 +204,52 @@ namespace RAID2D
 
 
         }
+        private void MoveAnimals(object sender, EventArgs e)
+        {
+            // Loop through all controls on the form and find animals
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox && (string)control.Tag == "animal")
+                {
+                    PictureBox animal = (PictureBox)control;
+
+                    // Randomly choose a direction (0 = up, 1 = down, 2 = left, 3 = right)
+                    int moveDirection = randNum.Next(0, 4); // 0 to 3 for four directions
+
+                    // Move the animal based on the chosen direction
+                    switch (moveDirection)
+                    {
+                        case 0: // Move up
+                            if (animal.Top > 0) // Check bounds
+                            {
+                                animal.Top -= 15; // Move the animal up by 15 pixels
+                            }
+                            break;
+
+                        case 1: // Move down
+                            if (animal.Top < this.ClientSize.Height - animal.Height)
+                            {
+                                animal.Top += 15; // Move the animal down by 15 pixels
+                            }
+                            break;
+
+                        case 2: // Move left
+                            if (animal.Left > 0) // Check bounds
+                            {
+                                animal.Left -= 15; // Move the animal left by 15 pixels
+                            }
+                            break;
+
+                        case 3: // Move right
+                            if (animal.Left < this.ClientSize.Width - animal.Width)
+                            {
+                                animal.Left += 15; // Move the animal right by 15 pixels
+                            }
+                            break;
+                    }
+                }
+            }
+        }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
         {
@@ -316,10 +368,28 @@ namespace RAID2D
 
         private void SpawnAnimals()
         {
-            PictureBox roar = new PictureBox();
-            roar.Tag = "roar";
-            roar.Image = Properties.Resources.ro
+            // Randomly select a medical item from the dictionary
+            var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
+            MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
+
+            PictureBox itemPictureBox = new PictureBox
+            {
+                Image = selectedMedicalItem.image,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = "animal",
+                Size = new Size(50, 50),
+                Name = selectedMedicalItem.name
+            };
+
+            // Position the item randomly on the screen
+            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
+
+            // Add the item to the controls
+            this.Controls.Add(itemPictureBox);
+            itemPictureBox.BringToFront();
         }
+
         private void MakeZombies()
         {
             PictureBox zombie = new PictureBox();
@@ -437,8 +507,14 @@ namespace RAID2D
             // Spawn initial zombies
             for (int i = 0; i < 3; i++)
             {
-                MakeZombies();
+                //MakeZombies();
+                
             }
+            for(int i = 0; i < randomAnimals.Next(1, 12); i++)
+            {
+                SpawnAnimals();
+            }
+            
 
             // Reset game stats
             goUp = false;
