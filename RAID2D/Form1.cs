@@ -26,6 +26,10 @@ namespace RAID2D
         int score;
         private List<PictureBox> zombiesList = new List<PictureBox>();
 
+        private List<PictureBox> animalsList = new List<PictureBox>();
+        private Timer animalMovementTimer = new Timer();
+        Random randomAnimals = new Random();
+
         private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
         {
             { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
@@ -35,11 +39,25 @@ namespace RAID2D
         };
 
 
+        private Dictionary<string, AnimalDrop> animaldrops = new Dictionary<string, AnimalDrop>
+        {
+            {"pork", new AnimalDrop("pork", 100, 10, Properties.Resources.boarMeat)},
+        };
+
+
+        private Dictionary<string, MedicalItem> medicalItems = new Dictionary<string, MedicalItem>
+        {
+            { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },
+            { "large_medkit", new MedicalItem("large_medkit", 50, 90, Properties.Resources.large_medkit) },
+            { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
+
+
         private Dictionary<string, MedicalItem> medicalItems = new Dictionary<string, MedicalItem>
         {
             { "small_medkit", new MedicalItem("small_medkit", 20, 50, Properties.Resources.small_medkit) },
             { "large_medkit", new MedicalItem("large_medkit", 50, 30, Properties.Resources.large_medkit) },
             { "health_potion", new MedicalItem("health_potion", 100, 20, Properties.Resources.health_potion) }
+
         };
 
 
@@ -50,6 +68,17 @@ namespace RAID2D
 
             if(instance == null)
                 instance = this;
+
+
+            // Set the form's background to a color you want to be transparent
+            //this.BackColor = Color.Lime; // Use a color not used in your images
+            //this.TransparencyKey = Color.Lime; // This color will be treated as transparent
+            //this.FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
+            // Initialize the animal movement timer
+            animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
+            animalMovementTimer.Tick += MoveAnimals;
+            animalMovementTimer.Start();
+
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
@@ -104,6 +133,28 @@ namespace RAID2D
                     }
                 }
 
+
+                // Player taking medical item
+                if (x is PictureBox && (string)x.Tag == "animaldrop" && player.Bounds.IntersectsWith(x.Bounds))
+                {
+                    if (animaldrops.TryGetValue(x.Name, out AnimalDrop item))
+                    {
+                        this.Controls.Remove(x);
+                        ((PictureBox)x).Dispose();
+                        if (playerHealth != 100)
+                        {
+                            if (playerHealth + item.healthSize > 100)
+                            {
+                                playerHealth = 100;
+                            }
+                            else
+                                playerHealth += item.healthSize;
+
+                        }
+
+                    }
+                }
+
                 // Player taking medical item
                 if (x is PictureBox && (string)x.Tag == "medical" && player.Bounds.IntersectsWith(x.Bounds))
                 {
@@ -112,10 +163,24 @@ namespace RAID2D
                         this.Controls.Remove(x);
                         ((PictureBox)x).Dispose();
 
+                        if(playerHealth != 100)
+                        {
+                            if (playerHealth + item.healthSize > 100)
+                            {
+                                playerHealth = 100;
+                            }
+                            else
+                                playerHealth += item.healthSize;
+                            
+                        }
+                        
+
+
                         if (item.name == "health_potion")
                             playerHealth = 100;
                         else
                             playerHealth += item.healthSize;
+
                     }
                 }
 
@@ -156,7 +221,7 @@ namespace RAID2D
                     }
 
                 }
-
+                
 
                 // Bullet collision with zombie
                 foreach (Control j in this.Controls)
@@ -183,6 +248,33 @@ namespace RAID2D
                             MakeZombies();
                         }
                     }
+                  
+                }
+                foreach (Control j in this.Controls)
+                {
+                    if (j is PictureBox && (string)j.Tag == "bullet" && x is PictureBox && (string)x.Tag == "animal")
+                    {
+                        if (x.Bounds.IntersectsWith(j.Bounds))
+                        {
+                            score++;
+
+                            // Random chance to drop valuable item (20% chance)
+                            int dropChance = randNum.Next(0, 100); // Generates a number between 0 and 99
+                            if (dropChance < 50) // 20% chance
+                            {
+                                DropAnimal(x.Location, x.Name);
+                                
+                            }
+
+                            // Remove bullet and zombie
+                            this.Controls.Remove(j);
+                            ((PictureBox)j).Dispose();
+                            this.Controls.Remove(x);
+                            ((PictureBox)x).Dispose();
+                            SpawnAnimals();                          
+                        }
+                    }
+
                 }
 
 
@@ -191,6 +283,52 @@ namespace RAID2D
             }
 
 
+        }
+        private void MoveAnimals(object sender, EventArgs e)
+        {
+            // Loop through all controls on the form and find animals
+            foreach (Control control in this.Controls)
+            {
+                if (control is PictureBox && (string)control.Tag == "animal")
+                {
+                    PictureBox animal = (PictureBox)control;
+
+                    // Randomly choose a direction (0 = up, 1 = down, 2 = left, 3 = right)
+                    int moveDirection = randNum.Next(0, 4); // 0 to 3 for four directions
+
+                    // Move the animal based on the chosen direction
+                    switch (moveDirection)
+                    {
+                        case 0: // Move up
+                            if (animal.Top > 0) // Check bounds
+                            {
+                                animal.Top -= 15; // Move the animal up by 15 pixels
+                            }
+                            break;
+
+                        case 1: // Move down
+                            if (animal.Top < this.ClientSize.Height - animal.Height)
+                            {
+                                animal.Top += 15; // Move the animal down by 15 pixels
+                            }
+                            break;
+
+                        case 2: // Move left
+                            if (animal.Left > 0) // Check bounds
+                            {
+                                animal.Left -= 15; // Move the animal left by 15 pixels
+                            }
+                            break;
+
+                        case 3: // Move right
+                            if (animal.Left < this.ClientSize.Width - animal.Width)
+                            {
+                                animal.Left += 15; // Move the animal right by 15 pixels
+                            }
+                            break;
+                    }
+                }
+            }
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
@@ -308,6 +446,8 @@ namespace RAID2D
             shootBullet.MakeBullet(this);
         }
 
+        
+
         private void MakeZombies()
         {
             PictureBox zombie = new PictureBox();
@@ -335,9 +475,88 @@ namespace RAID2D
             ammo.BringToFront();
             player.BringToFront();
         }
+        private void SpawnAnimals()
+        {
+
+            Random randomanimal = new Random();
+            Image image;
+            string name;
+            int animalid = randomanimal.Next(1, 3);
+            if (animalid == 1)
+            {
+                name = "boar";
+                image = Properties.Resources.boardown;
+            }
+            else
+            {
+                name = "goat";
+                image = Properties.Resources.goatdown;
+            }
+            PictureBox itemPictureBox = new PictureBox
+            {
+                Image = image,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = "animal",
+                Size = new Size(145, 145), // Increase size here
+                Name = name,
+            };
+            itemPictureBox.Parent = instance;
+            itemPictureBox.BackColor = Color.Transparent;
+            // Position the item randomly on the screen
+            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
+
+            // Add the item to the controls
+            this.Controls.Add(itemPictureBox);
+            itemPictureBox.BringToFront();
+        }
 
         private void DropValuableItem(Point location)
         {
+            // Calculate the total chance based on the values in the dictionary
+            int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
+            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+
+            int cumulativeChance = 0;
+            ValuableItem selectedItem = null;
+
+            // Loop through the dictionary to find the one to drop based on cumulative probability
+            foreach (var itemPair in valuableItems)
+            {
+                ValuableItem item = itemPair.Value;
+                cumulativeChance += item.spawnChance;
+
+                if (randomValue < cumulativeChance)
+                {
+                    selectedItem = item;
+                    break;
+                }
+            }
+
+            // If an item is selected, drop it at the given location
+            if (selectedItem != null)
+            {
+                PictureBox itemPictureBox = new PictureBox
+                {
+                    Image = selectedItem.image,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Tag = "valuable",
+                    Size = new Size(50, 50),
+                    Name = selectedItem.name // Using the Name property to identify the item
+                };
+
+                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
+                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
+
+                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
+                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
+
+                this.Controls.Add(itemPictureBox);
+
+                itemPictureBox.BringToFront();
+                player.BringToFront();
+            }
+
             // Calculate the total chance based on the values in the dictionary
             int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
             int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
@@ -405,7 +624,82 @@ namespace RAID2D
             // Add the item to the controls
             this.Controls.Add(itemPictureBox);
             itemPictureBox.BringToFront();
+
         }
+
+        private void DropAnimal(Point location, string name)
+        {
+
+            // Calculate the total chance based on the values in the dictionary
+            int totalChance = animaldrops.Values.Sum(item => item.spawnChance); // Sum of all drop chances
+            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+
+            int cumulativeChance = 0;
+            AnimalDrop selectedItem = null;
+
+            // Loop through the dictionary to find the one to drop based on cumulative probability
+            foreach (var itemPair in animaldrops)
+            {
+                AnimalDrop item = itemPair.Value;
+                cumulativeChance += item.spawnChance;
+
+                if (randomValue < cumulativeChance)
+                {
+                    selectedItem = item;
+                    break;
+                }
+            }
+
+            // If an item is selected, drop it at the given location
+            if (selectedItem != null)
+            {
+                PictureBox itemPictureBox = new PictureBox
+                {
+                    Image = selectedItem.image,
+                    SizeMode = PictureBoxSizeMode.StretchImage,
+                    Tag = "animaldrop",
+                    Size = new Size(50, 50),
+                    Name = selectedItem.name // Using the Name property to identify the item
+                };
+
+                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
+                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
+
+                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
+                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
+
+                this.Controls.Add(itemPictureBox);
+
+                itemPictureBox.BringToFront();
+                player.BringToFront();
+            }
+        }
+
+        private void SpawnRandomMedicalItem()
+        {
+            // Randomly select a medical item from the dictionary
+            var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
+            MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
+
+            PictureBox itemPictureBox = new PictureBox
+            {
+                Image = selectedMedicalItem.image,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = "medical",
+                Size = new Size(50, 50),
+                Name = selectedMedicalItem.name
+            };
+
+            // Position the item randomly on the screen
+            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
+
+            // Add the item to the controls
+            this.Controls.Add(itemPictureBox);
+            itemPictureBox.BringToFront();
+        }
+
+
 
 
 
@@ -426,7 +720,13 @@ namespace RAID2D
             for (int i = 0; i < 3; i++)
             {
                 MakeZombies();
+                
             }
+            for(int i = 0; i < randomAnimals.Next(1, 4); i++)
+            {
+                SpawnAnimals();
+            }
+            
 
             // Reset game stats
             goUp = false;
