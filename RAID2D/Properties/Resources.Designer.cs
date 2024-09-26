@@ -73,6 +73,7 @@ namespace RAID2D.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+
         internal static System.Drawing.Bitmap boar {
             get {
                 object obj = ResourceManager.GetObject("boar", resourceCulture);
@@ -103,6 +104,7 @@ namespace RAID2D.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+
         internal static System.Drawing.Bitmap cigarettes {
             get {
                 object obj = ResourceManager.GetObject("cigarettes", resourceCulture);
