@@ -1,16 +1,10 @@
 ﻿namespace Client
 {
-    internal class ValuableItem
+    internal class ValuableItem(string name, int value, int spawnChance, Image image)
     {
-        public string name { get; set; }
-        public int value { get; set; }
-        public Image image { get; set; }
-        public int spawnChance { get; set; }
-        public ValuableItem(string name, int value, int spawnChance, Image image) { 
-            this.name = name;
-            this.value = value;
-            this.image = image;
-            this.spawnChance = spawnChance;
-        }
+        public string Name { get; set; } = name;
+        public int Value { get; set; } = value;
+        public Image Image { get; set; } = image;
+        public int SpawnChance { get; set; } = spawnChance;
     }
 }

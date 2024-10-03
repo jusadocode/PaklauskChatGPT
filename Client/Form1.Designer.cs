@@ -60,7 +60,6 @@
             txtScore.Size = new Size(71, 24);
             txtScore.TabIndex = 0;
             txtScore.Text = "Kills: 0";
-            txtScore.Click += txtScore_Click;
             // 
             // label1
             // 
@@ -72,7 +71,6 @@
             label1.Size = new Size(82, 24);
             label1.TabIndex = 0;
             label1.Text = "Health: ";
-            label1.Click += label1_Click;
             // 
             // healthBar
             // 
@@ -81,7 +79,6 @@
             healthBar.Size = new Size(187, 23);
             healthBar.TabIndex = 1;
             healthBar.Value = 100;
-            healthBar.Click += healthBar_Click;
             // 
             // GameTimer
             // 
@@ -99,7 +96,6 @@
             valueLabel.Size = new Size(87, 24);
             valueLabel.TabIndex = 3;
             valueLabel.Text = "Value: 0";
-            valueLabel.Click += valueLabel_Click;
             // 
             // player
             // 
@@ -126,7 +122,6 @@
             Margin = new Padding(4, 3, 4, 3);
             Name = "Form1";
             Text = "Zombie Shootout Game MOO ICT";
-            Load += Form1_Load;
             KeyDown += KeyIsDown;
             KeyUp += KeyIsUp;
             ((System.ComponentModel.ISupportInitialize)player).EndInit();

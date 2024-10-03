@@ -4,26 +4,18 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-
-        public static Form1 instance;
         bool goLeft, goRight, goUp, goDown, gameOver;
-        string facing = "up";
+        Direction facing = Direction.Up;
         int playerHealth = 100;
         int value = 0;
         int speed = 10;
         int ammo = 10;
         int zombieSpeed = 3;
-        Random randNum = new Random();
+        Random random = new Random();
         int score;
         private List<PictureBox> zombiesList = new List<PictureBox>();
-        private List<PictureBox> animalsList = new List<PictureBox>();
         private Timer animalMovementTimer = new Timer();
         Random randomAnimals = new Random();
-
-        
-  
-
-       
 
         private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
         {
@@ -32,9 +24,6 @@ namespace Client
             { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
             { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
         };
-
-      
-
 
         private Dictionary<string, AnimalDrop> animaldrops = new Dictionary<string, AnimalDrop>
         {
@@ -47,277 +36,244 @@ namespace Client
             { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },
             { "large_medkit", new MedicalItem("large_medkit", 50, 90, Properties.Resources.large_medkit) },
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
-
-
-     
         };
-
 
         public Form1()
         {
             InitializeComponent();
             RestartGame();
 
-            if(instance == null)
-                instance = this;
-
-
             // Set the form's background to a color you want to be transparent
-            //this.BackColor = Color.Lime; // Use a color not used in your images
-            //this.TransparencyKey = Color.Lime; // This color will be treated as transparent
-            //this.FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
+            //BackColor = Color.Lime; // Use a color not used in your images
+            //TransparencyKey = Color.Lime; // This color will be treated as transparent
+            //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
             // Initialize the animal movement timer
             animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
             animalMovementTimer.Tick += MoveAnimals;
             animalMovementTimer.Start();
-
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
         {
+            UpdatePlayerHealth();
+            UpdateUI();
+
+            HandlePlayerMovement();
+
+            foreach (Control control in Controls)
+            {
+                if (control is not PictureBox box)
+                    continue;
+
+                if (player.Bounds.IntersectsWith(box.Bounds))
+                    HandleItemPickup(box);
+                if (box.Tag as string == "zombie")
+                    HandleZombieInteractions(box);
+                if (box.Tag as string == "animal" || box.Tag as string == "zombie")
+                    HandleBulletCollision(box);
+            }
+        }
+
+        private void UpdatePlayerHealth()
+        {
             if (playerHealth > 1)
             {
-                healthBar.Value = playerHealth;
+                healthBar.Value = Math.Clamp(playerHealth, 0, 100);
             }
             else
             {
-                gameOver = true;
-                player.Image = Properties.Resources.dead;
-                GameTimer.Stop();
+                EndGame();
             }
+        }
 
-
+        private void UpdateUI()
+        {
             txtAmmo.Text = "Ammo: " + ammo;
             txtScore.Text = "Kills: " + score;
             valueLabel.Text = "Value: " + value + "$";
+        }
 
-            // Player movement logic
+        private void EndGame()
+        {
+            gameOver = true;
+            player.Image = Properties.Resources.dead;
+            GameTimer.Stop();
+        }
+
+        private void HandlePlayerMovement()
+        {
             if (goLeft && player.Left > 0) player.Left -= speed;
-            if (goRight && player.Left + player.Width < this.ClientSize.Width) player.Left += speed;
+            if (goRight && player.Left + player.Width < ClientSize.Width) player.Left += speed;
             if (goUp && player.Top > 45) player.Top -= speed;
-            if (goDown && player.Top + player.Height < this.ClientSize.Height) player.Top += speed;
+            if (goDown && player.Top + player.Height < ClientSize.Height) player.Top += speed;
+        }
 
-
-            // Collision and item pickup logic
-            foreach (Control x in this.Controls)
+        private void HandleItemPickup(PictureBox item)
+        {
+            switch (item.Tag as string)
             {
+                case "ammo":
+                    PickupAmmo(item);
+                    break;
+                case "valuable":
+                    PickupValuableItem(item);
+                    break;
+                case "animaldrop":
+                    PickupAnimalDrop(item);
+                    break;
+                case "medical":
+                    PickupMedicalItem(item);
+                    break;
+            }
+        }
 
-                // Ammo pickup
-                if (x is PictureBox && (string)x.Tag == "ammo")
-                {
-                    if (player.Bounds.IntersectsWith(x.Bounds))
-                    {
-                        this.Controls.Remove(x);
-                        ((PictureBox)x).Dispose();
-                        ammo += 5;
+        private void PickupAmmo(PictureBox box)
+        {
+            Controls.Remove(box);
+            box.Dispose();
+            ammo += 5;
+        }
 
-                    }
-                }
+        private void PickupValuableItem(PictureBox box)
+        {
+            if (valuableItems.TryGetValue(box.Name, out ValuableItem? item))
+            {
+                Controls.Remove(box);
+                box.Dispose();
+                value += item.Value;
+            }
+        }
 
-                // Player picking up valuable item
-                if (x is PictureBox && (string)x.Tag == "valuable" && player.Bounds.IntersectsWith(x.Bounds))
-                {
-                    if (valuableItems.TryGetValue(x.Name, out ValuableItem item))
-                    {
-                        this.Controls.Remove(x);
-                        ((PictureBox)x).Dispose();
-                        value += item.value; // Add value score
-                    }
-                }
+        private void PickupMedicalItem(PictureBox box)
+        {
+            if (medicalItems.TryGetValue(box.Name, out MedicalItem? item))
+            {
+                Controls.Remove(box);
+                box.Dispose();
+                HealPlayer(item);
+            }
+        }
 
+        private void PickupAnimalDrop(PictureBox box)
+        {
+            if (animaldrops.TryGetValue(box.Name, out AnimalDrop? item))
+            {
+                Controls.Remove(box);
+                box.Dispose();
+                HealPlayer(item);
+            }
+        }
 
-                // Player taking medical item
-                if (x is PictureBox && (string)x.Tag == "animaldrop" && player.Bounds.IntersectsWith(x.Bounds))
-                {
-                    if (animaldrops.TryGetValue(x.Name, out AnimalDrop item))
-                    {
-                        this.Controls.Remove(x);
-                        ((PictureBox)x).Dispose();
-                        if (playerHealth != 100)
-                        {
-                            if (playerHealth + item.healthSize > 100)
-                            {
-                                playerHealth = 100;
-                            }
-                            else
-                                playerHealth += item.healthSize;
+        private void HealPlayer(MedicalItem item)
+        {
+            if (playerHealth < 100)
+                playerHealth = Math.Min(playerHealth + item.HealthSize, 100);
+        }
 
-                        }
+        private void HealPlayer(AnimalDrop item)
+        {
+            if (playerHealth < 100)
+                playerHealth = Math.Min(playerHealth + item.HealthSize, 100);
+        }
 
-                    }
-                }
+        private void HandleZombieInteractions(PictureBox zombie)
+        {
+            // Damage player if zombie touches
+            if (player.Bounds.IntersectsWith(zombie.Bounds))
+            {
+                playerHealth -= 1;
 
-                // Player taking medical item
-                if (x is PictureBox && (string)x.Tag == "medical" && player.Bounds.IntersectsWith(x.Bounds))
-                {
-                    if (medicalItems.TryGetValue(x.Name, out MedicalItem item))
-                    {
-                        this.Controls.Remove(x);
-                        ((PictureBox)x).Dispose();
-
-                        if(playerHealth != 100)
-                        {
-                            if (playerHealth + item.healthSize > 100)
-                            {
-                                playerHealth = 100;
-                            }
-                            else
-                                playerHealth += item.healthSize;
-                            
-                        }
-                        
-
-
-
-                        if (item.name == "health_potion")
-                            playerHealth = 100;
-                        else
-                            playerHealth += item.healthSize;
-
-                    }
-                }
-
-
-                // Zombie movement and collision with player
-                if (x is PictureBox && (string)x.Tag == "zombie")
-                {
-
-                    // Damage player if zombie touches
-                    if (player.Bounds.IntersectsWith(x.Bounds))
-                    {
-                        playerHealth -= 1;
-
-                        if (playerHealth == 20)
-                            SpawnRandomMedicalItem();
-                    }
-
-                    // Move zombie towards player
-                    if (x.Left > player.Left)
-                    {
-                        x.Left -= zombieSpeed;
-                        ((PictureBox)x).Image = Properties.Resources.zleft;
-                    }
-                    if (x.Left < player.Left)
-                    {
-                        x.Left += zombieSpeed;
-                        ((PictureBox)x).Image = Properties.Resources.zright;
-                    }
-                    if (x.Top > player.Top)
-                    {
-                        x.Top -= zombieSpeed;
-                        ((PictureBox)x).Image = Properties.Resources.zup;
-                    }
-                    if (x.Top < player.Top)
-                    {
-                        x.Top += zombieSpeed;
-                        ((PictureBox)x).Image = Properties.Resources.zdown;
-                    }
-
-                }
-                
-
-                // Bullet collision with zombie
-                foreach (Control j in this.Controls)
-                {
-                    if (j is PictureBox && (string)j.Tag == "bullet" && x is PictureBox && (string)x.Tag == "zombie")
-                    {
-                        if (x.Bounds.IntersectsWith(j.Bounds))
-                        {
-                            score++;
-
-                            // Random chance to drop valuable item (20% chance)
-                            int dropChance = randNum.Next(0, 100); // Generates a number between 0 and 99
-                            if (dropChance < 20) // 20% chance
-                            {
-                                DropValuableItem(x.Location); // Call function to spawn the item at the zombie's location
-                            }
-
-                            // Remove bullet and zombie
-                            this.Controls.Remove(j);
-                            ((PictureBox)j).Dispose();
-                            this.Controls.Remove(x);
-                            ((PictureBox)x).Dispose();
-                            zombiesList.Remove(((PictureBox)x));
-                            MakeZombies();
-                        }
-                    }
-                  
-                }
-                foreach (Control j in this.Controls)
-                {
-                    if (j is PictureBox && (string)j.Tag == "bullet" && x is PictureBox && (string)x.Tag == "animal")
-                    {
-                        if (x.Bounds.IntersectsWith(j.Bounds))
-                        {
-                            score++;
-
-                            // Random chance to drop valuable item (20% chance)
-                            int dropChance = randNum.Next(0, 100); // Generates a number between 0 and 99
-                            if (dropChance < 50) // 20% chance
-                            {
-                                DropAnimal(x.Location, x.Name);
-                                
-                            }
-
-                            // Remove bullet and zombie
-                            this.Controls.Remove(j);
-                            ((PictureBox)j).Dispose();
-                            this.Controls.Remove(x);
-                            ((PictureBox)x).Dispose();
-                            SpawnAnimals();                          
-                        }
-                    }
-
-                }
-
-
-
-
+                if (playerHealth == 20)
+                    SpawnRandomMedicalItem();
             }
 
-
-        }
-        private void MoveAnimals(object sender, EventArgs e)
-        {
-            // Loop through all controls on the form and find animals
-            foreach (Control control in this.Controls)
+            // Move zombie towards player
+            if (zombie.Left > player.Left)
             {
-                if (control is PictureBox && (string)control.Tag == "animal")
+                zombie.Left -= zombieSpeed;
+                zombie.Image = Properties.Resources.zleft;
+            }
+            else if (zombie.Left < player.Left)
+            {
+                zombie.Left += zombieSpeed;
+                zombie.Image = Properties.Resources.zright;
+            }
+            if (zombie.Top > player.Top)
+            {
+                zombie.Top -= zombieSpeed;
+                zombie.Image = Properties.Resources.zup;
+            }
+            else if (zombie.Top < player.Top)
+            {
+                zombie.Top += zombieSpeed;
+                zombie.Image = Properties.Resources.zdown;
+            }
+        }
+
+        private void HandleBulletCollision(PictureBox zombieOrAnimal)
+        {
+            bool zombie = zombieOrAnimal.Tag as string == "zombie";
+            bool animal = zombieOrAnimal.Tag as string == "animal";
+
+            foreach (Control control in Controls)
+            {
+                if (control is not PictureBox bullet ||
+                    bullet.Tag as string != "bullet" ||
+                    !zombieOrAnimal.Bounds.IntersectsWith(bullet.Bounds))
+                    continue;
+
+                score++;
+
+                // Random chance to drop valuable item (20% chance)
+                int dropChance = random.Next(0, 100);
+                if (animal && dropChance < 20)
+                    DropAnimal(zombieOrAnimal.Location);
+                if (zombie && dropChance < 50)
+                    DropValuableItem(zombieOrAnimal.Location);
+
+                // Remove bullet and zombie/animal
+                Controls.Remove(zombieOrAnimal);
+                zombieOrAnimal.Dispose();
+                Controls.Remove(bullet);
+                bullet.Dispose();
+
+                if (zombie)
                 {
-                    PictureBox animal = (PictureBox)control;
+                    zombiesList.Remove(zombieOrAnimal);
+                    MakeZombies();
+                }
+                if (animal)
+                {
+                    SpawnAnimals();
+                }
+            }
+        }
 
-                    // Randomly choose a direction (0 = up, 1 = down, 2 = left, 3 = right)
-                    int moveDirection = randNum.Next(0, 4); // 0 to 3 for four directions
+        private void MoveAnimals(object? sender, EventArgs e)
+        {
+            foreach (Control control in Controls)
+            {
+                if (control is PictureBox animal && (animal.Tag as string) == "animal")
+                {
+                    int moveDirection = random.Next(0, 4);
 
-                    // Move the animal based on the chosen direction
                     switch (moveDirection)
                     {
-                        case 0: // Move up
-                            if (animal.Top > 0) // Check bounds
-                            {
-                                animal.Top -= 15; // Move the animal up by 15 pixels
-                            }
+                        case 0:
+                            if (animal.Top > 0)
+                                animal.Top -= 15;
                             break;
-
-                        case 1: // Move down
-                            if (animal.Top < this.ClientSize.Height - animal.Height)
-                            {
-                                animal.Top += 15; // Move the animal down by 15 pixels
-                            }
+                        case 1:
+                            if (animal.Top < ClientSize.Height - animal.Height)
+                                animal.Top += 15;
                             break;
-
-                        case 2: // Move left
-                            if (animal.Left > 0) // Check bounds
-                            {
-                                animal.Left -= 15; // Move the animal left by 15 pixels
-                            }
+                        case 2:
+                            if (animal.Left > 0)
+                                animal.Left -= 15;
                             break;
-
-                        case 3: // Move right
-                            if (animal.Left < this.ClientSize.Width - animal.Width)
-                            {
-                                animal.Left += 15; // Move the animal right by 15 pixels
-                            }
+                        case 3:
+                            if (animal.Left < ClientSize.Width - animal.Width)
+                                animal.Left += 15;
                             break;
                     }
                 }
@@ -326,146 +282,96 @@ namespace Client
 
         private void KeyIsDown(object sender, KeyEventArgs e)
         {
+            if (gameOver) return;
 
-            if (gameOver == true)
+            switch (e.KeyCode)
             {
-                return;
+                case Keys.Left:
+                    goLeft = true;
+                    facing = Direction.Left;
+                    player.Image = Properties.Resources.left;
+                    break;
+                case Keys.Right:
+                    goRight = true;
+                    facing = Direction.Right;
+                    player.Image = Properties.Resources.right;
+                    break;
+                case Keys.Up:
+                    goUp = true;
+                    facing = Direction.Up;
+                    player.Image = Properties.Resources.up;
+                    break;
+                case Keys.Down:
+                    goDown = true;
+                    facing = Direction.Down;
+                    player.Image = Properties.Resources.down;
+                    break;
             }
-
-            if (e.KeyCode == Keys.Left)
-            {
-                goLeft = true;
-                facing = "left";
-                player.Image = Properties.Resources.left;
-            }
-
-            if (e.KeyCode == Keys.Right)
-            {
-                goRight = true;
-                facing = "right";
-                player.Image = Properties.Resources.right;
-            }
-
-            if (e.KeyCode == Keys.Up)
-            {
-                goUp = true;
-                facing = "up";
-                player.Image = Properties.Resources.up;
-            }
-
-            if (e.KeyCode == Keys.Down)
-            {
-                goDown = true;
-                facing = "down";
-                player.Image = Properties.Resources.down;
-            }
-
-
-
         }
 
         private void KeyIsUp(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Left)
+            switch (e.KeyCode)
             {
-                goLeft = false;
+                case Keys.Left:
+                    goLeft = false;
+                    break;
+                case Keys.Right:
+                    goRight = false;
+                    break;
+                case Keys.Up:
+                    goUp = false;
+                    break;
+                case Keys.Down:
+                    goDown = false;
+                    break;
+                case Keys.Space when ammo > 0 && !gameOver:
+                    ammo--;
+                    ShootBullet(facing);
+                    if (ammo < 1) DropAmmo();
+                    break;
+                case Keys.Enter when gameOver:
+                    RestartGame();
+                    break;
             }
-
-            if (e.KeyCode == Keys.Right)
-            {
-                goRight = false;
-            }
-
-            if (e.KeyCode == Keys.Up)
-            {
-                goUp = false;
-            }
-
-            if (e.KeyCode == Keys.Down)
-            {
-                goDown = false;
-            }
-
-            if (e.KeyCode == Keys.Space && ammo > 0 && gameOver == false)
-            {
-                ammo--;
-                ShootBullet(facing);
-
-
-                if (ammo < 1)
-                {
-                    DropAmmo();
-                }
-            }
-
-            if (e.KeyCode == Keys.Enter && gameOver == true)
-            {
-                RestartGame();
-            }
-
         }
 
-        private void valueLabel_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void healthBar_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtScore_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void ShootBullet(string direction)
+        private void ShootBullet(Direction direction)
         {
             Bullet shootBullet = new Bullet();
-            shootBullet.direction = direction;
-            shootBullet.bulletLeft = player.Left + (player.Width / 2);
-            shootBullet.bulletTop = player.Top + (player.Height / 2);
+            shootBullet.BulletDirection = direction;
+            shootBullet.BulletLeft = player.Left + (player.Width / 2);
+            shootBullet.BulletTop = player.Top + (player.Height / 2);
             shootBullet.MakeBullet(this);
         }
-
-        
 
         private void MakeZombies()
         {
             PictureBox zombie = new PictureBox();
             zombie.Tag = "zombie";
             zombie.Image = Properties.Resources.zdown;
-            zombie.Left = randNum.Next(0, 900);
-            zombie.Top = randNum.Next(0, 800);
+            zombie.Left = random.Next(0, 900);
+            zombie.Top = random.Next(0, 800);
             zombie.SizeMode = PictureBoxSizeMode.AutoSize;
             zombiesList.Add(zombie);
-            this.Controls.Add(zombie);
+            Controls.Add(zombie);
             player.BringToFront();
-
         }
 
         private void DropAmmo()
         {
-            PictureBox ammo = new PictureBox();
-            ammo.Image = Properties.Resources.ammo_Image;
-            ammo.SizeMode = PictureBoxSizeMode.AutoSize;
-            ammo.Left = randNum.Next(10, this.ClientSize.Width - ammo.Width);
-            ammo.Top = randNum.Next(60, this.ClientSize.Height - ammo.Height);
-            ammo.Tag = "ammo";
-            this.Controls.Add(ammo);
+            PictureBox ammoDrop = new()
+            {
+                Name = "amoo",
+                Tag = "ammo",
+                Image = Properties.Resources.ammo,
+                SizeMode = PictureBoxSizeMode.AutoSize,
+                Left = random.Next(0, ClientSize.Width),
+                Top = random.Next(0, ClientSize.Height)
+            };
+            Controls.Add(ammoDrop);
 
-            ammo.BringToFront();
+            ammoDrop.BringToFront();
             player.BringToFront();
         }
         private void SpawnAnimals()
@@ -493,31 +399,31 @@ namespace Client
                 Size = new Size(145, 145), // Increase size here
                 Name = name,
             };
-            itemPictureBox.Parent = instance;
+            //itemPictureBox.Parent = this;
             itemPictureBox.BackColor = Color.Transparent;
             // Position the item randomly on the screen
-            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
-            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
+            itemPictureBox.Left = random.Next(10, ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = random.Next(60, ClientSize.Height - itemPictureBox.Height - 10);
 
             // Add the item to the controls
-            this.Controls.Add(itemPictureBox);
+            Controls.Add(itemPictureBox);
             itemPictureBox.BringToFront();
         }
 
         private void DropValuableItem(Point location)
         {
             // Calculate the total chance based on the values in the dictionary
-            int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
-            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+            int totalChance = valuableItems.Values.Sum(item => item.SpawnChance); // Sum of all drop chances
+            int randomValue = random.Next(0, totalChance); // Generate a random number between 0 and the total chance
 
             int cumulativeChance = 0;
-            ValuableItem selectedItem = null;
+            ValuableItem? selectedItem = null;
 
             // Loop through the dictionary to find the one to drop based on cumulative probability
             foreach (var itemPair in valuableItems)
             {
                 ValuableItem item = itemPair.Value;
-                cumulativeChance += item.spawnChance;
+                cumulativeChance += item.SpawnChance;
 
                 if (randomValue < cumulativeChance)
                 {
@@ -531,72 +437,64 @@ namespace Client
             {
                 PictureBox itemPictureBox = new PictureBox
                 {
-                    Image = selectedItem.image,
+                    Image = selectedItem.Image,
                     SizeMode = PictureBoxSizeMode.StretchImage,
                     Tag = "valuable",
-                    Size = new Size(50, 50),
-                    Name = selectedItem.name // Using the Name property to identify the item
+                    Name = selectedItem.Name,
+                    Size = new Size(50, 50)
                 };
 
-                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
-                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
+                int offsetX = random.Next(-30, 30); // Offset between -30 to +30
+                int offsetY = random.Next(-30, 30); // Offset between -30 to +30
 
-                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
-                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
+                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, ClientSize.Width - itemPictureBox.Width - 10));
+                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, ClientSize.Height - itemPictureBox.Height - 10));
 
-                this.Controls.Add(itemPictureBox);
+                Controls.Add(itemPictureBox);
 
                 itemPictureBox.BringToFront();
                 player.BringToFront();
             }
-
-            
-
-   
-           
-            
         }
 
         private void SpawnRandomMedicalItem()
         {
             // Randomly select a medical item from the dictionary
-            var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
+            var randomItemKey = medicalItems.Keys.ElementAt(random.Next(0, medicalItems.Count));
             MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
 
             PictureBox itemPictureBox = new PictureBox
             {
-                Image = selectedMedicalItem.image,
+                Image = selectedMedicalItem.Image,
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Tag = "medical",
-                Size = new Size(50, 50),
-                Name = selectedMedicalItem.name
+                Name = selectedMedicalItem.Name,
+                Size = new Size(50, 50)
             };
 
             // Position the item randomly on the screen
-            itemPictureBox.Left = randNum.Next(10, this.ClientSize.Width - itemPictureBox.Width - 10);
-            itemPictureBox.Top = randNum.Next(60, this.ClientSize.Height - itemPictureBox.Height - 10);
+            itemPictureBox.Left = random.Next(10, ClientSize.Width - itemPictureBox.Width - 10);
+            itemPictureBox.Top = random.Next(60, ClientSize.Height - itemPictureBox.Height - 10);
 
             // Add the item to the controls
-            this.Controls.Add(itemPictureBox);
+            Controls.Add(itemPictureBox);
             itemPictureBox.BringToFront();
-
         }
 
-        private void DropAnimal(Point location, string name)
+        private void DropAnimal(Point location)
         {
-
             // Calculate the total chance based on the values in the dictionary
-            int totalChance = animaldrops.Values.Sum(item => item.spawnChance); // Sum of all drop chances
-            int randomValue = randNum.Next(0, totalChance); // Generate a random number between 0 and the total chance
+            int totalChance = animaldrops.Values.Sum(item => item.SpawnChance); // Sum of all drop chances
+            int randomValue = random.Next(0, totalChance); // Generate a random number between 0 and the total chance
 
             int cumulativeChance = 0;
-            AnimalDrop selectedItem = null;
+            AnimalDrop? selectedItem = null;
 
             // Loop through the dictionary to find the one to drop based on cumulative probability
             foreach (var itemPair in animaldrops)
             {
                 AnimalDrop item = itemPair.Value;
-                cumulativeChance += item.spawnChance;
+                cumulativeChance += item.SpawnChance;
 
                 if (randomValue < cumulativeChance)
                 {
@@ -610,34 +508,25 @@ namespace Client
             {
                 PictureBox itemPictureBox = new PictureBox
                 {
-                    Image = selectedItem.image,
+                    Image = selectedItem.Image,
                     SizeMode = PictureBoxSizeMode.StretchImage,
                     Tag = "animaldrop",
+                    Name = selectedItem.Name,
                     Size = new Size(50, 50),
-                    Name = selectedItem.name // Using the Name property to identify the item
                 };
 
-                int offsetX = randNum.Next(-30, 30); // Offset between -30 to +30
-                int offsetY = randNum.Next(-30, 30); // Offset between -30 to +30
+                int offsetX = random.Next(-30, 30); // Offset between -30 to +30
+                int offsetY = random.Next(-30, 30); // Offset between -30 to +30
 
-                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, this.ClientSize.Width - itemPictureBox.Width - 10));
-                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, this.ClientSize.Height - itemPictureBox.Height - 10));
+                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, ClientSize.Width - itemPictureBox.Width - 10));
+                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, ClientSize.Height - itemPictureBox.Height - 10));
 
-                this.Controls.Add(itemPictureBox);
+                Controls.Add(itemPictureBox);
 
                 itemPictureBox.BringToFront();
                 player.BringToFront();
             }
         }
-
-        
-
-       
-
-
-
-
-
 
         private void RestartGame()
         {
@@ -646,7 +535,7 @@ namespace Client
             // Remove zombies on restart
             foreach (PictureBox i in zombiesList)
             {
-                this.Controls.Remove(i);
+                Controls.Remove(i);
             }
 
             zombiesList.Clear();
@@ -655,13 +544,13 @@ namespace Client
             for (int i = 0; i < 3; i++)
             {
                 MakeZombies();
-                
+
             }
-            for(int i = 0; i < randomAnimals.Next(1, 4); i++)
+            for (int i = 0; i < randomAnimals.Next(1, 4); i++)
             {
                 SpawnAnimals();
             }
-            
+
 
             // Reset game stats
             goUp = false;
@@ -677,6 +566,5 @@ namespace Client
 
             GameTimer.Start();
         }
-
     }
 }

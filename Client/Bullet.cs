@@ -4,30 +4,26 @@ namespace Client
 {
     class Bullet
     {
-        public string direction;
-        public int bulletLeft;
-        public int bulletTop;
+        public Direction BulletDirection { get; set; }
+        public int BulletLeft { get; set; }
+        public int BulletTop { get; set; }
 
-        private int speed = 30;
-        private PictureBox bullet = new PictureBox();
-        private Timer bulletTimer = new Timer();
-
+        private readonly int speed = 30;
+        private readonly PictureBox bullet = new PictureBox();
+        private readonly Timer bulletTimer = new Timer();
 
         int formWidth = 100; // Values upadate at makeBullet
         int formHeight = 100;
 
         private DateTime lastUpdateTime = DateTime.Now;
 
-
-
         public void MakeBullet(Form form)
         {
-
             bullet.BackColor = Color.White;
-            bullet.Size = new Size(5,5);
+            bullet.Size = new Size(5, 5);
             bullet.Tag = "bullet";
-            bullet.Left = bulletLeft;
-            bullet.Top = bulletTop;
+            bullet.Left = BulletLeft;
+            bullet.Top = BulletTop;
             bullet.BringToFront();
 
             form.Controls.Add(bullet);
@@ -36,56 +32,45 @@ namespace Client
             formHeight = form.ClientSize.Height;
 
             bulletTimer.Interval = speed;
-            bulletTimer.Tick += new EventHandler(BulletTimerEvent);
+            bulletTimer.Tick += BulletTimerEvent;
             bulletTimer.Start();
-
         }
 
-        private void BulletTimerEvent(object sender, EventArgs e)
+        private void BulletTimerEvent(object? sender, EventArgs e)
         {
-
             DateTime now = DateTime.Now;
-            double deltaTime = (now - lastUpdateTime).TotalSeconds; 
+            double deltaTime = (now - lastUpdateTime).TotalSeconds;
             lastUpdateTime = now;
 
-            int deltaX = (int)(speed * deltaTime * 100);  // 100 is an arbitrary factor for scaling speed
+            int deltaX = (int)(speed * deltaTime * 100); // 100 is an arbitrary factor for scaling speed
 
-
-            if (direction == "left")
+            switch (BulletDirection)
             {
-                bullet.Left -= deltaX;
+                case Direction.Left:
+                    bullet.Left -= deltaX;
+                    break;
+                case Direction.Right:
+                    bullet.Left += deltaX;
+                    break;
+                case Direction.Up:
+                    bullet.Top -= deltaX;
+                    break;
+                case Direction.Down:
+                    bullet.Top += deltaX;
+                    break;
             }
-
-            if (direction == "right")
-            {
-                bullet.Left += deltaX;
-            }
-
-            if (direction == "up")
-            {
-                bullet.Top -= deltaX;
-            }
-
-            if (direction == "down")
-            {
-                bullet.Top += deltaX;
-            }
-
 
             if (bullet.Left < 10 || bullet.Left > formWidth - 10 || bullet.Top < 10 || bullet.Top > formHeight - 10)
             {
                 bulletTimer.Stop();
-                bulletTimer.Dispose();
-                bullet.Dispose();
-                bulletTimer = null;
-                bullet = null;
+                Dispose();
             }
-
-
-
         }
 
-
-
+        public void Dispose()
+        {
+            bulletTimer?.Dispose();
+            bullet?.Dispose();
+        }
     }
 }
