@@ -2,7 +2,7 @@
 
 namespace Client
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         bool goLeft, goRight, goUp, goDown, gameOver;
         Direction facing = Direction.Up;
@@ -38,7 +38,7 @@ namespace Client
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
         };
 
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
             RestartGame();
