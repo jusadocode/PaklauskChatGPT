@@ -9,14 +9,13 @@ namespace Client
         // Singleton instance
         private static readonly UIManager instance = new UIManager();
 
-        // Static constructor to initialize the singleton instance
-        static UIManager() { }
-
-        // Private constructor to prevent instantiation from outside
         private UIManager() { }
 
         // Public method to access the singleton instance
-        public static UIManager Instance => instance;
+        public static UIManager Instance
+        {
+            get{ return instance; }
+        }
 
         // UI Elements references
         private Label ammoLabel;
@@ -35,8 +34,7 @@ namespace Client
 
         public void UpdateHealth(int health)
         {
-           //healthBar.Value = Math.Clamp(health, 0, 100);
-           healthBar.Value = 50;
+           healthBar.Value = Math.Clamp(health, 0, 100);
         }
 
         public void UpdateUI(int ammo, int score, int value)

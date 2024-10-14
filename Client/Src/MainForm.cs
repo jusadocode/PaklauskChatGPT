@@ -60,6 +60,7 @@ namespace Client
 
             UIManager.Instance.UpdateUI(ammo, score, value);
 
+            CheckPlayerHealth();
 
             HandlePlayerMovement();
 
@@ -77,7 +78,7 @@ namespace Client
             }
         }
 
-        private void UpdatePlayerHealth()
+        private void CheckPlayerHealth()
         {
 
             if (playerHealth > 1)
@@ -88,13 +89,6 @@ namespace Client
             {
                 EndGame();
             }
-        }
-
-        private void UpdateUI()
-        {
-            txtAmmo.Text = "Ammo: " + ammo;
-            txtScore.Text = "Kills: " + score;
-            valueLabel.Text = "Value: " + value + "$";
         }
 
         private void EndGame()
@@ -185,9 +179,7 @@ namespace Client
             // Damage player if zombie touches
             if (player.Bounds.IntersectsWith(zombie.Bounds))
             {
-
                 playerHealth -= 1;
-                UpdatePlayerHealth();
 
                 if (playerHealth == 20)
                     SpawnRandomMedicalItem();
