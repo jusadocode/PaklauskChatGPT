@@ -48,15 +48,18 @@ namespace Client
             //TransparencyKey = Color.Lime; // This color will be treated as transparent
             //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
             // Initialize the animal movement timer
-            animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
+            animalMovementTimer.Interval = 200; // Adjust this to control movement speed (500ms = 0.5 seconds)
             animalMovementTimer.Tick += MoveAnimals;
             animalMovementTimer.Start();
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
         {
-            UpdatePlayerHealth();
-            UpdateUI();
+
+            UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
+
+            UIManager.Instance.UpdateUI(ammo, score, value);
+
 
             HandlePlayerMovement();
 
@@ -76,9 +79,10 @@ namespace Client
 
         private void UpdatePlayerHealth()
         {
+
             if (playerHealth > 1)
             {
-                healthBar.Value = Math.Clamp(playerHealth, 0, 100);
+                UIManager.Instance.UpdateHealth(playerHealth);
             }
             else
             {
@@ -181,7 +185,9 @@ namespace Client
             // Damage player if zombie touches
             if (player.Bounds.IntersectsWith(zombie.Bounds))
             {
+
                 playerHealth -= 1;
+                UpdatePlayerHealth();
 
                 if (playerHealth == 20)
                     SpawnRandomMedicalItem();
