@@ -71,10 +71,10 @@ namespace RAID2D
 
 
             // Set the form's background to a color you want to be transparent
-            //this.BackColor = Color.Lime; // Use a color not used in your images
-            //this.TransparencyKey = Color.Lime; // This color will be treated as transparent
-            //this.FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
-            // Initialize the animal movement timer
+            this.BackColor = Color.Lime; // Use a color not used in your images
+            this.TransparencyKey = Color.Lime; // This color will be treated as transparent
+            this.FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
+             //Initialize the animal movement timer
             animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
             animalMovementTimer.Tick += MoveAnimals;
             animalMovementTimer.Start();
@@ -177,10 +177,7 @@ namespace RAID2D
 
 
 
-                        if (item.name == "health_potion")
-                            playerHealth = 100;
-                        else
-                            playerHealth += item.healthSize;
+                        
 
                     }
                 }
@@ -272,6 +269,7 @@ namespace RAID2D
                             ((PictureBox)j).Dispose();
                             this.Controls.Remove(x);
                             ((PictureBox)x).Dispose();
+                            animalsList.Remove(((PictureBox)x));
                             SpawnAnimals();                          
                         }
                     }
@@ -478,7 +476,7 @@ namespace RAID2D
         }
         private void SpawnAnimals()
         {
-
+            
             Random randomanimal = new Random();
             Image image;
             string name;
@@ -510,6 +508,7 @@ namespace RAID2D
             // Add the item to the controls
             this.Controls.Add(itemPictureBox);
             itemPictureBox.BringToFront();
+            animalsList.Add(itemPictureBox);
         }
 
         private void DropValuableItem(Point location)
@@ -656,9 +655,12 @@ namespace RAID2D
             {
                 this.Controls.Remove(i);
             }
-
+            foreach(PictureBox i in animalsList)
+            {
+                this.Controls.Remove(i);
+            }
             zombiesList.Clear();
-
+            animalsList.Clear();
             // Spawn initial zombies
             for (int i = 0; i < 3; i++)
             {
