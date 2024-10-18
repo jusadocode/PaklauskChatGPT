@@ -54,6 +54,8 @@
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
+    <Compile Include="GameObjectFactory.cs" />
+    <Compile Include="IGameObject.cs" />
     <Compile Include="MedicalItem.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -117,7 +119,6 @@
   <ItemGroup>
     <None Include="Resources\small_medkit.png" />
     <None Include="Resources\cigarettes.png" />
-
     <None Include="Resources\boar.bmp" />
     <None Include="Resources\down3-removebg-preview.png" />
     <None Include="Resources\boarMeat.png" />
@@ -125,7 +126,6 @@
     <None Include="Resources\goat.png" />
     <None Include="Resources\boarMeat.png" />
     <Content Include="Resources\down3.png" />
-
     <None Include="Resources\goatdown.png" />
     <Content Include="Resources\gold.png" />
     <None Include="Resources\parcel_box.jpg" />

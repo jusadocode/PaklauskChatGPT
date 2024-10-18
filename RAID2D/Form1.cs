@@ -29,19 +29,23 @@ namespace RAID2D
         private Timer animalMovementTimer = new Timer();
         Random randomAnimals = new Random();
 
-        
-  
-       
 
-        private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
-        {
-            { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
-            { "rolex", new ValuableItem("rolex", 60, 20, Properties.Resources.rolex) },
-            { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
-            { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
-        };
+        private static Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
+    {
+        { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
+        { "rolex", new ValuableItem("rolex", 60, 20, Properties.Resources.rolex) },
+        { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
+        { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
+    };
 
-      
+
+
+
+
+
+
+
+
 
 
         private Dictionary<string, AnimalDrop> animaldrops = new Dictionary<string, AnimalDrop>
@@ -66,7 +70,7 @@ namespace RAID2D
             InitializeComponent();
             RestartGame();
 
-            if(instance == null)
+            if (instance == null)
                 instance = this;
 
 
@@ -125,6 +129,7 @@ namespace RAID2D
                 // Player picking up valuable item
                 if (x is PictureBox && (string)x.Tag == "valuable" && player.Bounds.IntersectsWith(x.Bounds))
                 {
+
                     if (valuableItems.TryGetValue(x.Name, out ValuableItem item))
                     {
                         this.Controls.Remove(x);
@@ -162,25 +167,19 @@ namespace RAID2D
                     {
                         this.Controls.Remove(x);
                         ((PictureBox)x).Dispose();
-
-                        if(playerHealth != 100)
+                       
+                        if(playerHealth + item.healingValue > 100)
                         {
-                            if (playerHealth + item.healthSize > 100)
-                            {
-                                playerHealth = 100;
-                            }
-                            else
-                                playerHealth += item.healthSize;
-                            
+                            playerHealth = 100;
+                        }
+                        else
+                        {
+                            playerHealth += item.healingValue;
                         }
                         
 
 
 
-                        if (item.name == "health_potion")
-                            playerHealth = 100;
-                        else
-                            playerHealth += item.healthSize;
 
                     }
                 }
@@ -196,7 +195,21 @@ namespace RAID2D
                         playerHealth -= 1;
 
                         if (playerHealth == 20)
-                            SpawnRandomMedicalItem();
+                        {
+                            IGameObject medical = GameObjectFactory.CreateGameObject("medical", x.Location);
+                            
+
+                            // Check if the created object is a ValuableItem
+                            if (medical is MedicalItem medicalItem)
+                            {
+
+                                this.Controls.Add(medicalItem.pictureBox);
+
+
+                            }
+
+                        }
+                        
                     }
 
                     // Move zombie towards player
@@ -222,7 +235,7 @@ namespace RAID2D
                     }
 
                 }
-                
+
 
                 // Bullet collision with zombie
                 foreach (Control j in this.Controls)
@@ -235,9 +248,18 @@ namespace RAID2D
 
                             // Random chance to drop valuable item (20% chance)
                             int dropChance = randNum.Next(0, 100); // Generates a number between 0 and 99
-                            if (dropChance < 20) // 20% chance
+                            if (dropChance < 60)
                             {
-                                DropValuableItem(x.Location); // Call function to spawn the item at the zombie's location
+                                IGameObject valuable = GameObjectFactory.CreateGameObject("valuable", x.Location);
+
+                                // Check if the created object is a ValuableItem
+                                if (valuable is ValuableItem valuableItem)
+                                {
+                                   
+                                    this.Controls.Add(valuableItem.pictureBox);
+
+
+                                }
                             }
 
                             // Remove bullet and zombie
@@ -249,7 +271,7 @@ namespace RAID2D
                             MakeZombies();
                         }
                     }
-                  
+
                 }
                 foreach (Control j in this.Controls)
                 {
@@ -263,8 +285,8 @@ namespace RAID2D
                             int dropChance = randNum.Next(0, 100); // Generates a number between 0 and 99
                             if (dropChance < 50) // 20% chance
                             {
-                                DropAnimal(x.Location, x.Name);
-                                
+                                //DropAnimal(x.Location, x.Name);
+
                             }
 
                             // Remove bullet and zombie
@@ -272,7 +294,7 @@ namespace RAID2D
                             ((PictureBox)j).Dispose();
                             this.Controls.Remove(x);
                             ((PictureBox)x).Dispose();
-                            SpawnAnimals();                          
+                            SpawnAnimals();
                         }
                     }
 
@@ -447,7 +469,7 @@ namespace RAID2D
             shootBullet.MakeBullet(this);
         }
 
-        
+
 
         private void MakeZombies()
         {
@@ -512,7 +534,7 @@ namespace RAID2D
             itemPictureBox.BringToFront();
         }
 
-        private void DropValuableItem(Point location)
+        /*private void DropValuableItem(Point location)
         {
             // Calculate the total chance based on the values in the dictionary
             int totalChance = valuableItems.Values.Sum(item => item.spawnChance); // Sum of all drop chances
@@ -563,9 +585,9 @@ namespace RAID2D
    
            
             
-        }
+        }*/
 
-        private void SpawnRandomMedicalItem()
+        /*private void SpawnRandomMedicalItem()
         {
             // Randomly select a medical item from the dictionary
             var randomItemKey = medicalItems.Keys.ElementAt(randNum.Next(0, medicalItems.Count));
@@ -636,11 +658,11 @@ namespace RAID2D
                 itemPictureBox.BringToFront();
                 player.BringToFront();
             }
-        }
+        }*/
 
-        
 
-       
+
+
 
 
 
@@ -663,13 +685,13 @@ namespace RAID2D
             for (int i = 0; i < 3; i++)
             {
                 MakeZombies();
-                
+
             }
-            for(int i = 0; i < randomAnimals.Next(1, 4); i++)
+            for (int i = 0; i < randomAnimals.Next(1, 4); i++)
             {
                 SpawnAnimals();
             }
-            
+
 
             // Reset game stats
             goUp = false;
@@ -684,7 +706,8 @@ namespace RAID2D
             value = 0;
 
             GameTimer.Start();
-        }
 
+
+        }
     }
 }

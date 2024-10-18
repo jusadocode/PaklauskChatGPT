@@ -1,24 +1,56 @@
-﻿using System;
+﻿using RAID2D.Resources;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+
 
 namespace RAID2D
 {
-    internal class MedicalItem
+    public class MedicalItem : IGameObject
     {
-        public string name { get; set; }
-        public int healthSize { get; set; }
-        public Image image { get; set; }
-        public int spawnChance { get; set; }
-        public MedicalItem(string name, int healthSz, int spawnChance, Image image)
+        public string name;
+        public int healingValue;
+        private int dropChance;
+        private Image itemImage;
+        public PictureBox pictureBox;
+
+        public MedicalItem(string Name, int HealingValue, int Dropchance, Image Image)
         {
-            this.name = name;
-            this.healthSize = healthSz;
-            this.image = image;
-            this.spawnChance = spawnChance;
+            this.name = Name;
+            this.healingValue = HealingValue;
+            this.dropChance = Dropchance;
+            this.itemImage = Image;
+
+
+        }
+
+        public PictureBox CreatePictureBox(Point location)
+        {
+            Random random = new Random();
+
+            PictureBox itemPictureBox = new PictureBox
+            {
+                Image = itemImage,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = "medical",
+                Size = new Size(50, 50),
+                Name = name,
+            };
+
+
+            itemPictureBox.Left = location.X + random.Next(100, 500);
+            itemPictureBox.Top = location.Y + random.Next(250, 782);
+            itemPictureBox.BringToFront();
+            pictureBox = itemPictureBox;
+            return itemPictureBox;
         }
     }
+
+
 }
