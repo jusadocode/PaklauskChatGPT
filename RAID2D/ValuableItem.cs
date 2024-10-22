@@ -19,8 +19,6 @@ namespace RAID2D
             this.value = value;
             this.dropchance = dropchance;
             this.itemImage = image;
-
-           
         }
 
         // Method to create and return the PictureBox

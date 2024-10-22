@@ -1,4 +1,6 @@
-﻿namespace RAID2D
+﻿using System;
+
+namespace RAID2D
 {
     partial class Form1
     {
@@ -60,7 +62,6 @@
             this.txtScore.Size = new System.Drawing.Size(71, 24);
             this.txtScore.TabIndex = 0;
             this.txtScore.Text = "Kills: 0";
-            this.txtScore.Click += new System.EventHandler(this.txtScore_Click);
             // 
             // label1
             // 
@@ -72,7 +73,6 @@
             this.label1.Size = new System.Drawing.Size(82, 24);
             this.label1.TabIndex = 0;
             this.label1.Text = "Health: ";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
             // 
             // healthBar
             // 
@@ -81,7 +81,6 @@
             this.healthBar.Size = new System.Drawing.Size(187, 23);
             this.healthBar.TabIndex = 1;
             this.healthBar.Value = 100;
-            this.healthBar.Click += new System.EventHandler(this.healthBar_Click);
             // 
             // GameTimer
             // 
@@ -99,7 +98,6 @@
             this.valueLabel.Size = new System.Drawing.Size(87, 24);
             this.valueLabel.TabIndex = 3;
             this.valueLabel.Text = "Value: 0";
-            this.valueLabel.Click += new System.EventHandler(this.valueLabel_Click);
             // 
             // player
             // 
@@ -125,7 +123,6 @@
             this.Controls.Add(this.txtAmmo);
             this.Name = "Form1";
             this.Text = "Zombie Shootout Game MOO ICT";
-            this.Load += new System.EventHandler(this.Form1_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyIsDown);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.KeyIsUp);
             ((System.ComponentModel.ISupportInitialize)(this.player)).EndInit();
@@ -133,6 +130,8 @@
             this.PerformLayout();
 
         }
+
+ 
 
         #endregion
 

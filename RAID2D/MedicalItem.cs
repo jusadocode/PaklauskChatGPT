@@ -26,8 +26,6 @@ namespace RAID2D
             this.healingValue = HealingValue;
             this.dropChance = Dropchance;
             this.itemImage = Image;
-
-
         }
 
         public PictureBox CreatePictureBox(Point location)

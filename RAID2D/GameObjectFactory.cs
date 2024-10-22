@@ -27,9 +27,6 @@ namespace RAID2D
             { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },
             { "large_medkit", new MedicalItem("large_medkit", 50, 90, Properties.Resources.large_medkit) },
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
-
-
-
         };
 
         public static IGameObject CreateGameObject(string objectType, Point location)
@@ -49,7 +46,6 @@ namespace RAID2D
                     throw new ArgumentException("Invalid object type");
             }
 
-            return null;
         }
 
     }
