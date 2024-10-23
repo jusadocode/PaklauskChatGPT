@@ -8,15 +8,17 @@ public class WanderMovement : IMovementStrategy
     private int directionTime;
     private Control _area;
     private int currentTime;
+    private int speed;
 
-    public WanderMovement(Control area)
+    public WanderMovement(Control area, int speed)
     {
         random = new Random();
         directionTime = random.Next(50, 200); // Change direction every 50 to 200 ticks
         _area = area;
+        this.speed = speed;
     }
 
-    public void Move(PictureBox animal, int speed)
+    public void Move(PictureBox animal)
     {
         currentTime++;
 

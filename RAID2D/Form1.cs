@@ -60,9 +60,9 @@ namespace RAID2D
             if (instance == null)
                 instance = this;
 
-            playerMovementStrategy = new ControlledMovement(goLeft, goRight, goUp, goDown);
-            zombieMovementStrategy = new FollowPlayerMovement(player, this);
-            animalMovementStrategy = new WanderMovement(this);
+            playerMovementStrategy = new ControlledMovement(goLeft, goRight, goUp, goDown,speed, this);
+            zombieMovementStrategy = new FollowPlayerMovement(player, this, zombieSpeed);
+            animalMovementStrategy = new WanderMovement(this, zombieSpeed);
 
         }
 
@@ -165,7 +165,7 @@ namespace RAID2D
                     }
 
                     // Move zombie towards player
-                    zombieMovementStrategy.Move((PictureBox)x, zombieSpeed);
+                    zombieMovementStrategy.Move((PictureBox)x);
                 }
 
                 // Bullet collision with zombies and animals
@@ -242,7 +242,7 @@ namespace RAID2D
             {
                 if (control is PictureBox && (string)control.Tag == "animal")
                 {
-                    animalMovementStrategy.Move((PictureBox)control,zombieSpeed);
+                    animalMovementStrategy.Move((PictureBox)control);
                 }
             }
         }

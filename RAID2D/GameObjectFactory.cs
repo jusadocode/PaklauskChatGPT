@@ -16,12 +16,12 @@ namespace RAID2D
     {
         private static Random random = new Random();
         private static Dictionary<string, IGameObject> valuableItems = new Dictionary<string, IGameObject>
-    {
-        { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
-        { "rolex", new ValuableItem("rolex", 60, 20, Properties.Resources.rolex) },
-        { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
-        { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
-    };
+        {
+            { "gold", new ValuableItem("gold", 100, 10, Properties.Resources.gold) },
+            { "rolex", new ValuableItem("rolex", 60, 20, Properties.Resources.rolex) },
+            { "parcel_box", new ValuableItem("parcel_box", 20, 35, Properties.Resources.parcel_box) },
+            { "cigarettes", new ValuableItem("cigarettes", 20, 35, Properties.Resources.cigarettes) }
+        };
         private static Dictionary<string, IGameObject> medicalItems = new Dictionary<string, IGameObject>
         {
             { "small_medkit", new MedicalItem("small_medkit", 20, 90, Properties.Resources.small_medkit) },

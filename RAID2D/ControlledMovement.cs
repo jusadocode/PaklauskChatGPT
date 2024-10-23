@@ -11,17 +11,19 @@ namespace RAID2D
     {
         private bool goLeft, goRight, goUp, goDown;
         private Control area;
+        private int speed;
 
-        public ControlledMovement(bool goLeft, bool goRight, bool goUp, bool goDown)
+        public ControlledMovement(bool goLeft, bool goRight, bool goUp, bool goDown, int speed, Control area)
         {
             this.goLeft = goLeft; 
             this.goRight = goRight;
             this.goUp = goUp;
             this.goDown = goDown;
-            this.area = new Control();
+            this.area = area;
+            this.speed = speed;
         }
 
-        public void Move(PictureBox player, int speed)
+        public void Move(PictureBox player)
         {
             if (goLeft && player.Left > 0) player.Left -= speed;
             if (goRight && player.Left + player.Width < area.ClientSize.Width) player.Left += speed;

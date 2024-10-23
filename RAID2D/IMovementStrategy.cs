@@ -9,6 +9,6 @@ namespace RAID2D
 {
     internal interface IMovementStrategy
     {
-        void Move(PictureBox character, int speed);
+        void Move(PictureBox character);
     }
 }

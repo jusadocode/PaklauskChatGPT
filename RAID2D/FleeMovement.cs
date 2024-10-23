@@ -10,14 +10,16 @@ namespace RAID2D
     public class FleeMovement : IMovementStrategy
     {
         private PictureBox player;
+        private int speed;
         private int fleeDistance = 200; // Distance threshold for fleeing
 
-        public FleeMovement(PictureBox player)
+        public FleeMovement(PictureBox player, int speed)
         {
             this.player = player;
+            this.speed = speed;
         }
 
-        public void Move(PictureBox entity, int speed)
+        public void Move(PictureBox entity)
         {
             double distance = Math.Sqrt(Math.Pow(entity.Left - player.Left, 2) + Math.Pow(entity.Top - player.Top, 2));
 

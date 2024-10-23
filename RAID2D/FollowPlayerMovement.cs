@@ -11,14 +11,16 @@ namespace RAID2D
     {
         private PictureBox player;
         private Control playArea;
+        private int speed;
 
-        public FollowPlayerMovement(PictureBox player, Control area)
+        public FollowPlayerMovement(PictureBox player, Control area, int speed)
         {
             this.player = player;
             this.playArea = area;
+            this.speed = speed;
         }
 
-        public void Move(PictureBox zombie, int speed)
+        public void Move(PictureBox zombie)
         {
             if (zombie.Left > player.Left)
             {
