@@ -1,11 +1,10 @@
-﻿using Client.Src;
+﻿using Client.Enums;
 using Timer = System.Windows.Forms.Timer;
 
 namespace Client
 {
     public partial class MainForm : Form
     {
-        public static MainForm instance;
         bool goLeft, goRight, goUp, goDown, gameOver;
         Direction facing = Direction.Up;
         int playerHealth = 100;
@@ -17,8 +16,6 @@ namespace Client
         int score;
         private List<PictureBox> zombiesList = new List<PictureBox>();
         private List<PictureBox> animalsList = new List<PictureBox>();
-        private Timer animalMovementTimer = new Timer();
-        Random randomAnimals = new Random();
 
         private Dictionary<string, ValuableItem> valuableItems = new Dictionary<string, ValuableItem>
         {
@@ -41,9 +38,6 @@ namespace Client
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
         };
 
-        IMovementStrategy zombieMovementStrategy;
-
-
         // Create a dictionary to store each animal's movement strategy
         private Dictionary<PictureBox, IMovementStrategy> animalMovementStrategies = new Dictionary<PictureBox, IMovementStrategy>();
 
@@ -59,10 +53,6 @@ namespace Client
             //TransparencyKey = Color.Lime; // This color will be treated as transparent
             //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
             // Initialize the animal movement timer
-
-            if (instance == null)
-                instance = this;
-
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
@@ -245,7 +235,7 @@ namespace Client
             }
         }
 
-        
+
 
 
         // Helper method to calculate the Euclidean distance between two PictureBox controls
@@ -443,7 +433,7 @@ namespace Client
                         {
                             if (!(movementStrategy is FollowPlayerMovement))
                             {
-                                movementStrategy = new FollowPlayerMovement(player,this, zombieSpeed);
+                                movementStrategy = new FollowPlayerMovement(player, this, zombieSpeed);
                                 zombieMovementStrategies[zombie] = movementStrategy;
                             }
                         }
@@ -486,7 +476,7 @@ namespace Client
             }
 
 
-            
+
             // If an item is selected, drop it at the given location
             if (selectedItem != null)
             {
@@ -604,11 +594,9 @@ namespace Client
 
         private void CreateHitmarker(Point location)
         {
-            Image hitmarkerImg = ImageUtils.ConvertFromByteToBitmap(Properties.Resources.hitmarker);
-
             PictureBox hitmarker = new PictureBox
             {
-                Image = hitmarkerImg, // Assign the converted Image here
+                Image = Properties.Resources.hitmarker, // Assign the converted Image here
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Tag = "hitmarker",
                 Name = "Hitmarker",

@@ -1,4 +1,5 @@
-﻿using Timer = System.Windows.Forms.Timer;
+﻿using Client.Enums;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Client
 {

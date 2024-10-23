@@ -1,8 +1,4 @@
-﻿using System;
-using System.Windows.Forms;
-using static System.Formats.Asn1.AsnWriter;
-
-namespace Client
+﻿namespace Client
 {
     public sealed class UIManager
     {
@@ -14,7 +10,7 @@ namespace Client
         // Public method to access the singleton instance
         public static UIManager Instance
         {
-            get{ return instance; }
+            get { return instance; }
         }
 
         // UI Elements references
@@ -34,7 +30,7 @@ namespace Client
 
         public void UpdateHealth(int health)
         {
-           healthBar.Value = Math.Clamp(health, 0, 100);
+            healthBar.Value = Math.Clamp(health, 0, 100);
         }
 
         public void UpdateUI(int ammo, int score, int value)
