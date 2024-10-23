@@ -1,5 +1,4 @@
-﻿using RAID2D.Resources;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,14 +9,14 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 
-namespace RAID2D
+namespace Client
 {
     public class MedicalItem : IGameObject
     {
         public string name;
         public int healingValue;
-        private int dropChance;
-        private Image itemImage;
+        public int dropChance;
+        public Image itemImage;
         public PictureBox pictureBox;
 
         public MedicalItem(string Name, int HealingValue, int Dropchance, Image Image)
@@ -26,6 +25,8 @@ namespace RAID2D
             this.healingValue = HealingValue;
             this.dropChance = Dropchance;
             this.itemImage = Image;
+
+
         }
 
         public PictureBox CreatePictureBox(Point location)
