@@ -192,13 +192,12 @@ namespace Client
 
         private void HandleZombieInteractions(PictureBox zombie)
         {
-            // Damage player if zombie touches
             if (player.Bounds.IntersectsWith(zombie.Bounds))
             {
                 playerHealth -= 1;
 
                 if (playerHealth == 20)
-                    SpawnRandomMedicalItem();
+                    SpawnRandomMedicalItem(zombie.Location);
 
             }
         }
@@ -486,53 +485,30 @@ namespace Client
                 }
             }
 
+
+            
             // If an item is selected, drop it at the given location
             if (selectedItem != null)
             {
-                PictureBox itemPictureBox = new PictureBox
+                IGameObject valuable = GameObjectFactory.CreateGameObject("valuable", location);
+
+                if (valuable is ValuableItem valuableItem)
                 {
-                    Image = selectedItem.itemImage,
-                    SizeMode = PictureBoxSizeMode.StretchImage,
-                    Tag = "valuable",
-                    Name = selectedItem.name,
-                    Size = new Size(50, 50)
-                };
+                    this.Controls.Add(valuableItem.pictureBox);
+                }
 
-                int offsetX = random.Next(-30, 30); // Offset between -30 to +30
-                int offsetY = random.Next(-30, 30); // Offset between -30 to +30
-
-                itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, ClientSize.Width - itemPictureBox.Width - 10));
-                itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, ClientSize.Height - itemPictureBox.Height - 10));
-
-                Controls.Add(itemPictureBox);
-
-                itemPictureBox.BringToFront();
-                player.BringToFront();
             }
         }
 
-        private void SpawnRandomMedicalItem()
+        private void SpawnRandomMedicalItem(Point location)
         {
-            // Randomly select a medical item from the dictionary
-            var randomItemKey = medicalItems.Keys.ElementAt(random.Next(0, medicalItems.Count));
-            MedicalItem selectedMedicalItem = medicalItems[randomItemKey];
+            IGameObject medical = GameObjectFactory.CreateGameObject("medical", location);
 
-            PictureBox itemPictureBox = new PictureBox
+            // Check if the created object is a ValuableItem
+            if (medical is MedicalItem medicalItem)
             {
-                Image = selectedMedicalItem.itemImage,
-                SizeMode = PictureBoxSizeMode.StretchImage,
-                Tag = "medical",
-                Name = selectedMedicalItem.name,
-                Size = new Size(50, 50)
-            };
-
-            // Position the item randomly on the screen
-            itemPictureBox.Left = random.Next(10, ClientSize.Width - itemPictureBox.Width - 10);
-            itemPictureBox.Top = random.Next(60, ClientSize.Height - itemPictureBox.Height - 10);
-
-            // Add the item to the controls
-            Controls.Add(itemPictureBox);
-            itemPictureBox.BringToFront();
+                this.Controls.Add(medicalItem.pictureBox);
+            }
         }
 
         private void DropAnimal(Point location)
