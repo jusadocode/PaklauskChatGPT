@@ -48,15 +48,19 @@ namespace Client
             //TransparencyKey = Color.Lime; // This color will be treated as transparent
             //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
             // Initialize the animal movement timer
-            animalMovementTimer.Interval = 500; // Adjust this to control movement speed (500ms = 0.5 seconds)
+            animalMovementTimer.Interval = 200; // Adjust this to control movement speed (500ms = 0.5 seconds)
             animalMovementTimer.Tick += MoveAnimals;
             animalMovementTimer.Start();
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
         {
-            UpdatePlayerHealth();
-            UpdateUI();
+
+            UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
+
+            UIManager.Instance.UpdateUI(ammo, score, value);
+
+            CheckPlayerHealth();
 
             HandlePlayerMovement();
 
@@ -74,23 +78,17 @@ namespace Client
             }
         }
 
-        private void UpdatePlayerHealth()
+        private void CheckPlayerHealth()
         {
+
             if (playerHealth > 1)
             {
-                healthBar.Value = Math.Clamp(playerHealth, 0, 100);
+                UIManager.Instance.UpdateHealth(playerHealth);
             }
             else
             {
                 EndGame();
             }
-        }
-
-        private void UpdateUI()
-        {
-            txtAmmo.Text = "Ammo: " + ammo;
-            txtScore.Text = "Kills: " + score;
-            valueLabel.Text = "Value: " + value + "$";
         }
 
         private void EndGame()
