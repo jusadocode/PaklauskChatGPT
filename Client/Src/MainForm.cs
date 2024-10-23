@@ -1,4 +1,5 @@
-﻿using Timer = System.Windows.Forms.Timer;
+﻿using Client.Src;
+using Timer = System.Windows.Forms.Timer;
 
 namespace Client
 {
@@ -198,6 +199,7 @@ namespace Client
 
                 if (playerHealth == 20)
                     SpawnRandomMedicalItem();
+
             }
         }
 
@@ -214,6 +216,8 @@ namespace Client
                     continue;
 
                 score++;
+
+                CreateHitmarker(bullet.Bounds.Location);
 
                 // Random chance to drop valuable item (20% chance)
                 int dropChance = random.Next(0, 100);
@@ -621,5 +625,42 @@ namespace Client
                 GameTimer.Start();
             }
         }
+
+        private void CreateHitmarker(Point location)
+        {
+            Image hitmarkerImg = ImageUtils.ConvertFromByteToBitmap(Properties.Resources.hitmarker);
+
+            PictureBox hitmarker = new PictureBox
+            {
+                Image = hitmarkerImg, // Assign the converted Image here
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = "hitmarker",
+                Name = "Hitmarker",
+                Size = new Size(20, 20)
+            };
+
+            hitmarker.Left = location.X;
+            hitmarker.Top = location.Y;
+
+            Controls.Add(hitmarker);
+            hitmarker.BringToFront();
+
+            Timer timer = new Timer
+            {
+                Interval = 200 // Set interval to 1 second (1000 milliseconds)
+            };
+
+            timer.Tick += (s, e) =>
+            {
+                Controls.Remove(hitmarker);
+                hitmarker.Dispose();
+
+                timer.Stop();
+                timer.Dispose();
+            };
+
+            timer.Start();
+        }
+
     }
 }
