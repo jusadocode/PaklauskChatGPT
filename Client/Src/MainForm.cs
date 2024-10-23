@@ -40,9 +40,13 @@ namespace Client
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
         };
 
-        IMovementStrategy playerMovementStrategy;
         IMovementStrategy zombieMovementStrategy;
-        IMovementStrategy animalMovementStrategy;
+
+
+        // Create a dictionary to store each animal's movement strategy
+        private Dictionary<PictureBox, IMovementStrategy> animalMovementStrategies = new Dictionary<PictureBox, IMovementStrategy>();
+
+        private Dictionary<PictureBox, IMovementStrategy> zombieMovementStrategies = new Dictionary<PictureBox, IMovementStrategy>();
 
         public MainForm()
         {
@@ -57,10 +61,6 @@ namespace Client
 
             if (instance == null)
                 instance = this;
-
-            zombieMovementStrategy = new FollowPlayerMovement(player, this, zombieSpeed) ;
-            animalMovementStrategy = new WanderMovement(this, zombieSpeed / 2);
-           
 
         }
 
@@ -89,6 +89,8 @@ namespace Client
             HandlePlayerMovement();
 
             MoveAnimals();
+
+            MoveZombies();
         }
 
         private void CheckPlayerHealth()
@@ -197,8 +199,6 @@ namespace Client
                 if (playerHealth == 20)
                     SpawnRandomMedicalItem();
             }
-
-            zombieMovementStrategy.Move(zombie);
         }
 
         private void HandleBulletCollision(PictureBox zombieOrAnimal)
@@ -231,46 +231,18 @@ namespace Client
                 if (zombie)
                 {
                     zombiesList.Remove(zombieOrAnimal);
+                    animalMovementStrategies.Remove(zombieOrAnimal);
                     MakeZombies();
                 }
                 if (animal)
                 {
+                    animalMovementStrategies.Remove(zombieOrAnimal);
                     SpawnAnimals();
                 }
             }
         }
 
-        private void MoveAnimals()
-        {
-            foreach (Control control in Controls)
-            {
-                if (control is PictureBox animal && (animal.Tag as string) == "animal")
-                {
-                    double distanceToPlayer = GetDistance(animal, player);
-                    int fleeRadius = 300; // Adjust this value as needed
-
-                    // Check if the animal is close enough to the player to flee
-                    if (distanceToPlayer < fleeRadius)
-                    {
-                        // Only switch to FleeMovement if it's not already using FleeMovement
-                        if (!(animalMovementStrategy is FleeMovement))
-                        {
-                            animalMovementStrategy = new FleeMovement(player, zombieSpeed);
-                        }
-                    }
-                    else
-                    {
-                        // Only switch to WanderMovement if it's not already using WanderMovement
-                        if (!(animalMovementStrategy is WanderMovement))
-                        {
-                            animalMovementStrategy = new WanderMovement(this, zombieSpeed / 2);
-                        }
-                    }
-
-                    animalMovementStrategy.Move(animal);
-                }
-            }
-        }
+        
 
 
         // Helper method to calculate the Euclidean distance between two PictureBox controls
@@ -356,6 +328,9 @@ namespace Client
             zombie.SizeMode = PictureBoxSizeMode.AutoSize;
             zombiesList.Add(zombie);
             Controls.Add(zombie);
+
+            zombieMovementStrategies[zombie] = new WanderMovement(this, zombieSpeed);
+
             player.BringToFront();
         }
 
@@ -409,7 +384,81 @@ namespace Client
             // Add the item to the controls
             Controls.Add(itemPictureBox);
             itemPictureBox.BringToFront();
+
+            animalMovementStrategies[itemPictureBox] = new WanderMovement(this, zombieSpeed / 2);
         }
+
+        private void MoveAnimals()
+        {
+            foreach (Control control in Controls)
+            {
+                if (control is PictureBox animal && (animal.Tag as string) == "animal")
+                {
+                    // Calculate distance to player
+                    double distanceToPlayer = GetDistance(animal, player);
+                    int fleeRadius = 300; // Adjust this value as needed
+
+                    if (animalMovementStrategies.TryGetValue(animal, out IMovementStrategy movementStrategy))
+                    {
+                        if (distanceToPlayer < fleeRadius)
+                        {
+                            if (!(movementStrategy is FleeMovement))
+                            {
+                                movementStrategy = new FleeMovement(player, zombieSpeed);
+                                animalMovementStrategies[animal] = movementStrategy; // Update the strategy in the dictionary
+                            }
+                        }
+                        else
+                        {
+                            if (!(movementStrategy is WanderMovement))
+                            {
+                                movementStrategy = new WanderMovement(this, zombieSpeed / 2);
+                                animalMovementStrategies[animal] = movementStrategy; // Update the strategy in the dictionary
+                            }
+                        }
+
+                        movementStrategy.Move(animal);
+                    }
+                }
+            }
+        }
+
+
+        private void MoveZombies()
+        {
+            foreach (Control control in Controls)
+            {
+                if (control is PictureBox zombie && (zombie.Tag as string) == "zombie")
+                {
+                    // Calculate distance to player
+                    double distanceToPlayer = GetDistance(zombie, player);
+                    int fleeRadius = 500; // Adjust this value as needed
+
+                    if (zombieMovementStrategies.TryGetValue(zombie, out IMovementStrategy movementStrategy))
+                    {
+                        if (distanceToPlayer < fleeRadius)
+                        {
+                            if (!(movementStrategy is FollowPlayerMovement))
+                            {
+                                movementStrategy = new FollowPlayerMovement(player,this, zombieSpeed);
+                                zombieMovementStrategies[zombie] = movementStrategy;
+                            }
+                        }
+                        else
+                        {
+                            if (!(movementStrategy is WanderMovement))
+                            {
+                                movementStrategy = new WanderMovement(this, zombieSpeed);
+                                zombieMovementStrategies[zombie] = movementStrategy;
+                            }
+                        }
+
+                        movementStrategy.Move(zombie);
+                    }
+                }
+            }
+        }
+
 
         private void DropValuableItem(Point location)
         {
