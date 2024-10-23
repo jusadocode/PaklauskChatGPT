@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RAID2D
+namespace Client
 {
     public class ControlledMovement : IMovementStrategy
     {
@@ -15,7 +15,7 @@ namespace RAID2D
 
         public ControlledMovement(bool goLeft, bool goRight, bool goUp, bool goDown, int speed, Control area)
         {
-            this.goLeft = goLeft; 
+            this.goLeft = goLeft;
             this.goRight = goRight;
             this.goUp = goUp;
             this.goDown = goDown;

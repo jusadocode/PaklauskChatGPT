@@ -5,9 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace RAID2D
+namespace Client
 {
-    public class FollowPlayerMovement: IMovementStrategy
+    public class FollowPlayerMovement : IMovementStrategy
     {
         private PictureBox player;
         private Control playArea;
@@ -16,7 +16,7 @@ namespace RAID2D
         public FollowPlayerMovement(PictureBox player, Control area, int speed)
         {
             this.player = player;
-            this.playArea = area;
+            playArea = area;
             this.speed = speed;
         }
 
