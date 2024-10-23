@@ -4,6 +4,7 @@ namespace Client
 {
     public partial class MainForm : Form
     {
+        public static MainForm instance;
         bool goLeft, goRight, goUp, goDown, gameOver;
         Direction facing = Direction.Up;
         int playerHealth = 100;
@@ -14,6 +15,7 @@ namespace Client
         Random random = new Random();
         int score;
         private List<PictureBox> zombiesList = new List<PictureBox>();
+        private List<PictureBox> animalsList = new List<PictureBox>();
         private Timer animalMovementTimer = new Timer();
         Random randomAnimals = new Random();
 
@@ -38,6 +40,10 @@ namespace Client
             { "health_potion", new MedicalItem("health_potion", 100, 90, Properties.Resources.large_medkit) }
         };
 
+        IMovementStrategy playerMovementStrategy;
+        IMovementStrategy zombieMovementStrategy;
+        IMovementStrategy animalMovementStrategy;
+
         public MainForm()
         {
             InitializeComponent();
@@ -48,9 +54,14 @@ namespace Client
             //TransparencyKey = Color.Lime; // This color will be treated as transparent
             //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
             // Initialize the animal movement timer
-            animalMovementTimer.Interval = 200; // Adjust this to control movement speed (500ms = 0.5 seconds)
-            animalMovementTimer.Tick += MoveAnimals;
-            animalMovementTimer.Start();
+
+            if (instance == null)
+                instance = this;
+
+            zombieMovementStrategy = new FollowPlayerMovement(player, this, zombieSpeed) ;
+            animalMovementStrategy = new WanderMovement(this, zombieSpeed / 2);
+           
+
         }
 
         private void MainTimerEvent(object sender, EventArgs e)
@@ -61,8 +72,6 @@ namespace Client
             UIManager.Instance.UpdateUI(ammo, score, value);
 
             CheckPlayerHealth();
-
-            HandlePlayerMovement();
 
             foreach (Control control in Controls)
             {
@@ -76,6 +85,10 @@ namespace Client
                 if (box.Tag as string == "animal" || box.Tag as string == "zombie")
                     HandleBulletCollision(box);
             }
+
+            HandlePlayerMovement();
+
+            MoveAnimals();
         }
 
         private void CheckPlayerHealth()
@@ -185,27 +198,7 @@ namespace Client
                     SpawnRandomMedicalItem();
             }
 
-            // Move zombie towards player
-            if (zombie.Left > player.Left)
-            {
-                zombie.Left -= zombieSpeed;
-                zombie.Image = Properties.Resources.zleft;
-            }
-            else if (zombie.Left < player.Left)
-            {
-                zombie.Left += zombieSpeed;
-                zombie.Image = Properties.Resources.zright;
-            }
-            if (zombie.Top > player.Top)
-            {
-                zombie.Top -= zombieSpeed;
-                zombie.Image = Properties.Resources.zup;
-            }
-            else if (zombie.Top < player.Top)
-            {
-                zombie.Top += zombieSpeed;
-                zombie.Image = Properties.Resources.zdown;
-            }
+            zombieMovementStrategy.Move(zombie);
         }
 
         private void HandleBulletCollision(PictureBox zombieOrAnimal)
@@ -247,35 +240,45 @@ namespace Client
             }
         }
 
-        private void MoveAnimals(object? sender, EventArgs e)
+        private void MoveAnimals()
         {
             foreach (Control control in Controls)
             {
                 if (control is PictureBox animal && (animal.Tag as string) == "animal")
                 {
-                    int moveDirection = random.Next(0, 4);
+                    double distanceToPlayer = GetDistance(animal, player);
+                    int fleeRadius = 300; // Adjust this value as needed
 
-                    switch (moveDirection)
+                    // Check if the animal is close enough to the player to flee
+                    if (distanceToPlayer < fleeRadius)
                     {
-                        case 0:
-                            if (animal.Top > 0)
-                                animal.Top -= 15;
-                            break;
-                        case 1:
-                            if (animal.Top < ClientSize.Height - animal.Height)
-                                animal.Top += 15;
-                            break;
-                        case 2:
-                            if (animal.Left > 0)
-                                animal.Left -= 15;
-                            break;
-                        case 3:
-                            if (animal.Left < ClientSize.Width - animal.Width)
-                                animal.Left += 15;
-                            break;
+                        // Only switch to FleeMovement if it's not already using FleeMovement
+                        if (!(animalMovementStrategy is FleeMovement))
+                        {
+                            animalMovementStrategy = new FleeMovement(player, zombieSpeed);
+                        }
                     }
+                    else
+                    {
+                        // Only switch to WanderMovement if it's not already using WanderMovement
+                        if (!(animalMovementStrategy is WanderMovement))
+                        {
+                            animalMovementStrategy = new WanderMovement(this, zombieSpeed / 2);
+                        }
+                    }
+
+                    animalMovementStrategy.Move(animal);
                 }
             }
+        }
+
+
+        // Helper method to calculate the Euclidean distance between two PictureBox controls
+        private double GetDistance(Control a, Control b)
+        {
+            int deltaX = a.Left + a.Width / 2 - (b.Left + b.Width / 2);
+            int deltaY = a.Top + a.Height / 2 - (b.Top + b.Height / 2);
+            return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
         }
 
         private void KeyIsDown(object sender, KeyEventArgs e)
@@ -530,39 +533,44 @@ namespace Client
         {
             player.Image = Properties.Resources.up;
 
-            // Remove zombies on restart
-            foreach (PictureBox i in zombiesList)
+            foreach (PictureBox zombie in zombiesList)
             {
-                Controls.Remove(i);
+                zombie.Dispose();
             }
-
             zombiesList.Clear();
 
-            // Spawn initial zombies
+            foreach (PictureBox animal in animalsList)
+            {
+                animal.Dispose();
+            }
+            animalsList.Clear();
+
+            foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
+            {
+                if (control.Tag == "zombie" || control.Tag == "animal" || control.Tag == "medical")
+                {
+                    this.Controls.Remove(control);
+                    control.Dispose();
+                }
+            }
+
             for (int i = 0; i < 3; i++)
             {
                 MakeZombies();
-
-            }
-            for (int i = 0; i < randomAnimals.Next(1, 4); i++)
-            {
                 SpawnAnimals();
             }
 
-
-            // Reset game stats
-            goUp = false;
-            goDown = false;
-            goLeft = false;
-            goRight = false;
+            goUp = goDown = goLeft = goRight = false;
             gameOver = false;
-
             playerHealth = 100;
             score = 0;
-            ammo = 10;
             value = 0;
+            ammo = 10;
 
-            GameTimer.Start();
+            if (!GameTimer.Enabled)
+            {
+                GameTimer.Start();
+            }
         }
     }
 }

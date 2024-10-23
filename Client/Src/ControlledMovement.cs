@@ -15,10 +15,6 @@ namespace Client
 
         public ControlledMovement(bool goLeft, bool goRight, bool goUp, bool goDown, int speed, Control area)
         {
-            this.goLeft = goLeft;
-            this.goRight = goRight;
-            this.goUp = goUp;
-            this.goDown = goDown;
             this.area = area;
             this.speed = speed;
         }

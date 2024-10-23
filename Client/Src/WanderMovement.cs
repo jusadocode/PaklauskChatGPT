@@ -1,5 +1,5 @@
-﻿using System.Windows.Forms;
-using System;
+﻿using System;
+using System.Windows.Forms;
 
 namespace Client
 {
@@ -7,16 +7,18 @@ namespace Client
     {
         private Random random;
         private int directionTime;
-        private Control _area;
+        private Control area;
         private int currentTime;
         private int speed;
+        private Direction currentDirection;
 
         public WanderMovement(Control area, int speed)
         {
-            random = new Random();
-            directionTime = random.Next(50, 200); // Change direction every 50 to 200 ticks
-            _area = area;
+            this.random = new Random();
+            this.directionTime = random.Next(200, 1000); // Change direction every 50 to 200 ticks
+            this.area = area;
             this.speed = speed;
+            this.currentDirection = (Direction)random.Next(0, 4); // Random initial direction
         }
 
         public void Move(PictureBox animal)
@@ -25,41 +27,36 @@ namespace Client
 
             if (currentTime >= directionTime)
             {
-                int direction = random.Next(0, 4);
-
-                switch (direction)
-                {
-                    case 0: // Up
-                        if (animal.Top > 0) animal.Top -= speed;
-                        else
-                            changeDirection();
-                        break;
-                    case 1: // Down
-                        if (animal.Top < animal.Parent.ClientSize.Height - animal.Height) animal.Top += speed;
-                        else
-                            changeDirection();
-                        break;
-                    case 2: // Left
-                        if (animal.Left > 0) animal.Left -= speed;
-                        else
-                            changeDirection();
-                        break;
-                    case 3: // Right
-                        if (animal.Left < animal.Parent.ClientSize.Width - animal.Width) animal.Left += speed;
-                        else
-                            changeDirection();
-                        break;
-                }
-
-                currentTime = 0;
+                ChangeDirection();
             }
-            changeDirection();
+
+            switch (currentDirection)
+            {
+                case Direction.Up:
+                    if (animal.Top > 0)
+                        animal.Top -= speed;
+                    break;
+                case Direction.Down:
+                    if (animal.Top < area.ClientSize.Height - animal.Height)
+                        animal.Top += speed;
+                    break;
+                case Direction.Left:
+                    if (animal.Left > 0)
+                        animal.Left -= speed;
+                    break;
+                case Direction.Right:
+                    if (animal.Left < area.ClientSize.Width - animal.Width)
+                        animal.Left += speed;
+                    break;
+            }
         }
 
-        private void changeDirection()
+        private void ChangeDirection()
         {
-            directionTime = random.Next(50, 200);
+            currentDirection = (Direction)random.Next(0, 4);
+            currentTime = 0;
+            directionTime = random.Next(50, 200); // Reset the time for the new direction
         }
-    }
 
+    }
 }
