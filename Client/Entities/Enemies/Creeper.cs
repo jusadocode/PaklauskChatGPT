@@ -1,4 +1,6 @@
-﻿namespace Client.Entities.Enemies;
+﻿using Client.Utils;
+
+namespace Client.Entities.Enemies;
 
 public class Creeper : IEnemy
 {

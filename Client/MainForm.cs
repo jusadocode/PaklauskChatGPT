@@ -3,6 +3,7 @@ using Client.Entities.Spawners;
 using Client.Enums;
 using Client.Movement;
 using Client.UI;
+using Client.Utils;
 
 namespace Client;
 

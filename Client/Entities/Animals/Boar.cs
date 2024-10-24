@@ -1,4 +1,6 @@
-﻿namespace Client.Entities.Animals;
+﻿using Client.Utils;
+
+namespace Client.Entities.Animals;
 
 public class Boar : IAnimal
 {
