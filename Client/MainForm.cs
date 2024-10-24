@@ -1,4 +1,5 @@
 ﻿using Client.Drops;
+using Client.Entities.Spawners;
 using Client.Enums;
 using Client.Movement;
 using Client.UI;
@@ -14,10 +15,7 @@ public partial class MainForm : Form
     readonly int speed = 10;
     int ammo = 10;
     readonly int zombieSpeed = 3;
-    readonly Random random = new();
     int score;
-    private readonly List<PictureBox> zombiesList = [];
-    private readonly List<PictureBox> animalsList = [];
 
     private readonly Dictionary<string, ValuableItem> valuableItems = new()
     {
@@ -44,6 +42,9 @@ public partial class MainForm : Form
 
     private readonly Dictionary<PictureBox, IMovementStrategy> zombieMovementStrategies = [];
 
+    private IEntitySpawner entitySpawner;
+    private bool isDay = true;
+
     public MainForm()
     {
         InitializeComponent();
@@ -58,12 +59,13 @@ public partial class MainForm : Form
 
     private void MainTimerEvent(object sender, EventArgs e)
     {
-
         UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
 
         UIManager.Instance.UpdateUI(ammo, score, value);
 
         CheckPlayerHealth();
+
+        HandleDayCycle();
 
         foreach (Control control in Controls)
         {
@@ -72,9 +74,9 @@ public partial class MainForm : Form
 
             if (player.Bounds.IntersectsWith(box.Bounds))
                 HandleItemPickup(box);
-            if ((box.Tag as string) == "zombie")
+            if ((box.Tag as string) == "enemy")
                 HandleZombieInteractions(box);
-            if (box.Tag as string is "animal" or "zombie")
+            if (box.Tag as string is "animal" or "enemy")
                 HandleBulletCollision(box);
         }
 
@@ -85,17 +87,17 @@ public partial class MainForm : Form
         MoveZombies();
     }
 
+    private void HandleDayCycle() // TODO: Implement proper day/night cycles instead of the placeholder "isDay" variable
+    {
+        entitySpawner = isDay ? new DayEntitySpawner() : new NightEntitySpawner();
+    }
+
     private void CheckPlayerHealth()
     {
-
         if (playerHealth > 1)
-        {
             UIManager.Instance.UpdateHealth(playerHealth);
-        }
         else
-        {
             EndGame();
-        }
     }
 
     private void EndGame()
@@ -199,7 +201,7 @@ public partial class MainForm : Form
 
     private void HandleBulletCollision(PictureBox zombieOrAnimal)
     {
-        bool zombie = (zombieOrAnimal.Tag as string) == "zombie";
+        bool zombie = (zombieOrAnimal.Tag as string) == "enemy";
         bool animal = (zombieOrAnimal.Tag as string) == "animal";
 
         foreach (Control control in Controls)
@@ -216,7 +218,7 @@ public partial class MainForm : Form
             CreateHitmarker(bullet.Bounds.Location);
 
             // Random chance to drop valuable item (20% chance)
-            int dropChance = random.Next(0, 100);
+            int dropChance = Rand.Next(0, 100);
             if (animal && dropChance < 20)
                 DropAnimal(zombieOrAnimal.Location);
             if (zombie && dropChance < 50)
@@ -230,15 +232,14 @@ public partial class MainForm : Form
 
             if (zombie)
             {
-                _ = zombiesList.Remove(zombieOrAnimal);
-                _ = animalMovementStrategies.Remove(zombieOrAnimal);
-                MakeZombies();
+                animalMovementStrategies.Remove(zombieOrAnimal);
+                SpawnEnemy();
             }
 
             if (animal)
             {
-                _ = animalMovementStrategies.Remove(zombieOrAnimal);
-                SpawnAnimals();
+                animalMovementStrategies.Remove(zombieOrAnimal);
+                SpawnAnimal();
             }
         }
     }
@@ -320,21 +321,25 @@ public partial class MainForm : Form
         shootBullet.MakeBullet(this);
     }
 
-    private void MakeZombies()
+    private void SpawnEnemy()
     {
-        PictureBox zombie = new()
-        {
-            Tag = "zombie",
-            Image = Assets.zdown,
-            Left = random.Next(0, 900),
-            Top = random.Next(0, 800),
-            SizeMode = PictureBoxSizeMode.AutoSize
-        };
-        zombiesList.Add(zombie);
-        Controls.Add(zombie);
+        var entity = entitySpawner.CreateEnemies(1);
+        var enemy = entity.First().PictureBox ?? throw new InvalidOperationException("Enemy PictureBox should not be null.");
 
-        zombieMovementStrategies[zombie] = new WanderMovement(this, zombieSpeed);
+        zombieMovementStrategies[enemy] = new WanderMovement(this, zombieSpeed);
 
+        Controls.Add(enemy);
+        player.BringToFront();
+    }
+
+    private void SpawnAnimal()
+    {
+        var entity = entitySpawner.CreateAnimals(1);
+        var animal = entity.First().PictureBox ?? throw new InvalidOperationException("Animal PictureBox should not be null.");
+
+        animalMovementStrategies[animal] = new WanderMovement(this, zombieSpeed / 2);
+
+        Controls.Add(animal);
         player.BringToFront();
     }
 
@@ -346,51 +351,13 @@ public partial class MainForm : Form
             Tag = "ammo",
             Image = Assets.ammo,
             SizeMode = PictureBoxSizeMode.AutoSize,
-            Left = random.Next(0, ClientSize.Width),
-            Top = random.Next(0, ClientSize.Height)
+            Left = Rand.Next(0, ClientSize.Width),
+            Top = Rand.Next(0, ClientSize.Height)
         };
         Controls.Add(ammoDrop);
 
         ammoDrop.BringToFront();
         player.BringToFront();
-    }
-    private void SpawnAnimals()
-    {
-
-        Random randomanimal = new();
-        Image image;
-        string name;
-        int animalid = randomanimal.Next(1, 3);
-        if (animalid == 1)
-        {
-            name = "boar";
-            image = Assets.boardown;
-        }
-        else
-        {
-            name = "goat";
-            image = Assets.goatdown;
-        }
-
-        PictureBox itemPictureBox = new()
-        {
-            Image = image,
-            SizeMode = PictureBoxSizeMode.StretchImage,
-            Tag = "animal",
-            Size = new Size(145, 145), // Increase size here
-            Name = name,
-            //itemPictureBox.Parent = this;
-            BackColor = Color.Transparent
-        };
-        // Position the item randomly on the screen
-        itemPictureBox.Left = random.Next(10, ClientSize.Width - itemPictureBox.Width - 10);
-        itemPictureBox.Top = random.Next(60, ClientSize.Height - itemPictureBox.Height - 10);
-
-        // Add the item to the controls
-        Controls.Add(itemPictureBox);
-        itemPictureBox.BringToFront();
-
-        animalMovementStrategies[itemPictureBox] = new WanderMovement(this, zombieSpeed / 2);
     }
 
     private void MoveAnimals()
@@ -432,7 +399,7 @@ public partial class MainForm : Form
     {
         foreach (Control control in Controls)
         {
-            if (control is PictureBox zombie && (zombie.Tag as string) == "zombie")
+            if (control is PictureBox zombie && (zombie.Tag as string) == "enemy")
             {
                 // Calculate distance to player
                 double distanceToPlayer = GetDistance(zombie, player);
@@ -467,7 +434,7 @@ public partial class MainForm : Form
     {
         // Calculate the total chance based on the values in the dictionary
         int totalChance = valuableItems.Values.Sum(item => item.dropChance); // Sum of all drop chances
-        int randomValue = random.Next(0, totalChance); // Generate a random number between 0 and the total chance
+        int randomValue = Rand.Next(0, totalChance); // Generate a random number between 0 and the total chance
 
         int cumulativeChance = 0;
         ValuableItem? selectedItem = null;
@@ -512,7 +479,7 @@ public partial class MainForm : Form
     {
         // Calculate the total chance based on the values in the dictionary
         int totalChance = animaldrops.Values.Sum(item => item.SpawnChance); // Sum of all drop chances
-        int randomValue = random.Next(0, totalChance); // Generate a random number between 0 and the total chance
+        int randomValue = Rand.Next(0, totalChance); // Generate a random number between 0 and the total chance
 
         int cumulativeChance = 0;
         AnimalDrop? selectedItem = null;
@@ -542,8 +509,8 @@ public partial class MainForm : Form
                 Size = new Size(50, 50),
             };
 
-            int offsetX = random.Next(-30, 30); // Offset between -30 to +30
-            int offsetY = random.Next(-30, 30); // Offset between -30 to +30
+            int offsetX = Rand.Next(-30, 30); // Offset between -30 to +30
+            int offsetY = Rand.Next(-30, 30); // Offset between -30 to +30
 
             itemPictureBox.Left = Math.Max(10, Math.Min(location.X + offsetX, ClientSize.Width - itemPictureBox.Width - 10));
             itemPictureBox.Top = Math.Max(60, Math.Min(location.Y + offsetY, ClientSize.Height - itemPictureBox.Height - 10));
@@ -559,33 +526,19 @@ public partial class MainForm : Form
     {
         player.Image = Assets.up;
 
-        foreach (PictureBox zombie in zombiesList)
-        {
-            zombie.Dispose();
-        }
-
-        zombiesList.Clear();
-
-        foreach (PictureBox animal in animalsList)
-        {
-            animal.Dispose();
-        }
-
-        animalsList.Clear();
-
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
         {
-            if (control.Tag is (object?)"zombie" or (object?)"animal" or (object?)"medical")
+            if (control.Tag is (object?)"enemy" or (object?)"animal" or (object?)"medical")
             {
-                this.Controls.Remove(control);
+                Controls.Remove(control);
                 control.Dispose();
             }
         }
 
         for (int i = 0; i < 3; i++)
         {
-            MakeZombies();
-            SpawnAnimals();
+            SpawnEnemy();
+            SpawnAnimal();
         }
 
         goUp = goDown = goLeft = goRight = false;
