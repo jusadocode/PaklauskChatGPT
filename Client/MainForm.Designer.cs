@@ -98,7 +98,7 @@
             // 
             // player
             // 
-            player.Image = Properties.Resources.up;
+            player.Image = Properties.Assets.up;
             player.Location = new Point(427, 471);
             player.Name = "player";
             player.Size = new Size(71, 100);

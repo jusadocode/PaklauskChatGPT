@@ -1,4 +1,7 @@
-﻿namespace Client;
+﻿global using Client.Properties;
+global using Timer = System.Windows.Forms.Timer;
+
+namespace Client;
 
 internal static class Program
 {
