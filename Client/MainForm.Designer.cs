@@ -42,26 +42,43 @@
             // 
             // AmmoLabel
             // 
-            resources.ApplyResources(this.AmmoLabel, "AmmoLabel");
+            this.AmmoLabel.AutoSize = true;
+            this.AmmoLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold);
             this.AmmoLabel.ForeColor = Color.White;
+            this.AmmoLabel.Location = new Point(12, 1047);
             this.AmmoLabel.Name = "AmmoLabel";
+            this.AmmoLabel.Size = new Size(93, 24);
+            this.AmmoLabel.TabIndex = 0;
+            this.AmmoLabel.Text = "Ammo: 0";
             // 
             // KillsLabel
             // 
-            resources.ApplyResources(this.KillsLabel, "KillsLabel");
+            this.KillsLabel.AutoSize = true;
+            this.KillsLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold);
             this.KillsLabel.ForeColor = Color.White;
+            this.KillsLabel.Location = new Point(878, 9);
             this.KillsLabel.Name = "KillsLabel";
+            this.KillsLabel.Size = new Size(71, 24);
+            this.KillsLabel.TabIndex = 0;
+            this.KillsLabel.Text = "Kills: 0";
             // 
             // HealthLabel
             // 
-            resources.ApplyResources(this.HealthLabel, "HealthLabel");
+            this.HealthLabel.AutoSize = true;
+            this.HealthLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold);
             this.HealthLabel.ForeColor = Color.White;
+            this.HealthLabel.Location = new Point(1633, 1047);
             this.HealthLabel.Name = "HealthLabel";
+            this.HealthLabel.Size = new Size(82, 24);
+            this.HealthLabel.TabIndex = 0;
+            this.HealthLabel.Text = "Health: ";
             // 
             // HealthBar
             // 
-            resources.ApplyResources(this.HealthBar, "HealthBar");
+            this.HealthBar.Location = new Point(1721, 1048);
             this.HealthBar.Name = "HealthBar";
+            this.HealthBar.Size = new Size(187, 23);
+            this.HealthBar.TabIndex = 1;
             this.HealthBar.Value = 100;
             // 
             // GameTimer
@@ -72,22 +89,31 @@
             // 
             // CashLabel
             // 
-            resources.ApplyResources(this.CashLabel, "CashLabel");
+            this.CashLabel.AutoSize = true;
+            this.CashLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold);
             this.CashLabel.ForeColor = Color.White;
+            this.CashLabel.Location = new Point(972, 9);
             this.CashLabel.Name = "CashLabel";
+            this.CashLabel.Size = new Size(80, 24);
+            this.CashLabel.TabIndex = 3;
+            this.CashLabel.Text = "Cash: 0";
             // 
             // Player
             // 
             this.Player.Image = Assets.PlayerUp;
-            resources.ApplyResources(this.Player, "Player");
+            this.Player.Location = new Point(960, 540);
             this.Player.Name = "Player";
+            this.Player.Size = new Size(71, 100);
+            this.Player.SizeMode = PictureBoxSizeMode.AutoSize;
+            this.Player.TabIndex = 2;
             this.Player.TabStop = false;
             // 
             // MainForm
             // 
-            resources.ApplyResources(this, "$this");
+            this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.DarkOliveGreen;
+            this.ClientSize = new Size(1920, 1061);
             this.Controls.Add(this.CashLabel);
             this.Controls.Add(this.Player);
             this.Controls.Add(this.HealthBar);
@@ -95,7 +121,10 @@
             this.Controls.Add(this.KillsLabel);
             this.Controls.Add(this.AmmoLabel);
             this.FormBorderStyle = FormBorderStyle.None;
+            this.Icon = (Icon)resources.GetObject("$this.Icon");
+            this.Margin = new Padding(4, 3, 4, 3);
             this.Name = "MainForm";
+            this.Text = "RAID2D";
             KeyDown += this.KeyIsDown;
             KeyUp += this.KeyIsUp;
             ((System.ComponentModel.ISupportInitialize)this.Player).EndInit();
