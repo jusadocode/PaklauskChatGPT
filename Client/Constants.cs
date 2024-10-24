@@ -3,7 +3,7 @@
 public static class Constants
 {
     public static readonly int Margin = 10;
-    public static readonly Size EntitySize = new(100, 100);
+    public static readonly Size EntitySize = new(75, 75);
     public static readonly PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
 
     public static readonly string AnimalTag = "animal";

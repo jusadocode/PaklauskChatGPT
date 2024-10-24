@@ -103,7 +103,7 @@
             this.Player.Image = Assets.PlayerUp;
             this.Player.Location = new Point(960, 540);
             this.Player.Name = "Player";
-            this.Player.Size = new Size(71, 100);
+            this.Player.Size = new Size(58, 86);
             this.Player.SizeMode = PictureBoxSizeMode.AutoSize;
             this.Player.TabIndex = 2;
             this.Player.TabStop = false;
