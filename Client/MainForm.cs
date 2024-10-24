@@ -58,16 +58,10 @@ public partial class MainForm : Form
     void Initialize()
     {
         InitializeComponent();
+        this.FormBorderStyle = FormBorderStyle.None;
+        this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
+
         InitializeDayNightCycle();
-
-        //this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
-        //this.WindowState = FormWindowState.Maximized;
-
-        //FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-        Left = Top = 0;
-        Width = Screen.PrimaryScreen.WorkingArea.Width;
-        Height = Screen.PrimaryScreen.WorkingArea.Height;
-        this.Location = new Point(0, 0);
 
         UIManager.Instance.Initialize(AmmoLabel, KillsLabel, CashLabel, HealthBar);
 

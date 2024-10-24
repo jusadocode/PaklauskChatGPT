@@ -45,7 +45,7 @@
             this.AmmoLabel.AutoSize = true;
             this.AmmoLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             this.AmmoLabel.ForeColor = Color.White;
-            this.AmmoLabel.Location = new Point(12, 1008);
+            this.AmmoLabel.Location = new Point(12, 1005);
             this.AmmoLabel.Name = "AmmoLabel";
             this.AmmoLabel.Size = new Size(93, 24);
             this.AmmoLabel.TabIndex = 0;
@@ -67,7 +67,7 @@
             this.HealthLabel.AutoSize = true;
             this.HealthLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold, GraphicsUnit.Point, 0);
             this.HealthLabel.ForeColor = Color.White;
-            this.HealthLabel.Location = new Point(1613, 953);
+            this.HealthLabel.Location = new Point(1617, 1005);
             this.HealthLabel.Name = "HealthLabel";
             this.HealthLabel.Size = new Size(82, 24);
             this.HealthLabel.TabIndex = 0;
@@ -75,7 +75,7 @@
             // 
             // HealthBar
             // 
-            this.HealthBar.Location = new Point(1701, 954);
+            this.HealthBar.Location = new Point(1705, 1005);
             this.HealthBar.Name = "HealthBar";
             this.HealthBar.Size = new Size(187, 23);
             this.HealthBar.TabIndex = 1;
@@ -101,7 +101,7 @@
             // Player
             // 
             this.Player.Image = Assets.up;
-            this.Player.Location = new Point(427, 471);
+            this.Player.Location = new Point(960, 540);
             this.Player.Name = "Player";
             this.Player.Size = new Size(71, 100);
             this.Player.SizeMode = PictureBoxSizeMode.AutoSize;
