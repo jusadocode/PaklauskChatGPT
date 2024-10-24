@@ -1,41 +1,51 @@
 ﻿namespace Client.UI;
 
-public sealed class UIManager
+public class UIManager
 {
-    // Singleton instance
-    private static readonly UIManager instance = new();
+    private static UIManager? _instance = null; // Singleton instance
+    private static readonly object _lock = new(); // Lock object for thread safety
 
-    private UIManager() { }
+    private UIManager() { } // Private constructor to prevent instantiation from outside
 
-    // Public method to access the singleton instance
-    public static UIManager Instance
+    public static UIManager GetInstance()
     {
-        get { return instance; }
+        if (_instance == null)
+        {
+            lock (_lock)
+            {
+                if (_instance == null)
+                    _instance = new UIManager();
+            }
+        }
+
+        return _instance;
     }
 
-    // UI Elements references
-    private Label ammoLabel;
-    private Label scoreLabel;
-    private Label valueLabel;
-    private ProgressBar healthBar;
+    public Size Resolution { get; private set; }
 
-    public void Initialize(Label ammo, Label score, Label value, ProgressBar health)
+    private Label? ammoLabel;
+    private Label? killsLabel;
+    private Label? cashLabel;
+    private ProgressBar? healthBar;
+
+    public void Initialize(Label ammo, Label kills, Label cash, ProgressBar health, Size res)
     {
         ammoLabel = ammo;
-        scoreLabel = score;
-        valueLabel = value;
+        killsLabel = kills;
+        cashLabel = cash;
         healthBar = health;
+        Resolution = res;
     }
 
     public void UpdateHealth(int health)
     {
-        healthBar.Value = Math.Clamp(health, 0, 100);
+        healthBar!.Value = Math.Clamp(health, 0, 100);
     }
 
-    public void UpdateUI(int ammo, int score, int value)
+    public void UpdateUI(int ammo, int kills, int cash)
     {
-        ammoLabel.Text = "Ammo: " + ammo;
-        scoreLabel.Text = "Kills: " + score;
-        valueLabel.Text = "Cash: " + value + "$";
+        ammoLabel!.Text = $"Ammo: {ammo}";
+        killsLabel!.Text = $"Kills: {kills}";
+        cashLabel!.Text = $"Cash: {cash}$";
     }
 }

@@ -1,4 +1,5 @@
-﻿using Client.Utils;
+﻿using Client.UI;
+using Client.Utils;
 
 namespace Client.Entities.Animals;
 
@@ -14,15 +15,19 @@ public class Goat : IAnimal
         }
         else
         {
+            UIManager UI = UIManager.GetInstance();
+
             PictureBox = new()
             {
-                Tag = "animal",
-                Name = "goat",
-                Image = Assets.goatdown,
-                Left = Rand.Next(0, 900),
-                Top = Rand.Next(0, 800),
-                Size = new Size(145, 145),
-                SizeMode = PictureBoxSizeMode.StretchImage,
+                Tag = Constants.AnimalTag,
+                Name = Constants.GoatName,
+                Image = Assets.AnimalGoat,
+                Location = new(
+                    Rand.Next(0 + Constants.Margin, UI.Resolution.Width - Constants.Margin),
+                    Rand.Next(0 + Constants.Margin, UI.Resolution.Height - Constants.Margin)
+                ),
+                Size = Constants.EntitySize,
+                SizeMode = Constants.SizeMode,
             };
 
             return PictureBox;

@@ -5,31 +5,19 @@ namespace Client.Entities.Spawners;
 
 public class NightEntitySpawner : IEntitySpawner
 {
-    public List<IEnemy> CreateEnemies(uint count)
+    public IEnemy CreateEnemy()
     {
-        List<IEnemy> enemies = [];
+        IEnemy enemy = new Zombie();
+        enemy.Create();
 
-        for (uint i = 0; i < count; i++)
-        {
-            IEnemy enemy = new Zombie();
-            enemy.Create();
-            enemies.Add(enemy);
-        }
-
-        return enemies;
+        return enemy;
     }
-    public List<IAnimal> CreateAnimals(uint count)
+
+    public IAnimal CreateAnimal()
     {
-        List<IAnimal> animals = [];
+        IAnimal animal = new Boar();
+        animal.Create();
 
-        for (uint i = 0; i < count; i++)
-        {
-            IAnimal animal = new Boar();
-            animal.Create();
-            animals.Add(animal);
-        }
-
-        return animals;
+        return animal;
     }
 }
-

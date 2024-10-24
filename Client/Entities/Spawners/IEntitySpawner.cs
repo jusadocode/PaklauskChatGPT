@@ -5,7 +5,7 @@ namespace Client.Entities.Spawners;
 
 public interface IEntitySpawner
 {
-    public List<IEnemy> CreateEnemies(uint count);
-    public List<IAnimal> CreateAnimals(uint count);
+    public IEnemy CreateEnemy();
+    public IAnimal CreateAnimal();
 }
 

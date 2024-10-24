@@ -7,23 +7,23 @@ public class FollowPlayerMovement(PictureBox player, Control area, int speed) : 
         if (zombie.Left > player.Left)
         {
             zombie.Left -= speed;
-            zombie.Image = Assets.zleft;
+            zombie.Image = Assets.ZombieLeft;
         }
         else if (zombie.Left < player.Left)
         {
             zombie.Left += speed;
-            zombie.Image = Assets.zright;
+            zombie.Image = Assets.ZombieRight;
         }
 
         if (zombie.Top > player.Top)
         {
             zombie.Top -= speed;
-            zombie.Image = Assets.zup;
+            zombie.Image = Assets.ZombieUp;
         }
         else if (zombie.Top < player.Top)
         {
             zombie.Top += speed;
-            zombie.Image = Assets.zdown;
+            zombie.Image = Assets.ZombieDown;
         }
     }
 }

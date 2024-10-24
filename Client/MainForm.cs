@@ -9,6 +9,7 @@ namespace Client;
 
 public partial class MainForm : Form
 {
+    private readonly UIManager UI = UIManager.GetInstance();
     bool goLeft, goRight, goUp, goDown, gameOver;
     Direction facing = Direction.Up;
     int playerHealth = 100;
@@ -20,22 +21,22 @@ public partial class MainForm : Form
 
     private readonly Dictionary<string, ValuableItem> valuableItems = new()
     {
-        { "gold", new ValuableItem("gold", 100, 10, Assets.gold) },
-        { "rolex", new ValuableItem("rolex", 60, 20, Assets.rolex) },
-        { "parcel_box", new ValuableItem("parcel_box", 20, 35, Assets.parcel_box) },
-        { "cigarettes", new ValuableItem("cigarettes", 20, 35, Assets.cigarettes) }
+        { "gold", new ValuableItem("gold", 100, 10, Assets.DropGold) },
+        { "rolex", new ValuableItem("rolex", 60, 20, Assets.DropRolex) },
+        { "parcel_box", new ValuableItem("parcel_box", 20, 35, Assets.DropParcelBox) },
+        { "cigarettes", new ValuableItem("cigarettes", 20, 35, Assets.DropCigarettes) }
     };
 
     private readonly Dictionary<string, AnimalDrop> animaldrops = new()
     {
-        {"pork", new AnimalDrop("pork", 100, 10, Assets.boarMeat)},
+        {"pork", new AnimalDrop("pork", 100, 10, Assets.DropMeat)},
     };
 
     private readonly Dictionary<string, MedicalItem> medicalItems = new()
     {
-        { "small_medkit", new MedicalItem("small_medkit", 20, 90, Assets.small_medkit) },
-        { "large_medkit", new MedicalItem("large_medkit", 50, 90, Assets.large_medkit) },
-        { "health_potion", new MedicalItem("health_potion", 100, 90, Assets.large_medkit) }
+        { "small_medkit", new MedicalItem("small_medkit", 20, 90, Assets.DropMedkitSmall) },
+        { "large_medkit", new MedicalItem("large_medkit", 50, 90, Assets.DropMedkitLarge) },
+        { "health_potion", new MedicalItem("health_potion", 100, 90, Assets.DropMedkitLarge) }
     };
 
     // Create a dictionary to store each animal's movement strategy
@@ -45,10 +46,10 @@ public partial class MainForm : Form
 
     private IEntitySpawner entitySpawner = new DayEntitySpawner();
 
-    private Timer dayNightTimer = new();
-    private int currentHour = 12;
+    private readonly Timer dayNightTimer = new();
+    private int currentHour;
     private const int hoursInDay = 24;
-    private const int updateInterval = 1000; // 1 second real-time = 1 minute game time.
+    private const int updateInterval = 1000; // 1 second irl = 1 hour in game
 
     public MainForm()
     {
@@ -58,25 +59,25 @@ public partial class MainForm : Form
     void Initialize()
     {
         InitializeComponent();
+        ForceFullscreen();
+        InitializeDayNightCycle();
+        UI.Initialize(AmmoLabel, KillsLabel, CashLabel, HealthBar, ClientSize);
+        SpawnEntities(3);
+
+        Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
+    }
+
+    private void ForceFullscreen()
+    {
+        this.WindowState = FormWindowState.Normal;
         this.FormBorderStyle = FormBorderStyle.None;
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
-
-        InitializeDayNightCycle();
-
-        UIManager.Instance.Initialize(AmmoLabel, KillsLabel, CashLabel, HealthBar);
-
-        for (int i = 0; i < 3; i++)
-        {
-            SpawnEnemy();
-            SpawnAnimal();
-        }
-
-        Console.WriteLine("Game initialized.");
     }
 
     private void InitializeDayNightCycle()
     {
-        currentHour = 0;
+        currentHour = hoursInDay / 2;
+        this.BackColor = Color.FromArgb(255, 143, 188, 143);
         dayNightTimer.Interval = updateInterval;
         dayNightTimer.Tick += UpdateDayNightCycle;
         dayNightTimer.Start();
@@ -108,7 +109,7 @@ public partial class MainForm : Form
 
     private void MainTimerEvent(object sender, EventArgs e)
     {
-        UIManager.Instance.UpdateUI(ammo, score, value);
+        UI.UpdateUI(ammo, score, value);
 
         CheckPlayerHealth();
 
@@ -121,7 +122,7 @@ public partial class MainForm : Form
 
             if (Player.Bounds.IntersectsWith(box.Bounds))
                 HandleItemPickup(box);
-            if ((box.Tag as string) == "enemy")
+            if (box.Tag as string is "enemy")
                 HandleZombieInteractions(box);
             if (box.Tag as string is "animal" or "enemy")
                 HandleBulletCollision(box);
@@ -142,7 +143,7 @@ public partial class MainForm : Form
     private void CheckPlayerHealth()
     {
         if (playerHealth > 1)
-            UIManager.Instance.UpdateHealth(playerHealth);
+            UI.UpdateHealth(playerHealth);
         else
             EndGame();
     }
@@ -150,7 +151,7 @@ public partial class MainForm : Form
     private void EndGame()
     {
         gameOver = true;
-        Player.Image = Assets.dead;
+        Player.Image = Assets.PlayerDead;
         GameTimer.Stop();
     }
 
@@ -308,22 +309,22 @@ public partial class MainForm : Form
             case Keys.Left:
                 goLeft = true;
                 facing = Direction.Left;
-                Player.Image = Assets.left;
+                Player.Image = Assets.PlayerLeft;
                 break;
             case Keys.Right:
                 goRight = true;
                 facing = Direction.Right;
-                Player.Image = Assets.right;
+                Player.Image = Assets.PlayerRight;
                 break;
             case Keys.Up:
                 goUp = true;
                 facing = Direction.Up;
-                Player.Image = Assets.up;
+                Player.Image = Assets.PlayerUp;
                 break;
             case Keys.Down:
                 goDown = true;
                 facing = Direction.Down;
-                Player.Image = Assets.down;
+                Player.Image = Assets.PlayerDown;
                 break;
         }
     }
@@ -369,24 +370,31 @@ public partial class MainForm : Form
 
     private void SpawnEnemy()
     {
-        var entity = entitySpawner.CreateEnemies(1);
-        var enemy = entity.First().PictureBox ?? throw new InvalidOperationException("Enemy PictureBox should not be null.");
+        var enemy = entitySpawner.CreateEnemy();
+        var pictureBox = enemy.PictureBox ?? throw new InvalidOperationException("Enemy PictureBox should not be null.");
 
-        zombieMovementStrategies[enemy] = new WanderMovement(this, zombieSpeed);
-
-        Controls.Add(enemy);
+        zombieMovementStrategies[pictureBox] = new WanderMovement(this, zombieSpeed);
+        Controls.Add(pictureBox);
         Player.BringToFront();
     }
 
     private void SpawnAnimal()
     {
-        var entity = entitySpawner.CreateAnimals(1);
-        var animal = entity.First().PictureBox ?? throw new InvalidOperationException("Animal PictureBox should not be null.");
+        var animal = entitySpawner.CreateAnimal();
+        var pictureBox = animal.PictureBox ?? throw new InvalidOperationException("Animal PictureBox should not be null.");
 
-        animalMovementStrategies[animal] = new WanderMovement(this, zombieSpeed / 2);
-
-        Controls.Add(animal);
+        animalMovementStrategies[pictureBox] = new WanderMovement(this, zombieSpeed / 2);
+        Controls.Add(pictureBox);
         Player.BringToFront();
+    }
+
+    private void SpawnEntities(uint count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            SpawnEnemy();
+            SpawnAnimal();
+        }
     }
 
     private void DropAmmo()
@@ -395,7 +403,7 @@ public partial class MainForm : Form
         {
             Name = "amoo",
             Tag = "ammo",
-            Image = Assets.ammo,
+            Image = Assets.DropAmmo,
             SizeMode = PictureBoxSizeMode.AutoSize,
             Left = Rand.Next(0, ClientSize.Width),
             Top = Rand.Next(0, ClientSize.Height)
@@ -570,7 +578,7 @@ public partial class MainForm : Form
 
     private void RestartGame()
     {
-        Player.Image = Assets.up;
+        Player.Image = Assets.PlayerUp;
 
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
         {
@@ -581,11 +589,7 @@ public partial class MainForm : Form
             }
         }
 
-        for (int i = 0; i < 3; i++)
-        {
-            SpawnEnemy();
-            SpawnAnimal();
-        }
+        SpawnEntities(3);
 
         goUp = goDown = goLeft = goRight = false;
         gameOver = false;
@@ -604,7 +608,7 @@ public partial class MainForm : Form
     {
         PictureBox hitmarker = new()
         {
-            Image = Assets.hitmarker, // Assign the converted Image here
+            Image = Assets.Hitmarker, // Assign the converted Image here
             SizeMode = PictureBoxSizeMode.StretchImage,
             Tag = "hitmarker",
             Name = "Hitmarker",

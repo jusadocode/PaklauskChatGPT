@@ -63,9 +63,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap ammo {
+        internal static System.Drawing.Bitmap AnimalBoar {
             get {
-                object obj = ResourceManager.GetObject("ammo", resourceCulture);
+                object obj = ResourceManager.GetObject("AnimalBoar", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -73,9 +73,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap boardown {
+        internal static System.Drawing.Bitmap AnimalGoat {
             get {
-                object obj = ResourceManager.GetObject("boardown", resourceCulture);
+                object obj = ResourceManager.GetObject("AnimalGoat", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -83,9 +83,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap boarMeat {
+        internal static System.Drawing.Bitmap DropAmmo {
             get {
-                object obj = ResourceManager.GetObject("boarMeat", resourceCulture);
+                object obj = ResourceManager.GetObject("DropAmmo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -93,9 +93,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap cigarettes {
+        internal static System.Drawing.Bitmap DropCigarettes {
             get {
-                object obj = ResourceManager.GetObject("cigarettes", resourceCulture);
+                object obj = ResourceManager.GetObject("DropCigarettes", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -103,9 +103,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap dead {
+        internal static System.Drawing.Bitmap DropGold {
             get {
-                object obj = ResourceManager.GetObject("dead", resourceCulture);
+                object obj = ResourceManager.GetObject("DropGold", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -113,9 +113,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap down {
+        internal static System.Drawing.Bitmap DropHealthPotion {
             get {
-                object obj = ResourceManager.GetObject("down", resourceCulture);
+                object obj = ResourceManager.GetObject("DropHealthPotion", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -123,9 +123,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap goatdown {
+        internal static System.Drawing.Bitmap DropMeat {
             get {
-                object obj = ResourceManager.GetObject("goatdown", resourceCulture);
+                object obj = ResourceManager.GetObject("DropMeat", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -133,9 +133,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap gold {
+        internal static System.Drawing.Bitmap DropMedkitLarge {
             get {
-                object obj = ResourceManager.GetObject("gold", resourceCulture);
+                object obj = ResourceManager.GetObject("DropMedkitLarge", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -143,9 +143,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap health_potion {
+        internal static System.Drawing.Bitmap DropMedkitSmall {
             get {
-                object obj = ResourceManager.GetObject("health_potion", resourceCulture);
+                object obj = ResourceManager.GetObject("DropMedkitSmall", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -153,9 +153,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap hitmarker {
+        internal static System.Drawing.Bitmap DropParcelBox {
             get {
-                object obj = ResourceManager.GetObject("hitmarker", resourceCulture);
+                object obj = ResourceManager.GetObject("DropParcelBox", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -163,9 +163,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap large_medkit {
+        internal static System.Drawing.Bitmap DropRolex {
             get {
-                object obj = ResourceManager.GetObject("large_medkit", resourceCulture);
+                object obj = ResourceManager.GetObject("DropRolex", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -173,9 +173,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap left {
+        internal static System.Drawing.Bitmap Hitmarker {
             get {
-                object obj = ResourceManager.GetObject("left", resourceCulture);
+                object obj = ResourceManager.GetObject("Hitmarker", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -183,9 +183,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap parcel_box {
+        internal static System.Drawing.Bitmap PlayerDead {
             get {
-                object obj = ResourceManager.GetObject("parcel_box", resourceCulture);
+                object obj = ResourceManager.GetObject("PlayerDead", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -193,9 +193,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap right {
+        internal static System.Drawing.Bitmap PlayerDown {
             get {
-                object obj = ResourceManager.GetObject("right", resourceCulture);
+                object obj = ResourceManager.GetObject("PlayerDown", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -203,9 +203,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap rolex {
+        internal static System.Drawing.Bitmap PlayerLeft {
             get {
-                object obj = ResourceManager.GetObject("rolex", resourceCulture);
+                object obj = ResourceManager.GetObject("PlayerLeft", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -213,9 +213,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap small_medkit {
+        internal static System.Drawing.Bitmap PlayerRight {
             get {
-                object obj = ResourceManager.GetObject("small_medkit", resourceCulture);
+                object obj = ResourceManager.GetObject("PlayerRight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -223,9 +223,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap up {
+        internal static System.Drawing.Bitmap PlayerUp {
             get {
-                object obj = ResourceManager.GetObject("up", resourceCulture);
+                object obj = ResourceManager.GetObject("PlayerUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -233,9 +233,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap zdown {
+        internal static System.Drawing.Bitmap ZombieDown {
             get {
-                object obj = ResourceManager.GetObject("zdown", resourceCulture);
+                object obj = ResourceManager.GetObject("ZombieDown", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -243,9 +243,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap zleft {
+        internal static System.Drawing.Bitmap ZombieLeft {
             get {
-                object obj = ResourceManager.GetObject("zleft", resourceCulture);
+                object obj = ResourceManager.GetObject("ZombieLeft", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -253,9 +253,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap zright {
+        internal static System.Drawing.Bitmap ZombieRight {
             get {
-                object obj = ResourceManager.GetObject("zright", resourceCulture);
+                object obj = ResourceManager.GetObject("ZombieRight", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -263,9 +263,9 @@ namespace Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap zup {
+        internal static System.Drawing.Bitmap ZombieUp {
             get {
-                object obj = ResourceManager.GetObject("zup", resourceCulture);
+                object obj = ResourceManager.GetObject("ZombieUp", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

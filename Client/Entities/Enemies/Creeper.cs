@@ -1,4 +1,5 @@
-﻿using Client.Utils;
+﻿using Client.UI;
+using Client.Utils;
 
 namespace Client.Entities.Enemies;
 
@@ -14,14 +15,19 @@ public class Creeper : IEnemy
         }
         else
         {
+            UIManager UI = UIManager.GetInstance();
+
             PictureBox = new()
             {
-                Tag = "enemy",
-                Name = "creeper",
-                Image = Assets.zdown,
-                Left = Rand.Next(0, 900),
-                Top = Rand.Next(0, 800),
-                SizeMode = PictureBoxSizeMode.AutoSize
+                Tag = Constants.EnemyTag,
+                Name = Constants.CreeperName,
+                Image = Assets.ZombieUp,
+                Location = new(
+                    Rand.Next(0 + Constants.Margin, UI.Resolution.Width - Constants.Margin),
+                    Rand.Next(0 + Constants.Margin, UI.Resolution.Height - Constants.Margin)
+                ),
+                Size = Constants.EntitySize,
+                SizeMode = Constants.SizeMode,
             };
 
             return PictureBox;
