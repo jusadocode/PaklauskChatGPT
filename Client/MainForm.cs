@@ -9,6 +9,8 @@ namespace Client;
 
 public partial class MainForm : Form
 {
+    bool isInitialized = false;
+
     bool goLeft, goRight, goUp, goDown, gameOver;
     Direction facing = Direction.Up;
     int playerHealth = 100;
@@ -16,7 +18,7 @@ public partial class MainForm : Form
     readonly int speed = 10;
     int ammo = 10;
     readonly int zombieSpeed = 3;
-    int score;
+    int score = 0;
 
     private readonly Dictionary<string, ValuableItem> valuableItems = new()
     {
@@ -43,24 +45,35 @@ public partial class MainForm : Form
 
     private readonly Dictionary<PictureBox, IMovementStrategy> zombieMovementStrategies = [];
 
-    private IEntitySpawner entitySpawner;
+    private IEntitySpawner entitySpawner = new DayEntitySpawner();
     private bool isDay = true;
 
     public MainForm()
     {
         InitializeComponent();
-        RestartGame();
+    }
 
-        // Set the form's background to a color you want to be transparent
-        //BackColor = Color.Lime; // Use a color not used in your images
-        //TransparencyKey = Color.Lime; // This color will be treated as transparent
-        //FormBorderStyle = FormBorderStyle.None; // Optional: Remove the border
-        // Initialize the animal movement timer
+    void Initialize()
+    {
+        if (isInitialized)
+            return;
+
+        UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
+
+        for (int i = 0; i < 3; i++)
+        {
+            SpawnEnemy();
+            SpawnAnimal();
+        }
+
+        isInitialized = true;
+        Console.WriteLine("Game initialized.");
     }
 
     private void MainTimerEvent(object sender, EventArgs e)
     {
-        UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
+        if (!isInitialized)
+            Initialize();
 
         UIManager.Instance.UpdateUI(ammo, score, value);
 
@@ -196,7 +209,6 @@ public partial class MainForm : Form
 
             if (playerHealth == 20)
                 SpawnRandomMedicalItem(zombie.Location);
-
         }
     }
 
