@@ -36,6 +36,6 @@ public sealed class UIManager
     {
         ammoLabel.Text = "Ammo: " + ammo;
         scoreLabel.Text = "Kills: " + score;
-        valueLabel.Text = "Value: " + value + "$";
+        valueLabel.Text = "Cash: " + value + "$";
     }
 }

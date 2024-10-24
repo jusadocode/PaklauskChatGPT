@@ -9,8 +9,6 @@ namespace Client;
 
 public partial class MainForm : Form
 {
-    bool isInitialized = false;
-
     bool goLeft, goRight, goUp, goDown, gameOver;
     Direction facing = Direction.Up;
     int playerHealth = 100;
@@ -46,19 +44,32 @@ public partial class MainForm : Form
     private readonly Dictionary<PictureBox, IMovementStrategy> zombieMovementStrategies = [];
 
     private IEntitySpawner entitySpawner = new DayEntitySpawner();
-    private bool isDay = true;
+
+    private Timer dayNightTimer = new();
+    private int currentHour = 12;
+    private const int hoursInDay = 24;
+    private const int updateInterval = 1000; // 1 second real-time = 1 minute game time.
 
     public MainForm()
     {
-        InitializeComponent();
+        Initialize();
     }
 
     void Initialize()
     {
-        if (isInitialized)
-            return;
+        InitializeComponent();
+        InitializeDayNightCycle();
 
-        UIManager.Instance.Initialize(txtAmmo, txtScore, valueLabel, healthBar);
+        //this.MaximizedBounds = Screen.FromHandle(this.Handle).WorkingArea;
+        //this.WindowState = FormWindowState.Maximized;
+
+        //FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+        Left = Top = 0;
+        Width = Screen.PrimaryScreen.WorkingArea.Width;
+        Height = Screen.PrimaryScreen.WorkingArea.Height;
+        this.Location = new Point(0, 0);
+
+        UIManager.Instance.Initialize(AmmoLabel, KillsLabel, CashLabel, HealthBar);
 
         for (int i = 0; i < 3; i++)
         {
@@ -66,15 +77,43 @@ public partial class MainForm : Form
             SpawnAnimal();
         }
 
-        isInitialized = true;
         Console.WriteLine("Game initialized.");
     }
 
+    private void InitializeDayNightCycle()
+    {
+        currentHour = 0;
+        dayNightTimer.Interval = updateInterval;
+        dayNightTimer.Tick += UpdateDayNightCycle;
+        dayNightTimer.Start();
+    }
+
+    private void UpdateDayNightCycle(object? sender, EventArgs e)
+    {
+        currentHour = (currentHour + 1) % hoursInDay;
+
+        Color dayColor = Color.FromArgb(0xFF, 0x8F, 0xBC, 0x8F); // Light green
+        Color nightColor = Color.FromArgb(0xFF, 0x2F, 0x4F, 0x2F); // Darker green
+
+        float middleHourOfTheDay = hoursInDay / 2.0f;
+
+        float lerpFactor;
+        if (currentHour <= middleHourOfTheDay)
+            lerpFactor = (float)currentHour / middleHourOfTheDay;  
+        else
+            lerpFactor = 1.0f - ((float)(currentHour - middleHourOfTheDay) / middleHourOfTheDay);
+        
+        int r = (int)(nightColor.R + (dayColor.R - nightColor.R) * lerpFactor);
+        int g = (int)(nightColor.G + (dayColor.G - nightColor.G) * lerpFactor);
+        int b = (int)(nightColor.B + (dayColor.B - nightColor.B) * lerpFactor);
+
+        this.BackColor = Color.FromArgb(255, r, g, b);
+        Console.WriteLine($"Current hour: {currentHour}, Lerp factor: {lerpFactor}, Color: {this.BackColor}");
+    }
+
+
     private void MainTimerEvent(object sender, EventArgs e)
     {
-        if (!isInitialized)
-            Initialize();
-
         UIManager.Instance.UpdateUI(ammo, score, value);
 
         CheckPlayerHealth();
@@ -86,7 +125,7 @@ public partial class MainForm : Form
             if (control is not PictureBox box)
                 continue;
 
-            if (player.Bounds.IntersectsWith(box.Bounds))
+            if (Player.Bounds.IntersectsWith(box.Bounds))
                 HandleItemPickup(box);
             if ((box.Tag as string) == "enemy")
                 HandleZombieInteractions(box);
@@ -101,9 +140,9 @@ public partial class MainForm : Form
         MoveZombies();
     }
 
-    private void HandleDayCycle() // TODO: Implement proper day/night cycles instead of the placeholder "isDay" variable
+    private void HandleDayCycle()
     {
-        entitySpawner = isDay ? new DayEntitySpawner() : new NightEntitySpawner();
+        entitySpawner = (currentHour is > 6 and <= 18) ? new DayEntitySpawner() : new NightEntitySpawner();
     }
 
     private void CheckPlayerHealth()
@@ -117,20 +156,20 @@ public partial class MainForm : Form
     private void EndGame()
     {
         gameOver = true;
-        player.Image = Assets.dead;
+        Player.Image = Assets.dead;
         GameTimer.Stop();
     }
 
     private void HandlePlayerMovement()
     {
-        if (goLeft && player.Left > 0)
-            player.Left -= speed;
-        if (goRight && player.Left + player.Width < ClientSize.Width)
-            player.Left += speed;
-        if (goUp && player.Top > 45)
-            player.Top -= speed;
-        if (goDown && player.Top + player.Height < ClientSize.Height)
-            player.Top += speed;
+        if (goLeft && Player.Left > 0)
+            Player.Left -= speed;
+        if (goRight && Player.Left + Player.Width < ClientSize.Width)
+            Player.Left += speed;
+        if (goUp && Player.Top > 45)
+            Player.Top -= speed;
+        if (goDown && Player.Top + Player.Height < ClientSize.Height)
+            Player.Top += speed;
     }
 
     private void HandleItemPickup(PictureBox item)
@@ -203,7 +242,7 @@ public partial class MainForm : Form
 
     private void HandleZombieInteractions(PictureBox zombie)
     {
-        if (player.Bounds.IntersectsWith(zombie.Bounds))
+        if (Player.Bounds.IntersectsWith(zombie.Bounds))
         {
             playerHealth -= 1;
 
@@ -275,22 +314,22 @@ public partial class MainForm : Form
             case Keys.Left:
                 goLeft = true;
                 facing = Direction.Left;
-                player.Image = Assets.left;
+                Player.Image = Assets.left;
                 break;
             case Keys.Right:
                 goRight = true;
                 facing = Direction.Right;
-                player.Image = Assets.right;
+                Player.Image = Assets.right;
                 break;
             case Keys.Up:
                 goUp = true;
                 facing = Direction.Up;
-                player.Image = Assets.up;
+                Player.Image = Assets.up;
                 break;
             case Keys.Down:
                 goDown = true;
                 facing = Direction.Down;
-                player.Image = Assets.down;
+                Player.Image = Assets.down;
                 break;
         }
     }
@@ -328,8 +367,8 @@ public partial class MainForm : Form
         Bullet shootBullet = new()
         {
             BulletDirection = direction,
-            BulletLeft = player.Left + (player.Width / 2),
-            BulletTop = player.Top + (player.Height / 2)
+            BulletLeft = Player.Left + (Player.Width / 2),
+            BulletTop = Player.Top + (Player.Height / 2)
         };
         shootBullet.MakeBullet(this);
     }
@@ -342,7 +381,7 @@ public partial class MainForm : Form
         zombieMovementStrategies[enemy] = new WanderMovement(this, zombieSpeed);
 
         Controls.Add(enemy);
-        player.BringToFront();
+        Player.BringToFront();
     }
 
     private void SpawnAnimal()
@@ -353,7 +392,7 @@ public partial class MainForm : Form
         animalMovementStrategies[animal] = new WanderMovement(this, zombieSpeed / 2);
 
         Controls.Add(animal);
-        player.BringToFront();
+        Player.BringToFront();
     }
 
     private void DropAmmo()
@@ -370,7 +409,7 @@ public partial class MainForm : Form
         Controls.Add(ammoDrop);
 
         ammoDrop.BringToFront();
-        player.BringToFront();
+        Player.BringToFront();
     }
 
     private void MoveAnimals()
@@ -380,7 +419,7 @@ public partial class MainForm : Form
             if (control is PictureBox animal && (animal.Tag as string) == "animal")
             {
                 // Calculate distance to player
-                double distanceToPlayer = GetDistance(animal, player);
+                double distanceToPlayer = GetDistance(animal, Player);
                 int fleeRadius = 300; // Adjust this value as needed
 
                 if (animalMovementStrategies.TryGetValue(animal, out IMovementStrategy movementStrategy))
@@ -389,7 +428,7 @@ public partial class MainForm : Form
                     {
                         if (movementStrategy is not FleeMovement)
                         {
-                            movementStrategy = new FleeMovement(player, zombieSpeed);
+                            movementStrategy = new FleeMovement(Player, zombieSpeed);
                             animalMovementStrategies[animal] = movementStrategy; // Update the strategy in the dictionary
                         }
                     }
@@ -415,7 +454,7 @@ public partial class MainForm : Form
             if (control is PictureBox zombie && (zombie.Tag as string) == "enemy")
             {
                 // Calculate distance to player
-                double distanceToPlayer = GetDistance(zombie, player);
+                double distanceToPlayer = GetDistance(zombie, Player);
                 int fleeRadius = 500; // Adjust this value as needed
 
                 if (zombieMovementStrategies.TryGetValue(zombie, out IMovementStrategy movementStrategy))
@@ -424,7 +463,7 @@ public partial class MainForm : Form
                     {
                         if (movementStrategy is not FollowPlayerMovement)
                         {
-                            movementStrategy = new FollowPlayerMovement(player, this, zombieSpeed);
+                            movementStrategy = new FollowPlayerMovement(Player, this, zombieSpeed);
                             zombieMovementStrategies[zombie] = movementStrategy;
                         }
                     }
@@ -531,13 +570,13 @@ public partial class MainForm : Form
             Controls.Add(itemPictureBox);
 
             itemPictureBox.BringToFront();
-            player.BringToFront();
+            Player.BringToFront();
         }
     }
 
     private void RestartGame()
     {
-        player.Image = Assets.up;
+        Player.Image = Assets.up;
 
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
         {
