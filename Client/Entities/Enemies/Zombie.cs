@@ -15,18 +15,13 @@ public class Zombie : IEnemy
         }
         else
         {
-            UIManager UI = UIManager.GetInstance();
-
             PictureBox = new()
             {
                 Tag = Constants.EnemyTag,
                 Name = Constants.ZombieName,
                 Image = Assets.ZombieUp,
-                Location = new(
-                    Rand.Next(0 + Constants.Margin, UI.Resolution.Width - Constants.Margin),
-                    Rand.Next(0 + Constants.Margin, UI.Resolution.Height - Constants.Margin)
-                ),
-                Size = Constants.EntitySize,
+                Location = Rand.LocationOnScreen(),
+                Size = Constants.EnemySize,
                 SizeMode = Constants.SizeMode,
             };
 

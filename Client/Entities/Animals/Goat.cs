@@ -15,18 +15,13 @@ public class Goat : IAnimal
         }
         else
         {
-            UIManager UI = UIManager.GetInstance();
-
             PictureBox = new()
             {
                 Tag = Constants.AnimalTag,
                 Name = Constants.GoatName,
                 Image = Assets.AnimalGoat,
-                Location = new(
-                    Rand.Next(0 + Constants.Margin, UI.Resolution.Width - Constants.Margin),
-                    Rand.Next(0 + Constants.Margin, UI.Resolution.Height - Constants.Margin)
-                ),
-                Size = Constants.EntitySize,
+                Location = Rand.LocationOnScreen(),
+                Size = Constants.AnimalSize,
                 SizeMode = Constants.SizeMode,
             };
 

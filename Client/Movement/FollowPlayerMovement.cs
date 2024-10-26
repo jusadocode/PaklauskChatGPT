@@ -1,6 +1,6 @@
 ﻿namespace Client.Movement;
 
-public class FollowPlayerMovement(PictureBox player, Control area, int speed) : IMovementStrategy
+public class FollowPlayerMovement(PictureBox player, int speed) : IMovementStrategy
 {
     public void Move(PictureBox zombie)
     {

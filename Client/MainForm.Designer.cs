@@ -36,8 +36,6 @@
             this.HealthBar = new ProgressBar();
             this.GameTimer = new Timer(this.components);
             this.CashLabel = new Label();
-            this.Player = new PictureBox();
-            ((System.ComponentModel.ISupportInitialize)this.Player).BeginInit();
             this.SuspendLayout();
             // 
             // AmmoLabel
@@ -98,16 +96,6 @@
             this.CashLabel.TabIndex = 3;
             this.CashLabel.Text = "Cash: 0";
             // 
-            // Player
-            // 
-            this.Player.Image = Assets.PlayerUp;
-            this.Player.Location = new Point(960, 540);
-            this.Player.Name = "Player";
-            this.Player.Size = new Size(58, 86);
-            this.Player.SizeMode = PictureBoxSizeMode.AutoSize;
-            this.Player.TabIndex = 2;
-            this.Player.TabStop = false;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
@@ -115,7 +103,6 @@
             this.BackColor = Color.DarkOliveGreen;
             this.ClientSize = new Size(1920, 1061);
             this.Controls.Add(this.CashLabel);
-            this.Controls.Add(this.Player);
             this.Controls.Add(this.HealthBar);
             this.Controls.Add(this.HealthLabel);
             this.Controls.Add(this.KillsLabel);
@@ -126,8 +113,6 @@
             this.Name = "MainForm";
             this.Text = "RAID2D";
             KeyDown += this.KeyIsDown;
-            KeyUp += this.KeyIsUp;
-            ((System.ComponentModel.ISupportInitialize)this.Player).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -138,7 +123,6 @@
         private System.Windows.Forms.Label KillsLabel;
         private System.Windows.Forms.Label HealthLabel;
         private System.Windows.Forms.ProgressBar HealthBar;
-        private System.Windows.Forms.PictureBox Player;
         private System.Windows.Forms.Timer GameTimer;
         private System.Windows.Forms.Label CashLabel;
     }

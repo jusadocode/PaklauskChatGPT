@@ -23,11 +23,11 @@ public static class GameObjectFactory
         {
             case "valuable":
                 IGameObject valuableItem = valuableItems.ElementAt(random.Next(valuableItems.Count)).Value;
-                _ = valuableItem.CreatePictureBox(location);
+                valuableItem.Create(location);
                 return valuableItem;
             case "medical":
                 IGameObject medicalItem = medicalItems.ElementAt(random.Next(medicalItems.Count)).Value;
-                _ = medicalItem.CreatePictureBox(location);
+                medicalItem.Create(location);
                 return medicalItem;
 
             default:

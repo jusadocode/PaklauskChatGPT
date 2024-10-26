@@ -1,13 +1,14 @@
-﻿using Client.UI;
+﻿using Client.Entities.Animals;
+using Client.UI;
 using Client.Utils;
 
-namespace Client.Entities.Animals;
+namespace Client.Drops;
 
-public class Boar : IAnimal
+public class AmmoDrop
 {
     public PictureBox? PictureBox { get; private set; }
 
-    PictureBox IAnimal.Create()
+    public PictureBox Create()
     {
         if (PictureBox is not null)
         {
@@ -17,15 +18,16 @@ public class Boar : IAnimal
         {
             PictureBox = new()
             {
-                Tag = Constants.AnimalTag,
-                Name = Constants.BoarName,
-                Image = Assets.AnimalBoar,
+                Tag = Constants.AmmoDropTag,
+                Name = Constants.AmmoDropTag,
+                Image = Assets.DropAmmo,
                 Location = Rand.LocationOnScreen(),
-                Size = Constants.AnimalSize,
+                Size = Constants.DropSize,
                 SizeMode = Constants.SizeMode,
             };
 
             return PictureBox;
         }
     }
+
 }

@@ -1,23 +1,23 @@
 ﻿namespace Client.Drops;
 
-public class ValuableItem(string name, int value, int dropchance, Image image) : IGameObject
+public class ValuableItem(string name, uint value, int dropchance, Image image) : IGameObject
 {
     public string name = name;
-    public int value = value;
+    public uint value = value;
     public int dropChance = dropchance;
     public Image itemImage = image;
     public PictureBox pictureBox;
 
     // Method to create and return the PictureBox
-    public PictureBox CreatePictureBox(Point location)
+    public PictureBox Create(Point location)
     {
 
         PictureBox itemPictureBox = new()
         {
             Image = itemImage,
-            SizeMode = PictureBoxSizeMode.StretchImage,
+            SizeMode = Constants.SizeMode,
             Tag = "valuable",
-            Size = new Size(50, 50),
+            Size = Constants.DropSize,
             Name = name,
             Location = location,
             Left = location.X,

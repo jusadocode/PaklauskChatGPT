@@ -2,5 +2,5 @@
 
 public interface IGameObject
 {
-    PictureBox CreatePictureBox(Point location);
+    public PictureBox Create(Point location);
 }

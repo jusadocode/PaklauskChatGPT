@@ -1,23 +1,23 @@
 ﻿namespace Client.Drops;
 
-public class MedicalItem(string Name, int HealingValue, int Dropchance, Image Image) : IGameObject
+public class MedicalItem(string Name, uint HealingValue, int Dropchance, Image Image) : IGameObject
 {
     public string name = Name;
-    public int healingValue = HealingValue;
+    public uint healingValue = HealingValue;
     public int dropChance = Dropchance;
     public Image itemImage = Image;
     public PictureBox pictureBox;
 
-    public PictureBox CreatePictureBox(Point location)
+    PictureBox IGameObject.Create(Point location)
     {
         Random random = new();
 
         PictureBox itemPictureBox = new()
         {
             Image = itemImage,
-            SizeMode = PictureBoxSizeMode.StretchImage,
+            SizeMode = Constants.SizeMode,
             Tag = "medical",
-            Size = new Size(50, 50),
+            Size = Constants.DropSize,
             Name = name,
             Left = location.X + random.Next(100, 500),
             Top = location.Y + random.Next(250, 782)

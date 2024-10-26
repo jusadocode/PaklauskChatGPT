@@ -1,27 +1,18 @@
 ﻿using Client.Enums;
+using Client.UI;
+using Client.Utils;
 
 namespace Client.Movement;
 
-public class WanderMovement : IMovementStrategy
+public class WanderMovement(int speed) : IMovementStrategy
 {
-    private readonly Random random;
-    private int directionTime;
-    private readonly Control area;
+    private int directionTime = Rand.Next(200, 1000);
     private int currentTime;
-    private readonly int speed;
-    private Direction currentDirection;
-
-    public WanderMovement(Control area, int speed)
-    {
-        random = new Random();
-        directionTime = random.Next(200, 1000); // Change direction every 50 to 200 ticks
-        this.area = area;
-        this.speed = speed;
-        currentDirection = (Direction)random.Next(0, 4); // Random initial direction
-    }
+    private Direction currentDirection = (Direction)Rand.Next(0, 4);
 
     public void Move(PictureBox animal)
     {
+        UIManager UI = UIManager.GetInstance();
         currentTime++;
 
         if (currentTime >= directionTime)
@@ -34,7 +25,7 @@ public class WanderMovement : IMovementStrategy
                     animal.Top -= speed;
                 break;
             case Direction.Down:
-                if (animal.Top < area.ClientSize.Height - animal.Height)
+                if (animal.Top < UI.Resolution.Height - animal.Height)
                     animal.Top += speed;
                 break;
             case Direction.Left:
@@ -42,7 +33,7 @@ public class WanderMovement : IMovementStrategy
                     animal.Left -= speed;
                 break;
             case Direction.Right:
-                if (animal.Left < area.ClientSize.Width - animal.Width)
+                if (animal.Left < UI.Resolution.Width - animal.Width)
                     animal.Left += speed;
                 break;
         }
@@ -50,8 +41,8 @@ public class WanderMovement : IMovementStrategy
 
     private void ChangeDirection()
     {
-        currentDirection = (Direction)random.Next(0, 4);
+        currentDirection = (Direction)Rand.Next(0, 4);
         currentTime = 0;
-        directionTime = random.Next(50, 200); // Reset the time for the new direction
+        directionTime = Rand.Next(50, 200); // Reset the time for the new direction
     }
 }

@@ -37,15 +37,23 @@ public class UIManager
         Resolution = res;
     }
 
-    public void UpdateHealth(int health)
+    public void UpdateHealth(uint health)
     {
-        healthBar!.Value = Math.Clamp(health, 0, 100);
+        healthBar!.Value = (int)health;
     }
 
-    public void UpdateUI(int ammo, int kills, int cash)
+    public void UpdateAmmo(uint ammo)
     {
         ammoLabel!.Text = $"Ammo: {ammo}";
+    }
+
+    public void UpdateKills(uint kills)
+    {
         killsLabel!.Text = $"Kills: {kills}";
+    }
+
+    public void UpdateCash(uint cash)
+    {
         cashLabel!.Text = $"Cash: {cash}$";
     }
 }
