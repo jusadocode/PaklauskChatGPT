@@ -1,6 +1,4 @@
-﻿using Client.Entities.Animals;
-using Client.UI;
-using Client.Utils;
+﻿using Client.Utils;
 
 namespace Client.Drops;
 

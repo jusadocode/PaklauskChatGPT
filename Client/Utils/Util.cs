@@ -21,6 +21,6 @@ public static class Util
 
     public static Point MiddleOfScreen(Size size)
     {
-        return MiddleOfScreen() - size / 2;
+        return MiddleOfScreen() - (size / 2);
     }
 }

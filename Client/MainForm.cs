@@ -1,6 +1,5 @@
 ﻿using Client.Drops;
 using Client.Entities.Spawners;
-using Client.Enums;
 using Client.Movement;
 using Client.UI;
 using Client.Utils;
@@ -87,16 +86,16 @@ public partial class MainForm : Form
         else
             lerpFactor = 1.0f - ((float)(currentHour - Constants.MiddleOfDay) / Constants.MiddleOfDay);
 
-        int r = (int)(Constants.NightColor.R + (Constants.DayColor.R - Constants.NightColor.R) * lerpFactor);
-        int g = (int)(Constants.NightColor.G + (Constants.DayColor.G - Constants.NightColor.G) * lerpFactor);
-        int b = (int)(Constants.NightColor.B + (Constants.DayColor.B - Constants.NightColor.B) * lerpFactor);
+        int r = (int)(Constants.NightColor.R + ((Constants.DayColor.R - Constants.NightColor.R) * lerpFactor));
+        int g = (int)(Constants.NightColor.G + ((Constants.DayColor.G - Constants.NightColor.G) * lerpFactor));
+        int b = (int)(Constants.NightColor.B + ((Constants.DayColor.B - Constants.NightColor.B) * lerpFactor));
         this.BackColor = Color.FromArgb(0xFF, r, g, b);
     }
 
     private void HandleDayAndNightCycle()
     {
-        uint lowerBound = Constants.MiddleOfDay - Constants.MiddleOfDay / 2;
-        uint upperBound = Constants.MiddleOfDay + Constants.MiddleOfDay / 2;
+        uint lowerBound = Constants.MiddleOfDay - (Constants.MiddleOfDay / 2);
+        uint upperBound = Constants.MiddleOfDay + (Constants.MiddleOfDay / 2);
 
         entitySpawner = (currentHour > lowerBound && currentHour <= upperBound) ? new DayEntitySpawner() : new NightEntitySpawner();
     }
@@ -145,7 +144,7 @@ public partial class MainForm : Form
         if (Constants.MedicalDrops.TryGetValue(box.Name, out MedicalItem? item))
         {
             RemoveControl(box);
-            player.PickupHealable(item.healingValue);
+            player.PickupHealable(item.HealingAmount);
         }
     }
 
@@ -154,7 +153,7 @@ public partial class MainForm : Form
         if (Constants.AnimalDrops.TryGetValue(box.Name, out AnimalDrop? item))
         {
             RemoveControl(box);
-            player.PickupHealable(item.HealthSize);
+            player.PickupHealable(item.HealingAmount);
         }
     }
 
@@ -347,7 +346,7 @@ public partial class MainForm : Form
         // Check if the created object is a ValuableItem
         if (medical is MedicalItem medicalItem)
         {
-            AddControl(medicalItem.pictureBox);
+            AddControl(medicalItem.PictureBox);
         }
     }
 

@@ -68,9 +68,9 @@ public static class Constants
 
     public static readonly Dictionary<string, MedicalItem> MedicalDrops = new()
     {
-        { "small_medkit", new MedicalItem("small_medkit", 20, 90, Assets.DropMedkitSmall) },
-        { "large_medkit", new MedicalItem("large_medkit", 50, 90, Assets.DropMedkitLarge) },
-        { "health_potion", new MedicalItem("health_potion", 100, 90, Assets.DropMedkitLarge) }
+        { "small_medkit", new MedicalItem("small_medkit", 20, Assets.DropMedkitSmall) },
+        { "large_medkit", new MedicalItem("large_medkit", 50, Assets.DropMedkitLarge) },
+        { "health_potion", new MedicalItem("health_potion", 100, Assets.DropMedkitLarge) }
     };
 
     public static readonly Dictionary<string, AnimalDrop> AnimalDrops = new()

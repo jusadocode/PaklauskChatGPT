@@ -14,6 +14,11 @@ public static class Rand
         return _random.Next(minValue, maxValue);
     }
 
+    public static int Next(int maxValue)
+    {
+        return _random.Next(maxValue);
+    }
+
     //public static uint NextUint(uint minValue, uint maxValue)
     //{
     //    return _random.Next(minValue, maxValue);

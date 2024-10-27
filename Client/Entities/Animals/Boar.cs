@@ -1,5 +1,4 @@
-﻿using Client.UI;
-using Client.Utils;
+﻿using Client.Utils;
 
 namespace Client.Entities.Animals;
 
