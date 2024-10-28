@@ -2,30 +2,27 @@
 
 namespace Client.Drops;
 
-public class AmmoDrop
+public class AmmoDrop : IDroppableItem
 {
-    public PictureBox? PictureBox { get; private set; }
+    public PictureBox PictureBox { get; private set; } = new();
+    public Point Location { get; private set; } = Rand.LocationOnScreen(Constants.DropSize);
 
-    public PictureBox Create()
+    PictureBox IDroppableItem.Create()
     {
-        if (PictureBox is not null)
-        {
-            return PictureBox;
-        }
-        else
-        {
-            PictureBox = new()
-            {
-                Tag = Constants.AmmoDropTag,
-                Name = Constants.AmmoDropTag,
-                Image = Assets.DropAmmo,
-                Location = Rand.LocationOnScreen(),
-                Size = Constants.DropSize,
-                SizeMode = Constants.SizeMode,
-            };
+        AmmoDropData data = DropManager.GetRandomAmmoDropData();
 
-            return PictureBox;
-        }
+        PictureBox = new()
+        {
+            Tag = Constants.DropAmmoTag,
+            Name = data.Name,
+            Image = data.Image,
+            Location = this.Location,
+            Size = Constants.DropSize,
+            SizeMode = Constants.SizeMode,
+        };
+
+        Console.WriteLine($"Spawned {data.Name} at {PictureBox.Location}");
+
+        return PictureBox;
     }
-
 }

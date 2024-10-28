@@ -4,27 +4,20 @@ namespace Client.Entities.Animals;
 
 public class Boar : IAnimal
 {
-    public PictureBox? PictureBox { get; private set; }
+    public PictureBox PictureBox { get; private set; } = new();
 
     PictureBox IAnimal.Create()
     {
-        if (PictureBox is not null)
+        PictureBox = new()
         {
-            return PictureBox;
-        }
-        else
-        {
-            PictureBox = new()
-            {
-                Tag = Constants.AnimalTag,
-                Name = Constants.BoarName,
-                Image = Assets.AnimalBoar,
-                Location = Rand.LocationOnScreen(),
-                Size = Constants.AnimalSize,
-                SizeMode = Constants.SizeMode,
-            };
+            Tag = Constants.AnimalTag,
+            Name = Constants.BoarName,
+            Image = Assets.AnimalBoar,
+            Location = Rand.LocationOnScreen(Constants.AnimalSize),
+            Size = Constants.AnimalSize,
+            SizeMode = Constants.SizeMode,
+        };
 
-            return PictureBox;
-        }
+        return PictureBox;
     }
 }

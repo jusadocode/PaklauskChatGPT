@@ -28,14 +28,13 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.AmmoLabel = new Label();
             this.KillsLabel = new Label();
             this.HealthLabel = new Label();
             this.HealthBar = new ProgressBar();
-            this.GameTimer = new Timer(this.components);
             this.CashLabel = new Label();
+            this.FpsLabel = new Label();
             this.SuspendLayout();
             // 
             // AmmoLabel
@@ -76,14 +75,9 @@
             this.HealthBar.Location = new Point(1721, 1048);
             this.HealthBar.Name = "HealthBar";
             this.HealthBar.Size = new Size(187, 23);
+            this.HealthBar.Step = 1;
             this.HealthBar.TabIndex = 1;
             this.HealthBar.Value = 100;
-            // 
-            // GameTimer
-            // 
-            this.GameTimer.Enabled = true;
-            this.GameTimer.Interval = 20;
-            this.GameTimer.Tick += this.MainTimerEvent;
             // 
             // CashLabel
             // 
@@ -96,12 +90,24 @@
             this.CashLabel.TabIndex = 3;
             this.CashLabel.Text = "Cash: 0";
             // 
+            // FpsLabel
+            // 
+            this.FpsLabel.AutoSize = true;
+            this.FpsLabel.Font = new Font("Microsoft Sans Serif", 14.25F, FontStyle.Bold);
+            this.FpsLabel.ForeColor = Color.White;
+            this.FpsLabel.Location = new Point(12, 9);
+            this.FpsLabel.Name = "FpsLabel";
+            this.FpsLabel.Size = new Size(72, 24);
+            this.FpsLabel.TabIndex = 4;
+            this.FpsLabel.Text = "FPS: 0";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new SizeF(7F, 15F);
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.DarkOliveGreen;
-            this.ClientSize = new Size(1920, 1061);
+            this.ClientSize = new Size(1920, 1080);
+            this.Controls.Add(this.FpsLabel);
             this.Controls.Add(this.CashLabel);
             this.Controls.Add(this.HealthBar);
             this.Controls.Add(this.HealthLabel);
@@ -109,10 +115,8 @@
             this.Controls.Add(this.AmmoLabel);
             this.FormBorderStyle = FormBorderStyle.None;
             this.Icon = (Icon)resources.GetObject("$this.Icon");
-            this.Margin = new Padding(4, 3, 4, 3);
             this.Name = "MainForm";
             this.Text = "RAID2D";
-            KeyDown += this.KeyIsDown;
             this.ResumeLayout(false);
             this.PerformLayout();
         }
@@ -123,8 +127,8 @@
         private System.Windows.Forms.Label KillsLabel;
         private System.Windows.Forms.Label HealthLabel;
         private System.Windows.Forms.ProgressBar HealthBar;
-        private System.Windows.Forms.Timer GameTimer;
         private System.Windows.Forms.Label CashLabel;
+        private Label FpsLabel;
     }
 }
 

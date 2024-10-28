@@ -2,19 +2,18 @@
 
 namespace Client.Drops;
 
-public class AnimalDrop(Point location, string animalName) : IDroppableItem
+public class ValuableDrop(Point location) : IDroppableItem
 {
     public PictureBox PictureBox { get; private set; } = new();
     public Point Location { get; private set; } = location;
-    public string AnimalName { get; private set; } = animalName;
 
     PictureBox IDroppableItem.Create()
     {
-        AnimalDropData data = DropManager.GetRandomAnimalDropDataByAnimalName(AnimalName);
+        ValuableDropData data = DropManager.GetRandomValuableDropData();
 
         PictureBox = new()
         {
-            Tag = Constants.DropAnimalTag,
+            Tag = Constants.DropValuableTag,
             Name = data.Name,
             Image = data.Image,
             Location = this.Location,

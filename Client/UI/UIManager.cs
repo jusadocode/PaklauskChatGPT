@@ -23,13 +23,15 @@ public class UIManager
 
     public Size Resolution { get; private set; }
 
-    private Label? ammoLabel;
-    private Label? killsLabel;
-    private Label? cashLabel;
-    private ProgressBar? healthBar;
+    private Label fpsLabel = new();
+    private Label ammoLabel = new();
+    private Label killsLabel = new();
+    private Label cashLabel = new();
+    private ProgressBar healthBar = new();
 
-    public void Initialize(Label ammo, Label kills, Label cash, ProgressBar health, Size res)
+    public void Initialize(Label fps, Label ammo, Label kills, Label cash, ProgressBar health, Size res)
     {
+        fpsLabel = fps;
         ammoLabel = ammo;
         killsLabel = kills;
         cashLabel = cash;
@@ -37,23 +39,30 @@ public class UIManager
         Resolution = res;
     }
 
-    public void UpdateHealth(uint health)
+    public void UpdateFPS(double fps)
     {
-        healthBar!.Value = (int)health;
+        fpsLabel.Text = $"FPS: {(fps):F0}";
+    }
+
+    public void UpdateHealth(int maxHealth, int currentHealth)
+    {
+        healthBar.Minimum = 0;
+        healthBar.Maximum = maxHealth;
+        healthBar.Value = currentHealth;
     }
 
     public void UpdateAmmo(uint ammo)
     {
-        ammoLabel!.Text = $"Ammo: {ammo}";
+        ammoLabel.Text = $"Ammo: {ammo}";
     }
 
     public void UpdateKills(uint kills)
     {
-        killsLabel!.Text = $"Kills: {kills}";
+        killsLabel.Text = $"Kills: {kills}";
     }
 
     public void UpdateCash(uint cash)
     {
-        cashLabel!.Text = $"Cash: {cash}$";
+        cashLabel.Text = $"Cash: {cash}$";
     }
 }

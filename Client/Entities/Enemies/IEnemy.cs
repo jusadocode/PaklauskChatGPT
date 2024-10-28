@@ -2,7 +2,7 @@
 
 public interface IEnemy
 {
-    public PictureBox? PictureBox { get; }
+    public PictureBox PictureBox { get; }
     public PictureBox Create();
 }
 

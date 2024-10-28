@@ -1,4 +1,5 @@
-﻿using Client.UI;
+﻿using Client.Enums;
+using Client.UI;
 
 namespace Client.Utils;
 
@@ -19,8 +20,70 @@ public static class Util
         return MiddleOfScreen(control.Size);
     }
 
-    public static Point MiddleOfScreen(Size size)
+    public static Point MiddleOfScreen(Size sizeOfControl)
     {
-        return MiddleOfScreen() - (size / 2);
+        return MiddleOfScreen() - (sizeOfControl / 2);
+    }
+
+    public static Point ClampToBounds(Point pointOfControl, Size sizeOfControl)
+    {
+        UIManager UI = UIManager.GetInstance();
+        int offset = Constants.FormBounds;
+
+        return new Point(
+            Math.Clamp(pointOfControl.X, offset, UI.Resolution.Width - offset - sizeOfControl.Width),
+            Math.Clamp(pointOfControl.Y, offset, UI.Resolution.Height - offset - sizeOfControl.Height)
+        );
+    }
+
+    public static Bitmap GetImageFromDirection(double x, double y, Bitmap up, Bitmap down, Bitmap left, Bitmap right)
+    {
+        return Math.Abs(y) > Math.Abs(x)
+                ? y < 0 ? up : down
+                : x < 0 ? left : right;
+    }
+
+    private static void RotateImage(PictureBox box, double directionX, double directionY) // not used, but maybe could get implemented in the future
+    {
+        double angle = Math.Atan2(directionY, directionX) * (180 / Math.PI);
+
+        box.Image = RotateImage(Assets.ZombieRight, (float)angle);
+    }
+
+    private static Image RotateImage(Image img, float angle)
+    {
+        Bitmap rotatedBmp = new Bitmap(img.Width, img.Height);
+        rotatedBmp.SetResolution(img.HorizontalResolution, img.VerticalResolution);
+
+        using (Graphics g = Graphics.FromImage(rotatedBmp))
+        {
+            g.TranslateTransform((float)rotatedBmp.Width / 2, (float)rotatedBmp.Height / 2);
+            g.RotateTransform(angle);
+            g.TranslateTransform(-(float)rotatedBmp.Width / 2, -(float)rotatedBmp.Height / 2);
+
+            g.DrawImage(img, new Point(0, 0));
+        }
+
+        return rotatedBmp;
+    }
+
+    private static Dictionary<float, Image> rotatedZombieImages = new Dictionary<float, Image>();
+
+    private static void PreRenderZombieImages(Image originalImage)
+    {
+        for (float angle = 0; angle < 360; angle += 10) // Pre-render at 10-degree increments
+        {
+            rotatedZombieImages[angle] = RotateImage(originalImage, angle);
+        }
+    }
+
+    private static void RotateZombieImage(PictureBox zombie, double directionX, double directionY)
+    {
+        double angle = Math.Atan2(directionY, directionX) * (180 / Math.PI);
+        angle = (angle + 360) % 360;
+
+        // Find the closest pre-rendered image
+        float closestAngle = (float)(Math.Round((float)angle / 10) * 10); // Round to the nearest 10 degrees
+        zombie.Image = rotatedZombieImages[closestAngle];
     }
 }

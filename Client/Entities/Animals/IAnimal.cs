@@ -2,7 +2,7 @@
 
 public interface IAnimal
 {
-    public PictureBox? PictureBox { get; }
+    public PictureBox PictureBox { get; }
 
     public PictureBox Create();
 }

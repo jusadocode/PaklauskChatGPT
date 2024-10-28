@@ -1,19 +1,14 @@
 ﻿using Client.Enums;
 using Client.UI;
+using Client.Utils;
 
 namespace Client.Effects;
 
-public class Bullet
+public static class Bullet
 {
-    private Direction direction = Direction.Up;
-    private PictureBox bullet = new();
-    private readonly Timer bulletTimer = new();
-    private DateTime lastUpdateTime = DateTime.Now;
-
-    public PictureBox Create(Direction direction, Point location)
+    public static void Create(Direction direction, Point location, Action<PictureBox> onBulletCreated, Action<PictureBox> onBulletExpired)
     {
-        this.direction = direction;
-        this.bullet = new PictureBox
+        PictureBox picture = new()
         {
             BackColor = Constants.BulletColor,
             Size = Constants.BulletSize,
@@ -21,45 +16,54 @@ public class Bullet
             Location = location
         };
 
-        bulletTimer.Interval = Constants.BulletSpeed;
-        bulletTimer.Tick += BulletTimerEvent;
-        bulletTimer.Start();
+        DateTime lastUpdateTime = DateTime.Now;
 
-        return bullet;
-    }
-
-    private void BulletTimerEvent(object? sender, EventArgs e)
-    {
-        UIManager UI = UIManager.GetInstance();
-        DateTime now = DateTime.Now;
-        double deltaTime = (now - lastUpdateTime).TotalSeconds;
-        lastUpdateTime = now;
-
-        int deltaX = (int)(Constants.BulletSpeed * deltaTime * 100); // 100 is an arbitrary factor for scaling speed
-
-        switch (this.direction)
+        Timer? timer = new()
         {
-            case Direction.Left:
-                bullet.Left -= deltaX;
-                break;
-            case Direction.Right:
-                bullet.Left += deltaX;
-                break;
-            case Direction.Up:
-                bullet.Top -= deltaX;
-                break;
-            case Direction.Down:
-                bullet.Top += deltaX;
-                break;
-        }
-
-        if (bullet.Left < Constants.FormBounds ||
-            bullet.Left > UI.Resolution.Width - Constants.FormBounds ||
-            bullet.Top < Constants.FormBounds ||
-            bullet.Top > UI.Resolution.Height - Constants.FormBounds)
+            Enabled = true,
+            Interval = Constants.BulletSpeed
+        };
+        timer.Tick += (s, e) =>
         {
-            bulletTimer.Dispose();
-            bullet.Dispose();
-        }
+            UIManager UI = UIManager.GetInstance();
+            DateTime now = DateTime.Now;
+            double deltaTime = (now - lastUpdateTime).TotalSeconds;
+            lastUpdateTime = now;
+
+            int deltaX = (int)(Constants.BulletSpeed * deltaTime * 100); // 100 is an arbitrary factor for scaling speed
+
+            switch (direction)
+            {
+                case Direction.Left:
+                    picture.Left -= deltaX;
+                    break;
+                case Direction.Right:
+                    picture.Left += deltaX;
+                    break;
+                case Direction.Up:
+                    picture.Top -= deltaX;
+                    break;
+                case Direction.Down:
+                    picture.Top += deltaX;
+                    break;
+            }
+
+            if (picture.Left < Constants.FormBounds ||
+                picture.Left > UI.Resolution.Width - Constants.FormBounds ||
+                picture.Top < Constants.FormBounds ||
+                picture.Top > UI.Resolution.Height - Constants.FormBounds)
+            {
+                onBulletExpired(picture);
+                Console.WriteLine($"Deleted bullet at {picture.Location}");
+
+                timer.Stop();
+                timer.Dispose();
+                timer = null;
+            }
+        };
+
+        onBulletCreated(picture);
+
+        Console.WriteLine($"Spawned bullet at {picture.Location}");
     }
 }

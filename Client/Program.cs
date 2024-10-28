@@ -5,7 +5,7 @@ global using Timer = System.Windows.Forms.Timer;
 static void Main()
 {
     ApplicationConfiguration.Initialize();
-    Client.Utils.ConsoleHelper.AllocConsole();
+    Client.Utils.ConsoleManager.SpawnConsole();
     Application.Run(new Client.MainForm());
 }
 

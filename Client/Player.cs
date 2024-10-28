@@ -1,109 +1,104 @@
 ﻿using Client.Effects;
 using Client.Enums;
+using Client.MovementStrategies;
 using Client.UI;
 using Client.Utils;
 
 namespace Client;
 
 public class Player(
-    uint health = Constants.PlayerMaxHealth,
-    uint maxHealth = Constants.PlayerMaxHealth,
-    uint speed = Constants.PlayerSpeed,
+    int health = Constants.PlayerMaxHealth,
+    int maxHealth = Constants.PlayerMaxHealth,
+    int speed = Constants.PlayerSpeed,
     uint ammo = Constants.PlayerInitialAmmo,
     uint cash = 0,
     uint kills = 0,
     Direction direction = Direction.Up)
 {
-    public uint Health { get; private set; } = health;
-    public uint MaxHealth { get; private set; } = maxHealth; // TODO: Implement this in calculations below (and also in UIManager)
-    public uint Speed { get; private set; } = speed;
-    public uint Cash { get; private set; } = cash;
+    public int Health { get; private set; } = health;
+    public int MaxHealth { get; private set; } = maxHealth;
+    public int Speed { get; private set; } = speed;
     public uint Ammo { get; private set; } = ammo;
+    public uint Cash { get; private set; } = cash;
     public uint Kills { get; private set; } = kills;
-    public Direction Direction { get; private set; } = direction;
+    public Direction Direction { get; set; } = direction;
+    public PictureBox PictureBox { get; private set; } = new();
 
-    public PictureBox? PictureBox { get; private set; } = null;
-
-    public event Action? OnDeath;
     public event Action? OnEmptyMagazine;
     public event Action? OnLowHealth;
 
-    public bool IntersectsWith(Control control) => PictureBox?.Bounds.IntersectsWith(control.Bounds) ?? false;
-    public bool IsDead() => Health == 0;
+    private bool lowHealthTriggered = false;
+    private IMovementStrategy? MovementStrategy;
 
     public PictureBox Create()
     {
-        if (PictureBox is not null)
-        {
-            return PictureBox;
-        }
-        else
-        {
-            PictureBox = new()
-            {
-                Tag = Constants.PlayerTag,
-                Name = Constants.PlayerTag,
-                Image = Assets.PlayerUp,
-                Location = Util.MiddleOfScreen(Constants.PlayerSize),
-                Size = Constants.PlayerSize,
-                SizeMode = Constants.SizeMode,
-            };
+        MovementStrategy = new PlayerMovement(this, Speed);
 
-            Console.WriteLine($"Created Player at {PictureBox.Location}");
+        PictureBox = new()
+        {
+            Tag = Constants.PlayerTag,
+            Name = Constants.PlayerTag,
+            Image = Assets.PlayerUp,
+            Location = Util.MiddleOfScreen(Constants.PlayerSize),
+            Size = Constants.PlayerSize,
+            SizeMode = Constants.SizeMode,
+        };
 
-            return PictureBox;
-        }
+        Console.WriteLine($"Spawned Player at {PictureBox.Location}");
+
+        return PictureBox;
     }
 
-    public void Respawn()
+    public PictureBox Respawn()
     {
-        if (PictureBox is null)
-            throw new InvalidOperationException("Player PictureBox is null!");
+        PictureBox newPlayer = this.Create();
 
-        this.PictureBox.Location = (Point)(UIManager.GetInstance().Resolution / 2);
-        this.PictureBox.Image = Assets.PlayerUp;
-
-        Health = 100;
+        Health = Constants.PlayerMaxHealth;
+        MaxHealth = Constants.PlayerMaxHealth;
+        Speed = Constants.PlayerSpeed;
+        Ammo = Constants.PlayerInitialAmmo;
         Cash = 0;
-        Ammo = 10;
         Kills = 0;
 
-        UIManager.GetInstance().UpdateHealth(Health);
-        UIManager.GetInstance().UpdateCash(Cash);
-        UIManager.GetInstance().UpdateAmmo(Ammo);
-        UIManager.GetInstance().UpdateKills(Kills);
+        UIManager UI = UIManager.GetInstance();
+
+        UI.UpdateHealth(MaxHealth, Health);
+        UI.UpdateCash(Cash);
+        UI.UpdateAmmo(Ammo);
+        UI.UpdateKills(Kills);
+
+        return newPlayer;
     }
 
     public void TakeDamage(uint damage)
     {
-        if (PictureBox is null)
-            throw new InvalidOperationException("Player PictureBox is null!");
+        Health = (int)Math.Max(0, Health - damage);
 
-        if (damage >= Health)
+        if (IsDead())
         {
-            Health = 0;
             PictureBox.Image = Assets.PlayerDead;
-            OnDeath?.Invoke();
         }
-        else
+        else if (IsLowHealth() && !lowHealthTriggered)
         {
-            Health -= damage;
+            lowHealthTriggered = true;
+            OnLowHealth?.Invoke();
+        }
+        else if (!IsLowHealth())
+        {
+            lowHealthTriggered = false;
         }
 
-        if (Health == Constants.PlayerLowHealthLimit)
-            OnLowHealth?.Invoke();
-
-        UIManager.GetInstance().UpdateHealth(Health);
+        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 
     public void PickupHealable(uint health)
     {
-        Health += health;
+        Health += (int)health;
         Health = Health > 100 ? 100 : Health;
-        UIManager.GetInstance().UpdateHealth(Health);
+        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 
-    public void PicupValuable(uint cash)
+    public void PickupValuable(uint cash)
     {
         Cash += cash;
         UIManager.GetInstance().UpdateCash(Cash);
@@ -115,57 +110,24 @@ public class Player(
         UIManager.GetInstance().UpdateAmmo(Ammo);
     }
 
-    public void GetKill()
+    public void RegisterKill(Point hitmarkLocation, Action<PictureBox> onHitmarkerCreation, Action<PictureBox> onHitmarkerExpired)
     {
         Kills++;
+        Hitmarker hitmark = new();
+        hitmark.CreatePictureBox(hitmarkLocation, onHitmarkerExpired);
+        onHitmarkerCreation(hitmark.PictureBox);
         UIManager.GetInstance().UpdateKills(Kills);
     }
 
-    public void Move(Keys key)
+    public void Move()
     {
-        foreach (var (direction, keys) in Constants.MovementKeysMap)
-        {
-            if (keys.Contains(key))
-            {
-                Move(direction);
-                break;
-            }
-        }
+        MovementStrategy?.Move(this.PictureBox);
     }
 
-    private void Move(Direction direction)
+    public void ShootBullet(Action<PictureBox> onBulletCreated, Action<PictureBox> onBulletExpired)
     {
-        if (PictureBox is null)
-            throw new InvalidOperationException("Player PictureBox is null!");
-
-        Direction = direction;
-
-        PictureBox.Image = direction switch
-        {
-            Direction.Up => Assets.PlayerUp,
-            Direction.Down => Assets.PlayerDown,
-            Direction.Left => Assets.PlayerLeft,
-            Direction.Right => Assets.PlayerRight,
-            _ => throw new NotImplementedException()
-        };
-
-        PictureBox.Location += direction switch
-        {
-            Direction.Up => new Size(0, -5),
-            Direction.Down => new Size(0, 5),
-            Direction.Left => new Size(-5, 0),
-            Direction.Right => new Size(5, 0),
-            _ => throw new NotImplementedException()
-        };
-    }
-
-    public PictureBox ShootBullet()
-    {
-        if (PictureBox is null)
-            throw new InvalidOperationException("Player PictureBox is null!");
-
         if (Ammo == 0)
-            throw new InvalidOperationException("No ammo left!");
+            return;
 
         Ammo--;
         UIManager.GetInstance().UpdateAmmo(Ammo);
@@ -173,14 +135,26 @@ public class Player(
         if (Ammo == 0)
             OnEmptyMagazine?.Invoke();
 
-        return new Bullet().Create(Direction, this.PictureBox.Location + (this.PictureBox.Size / 2));
+        Bullet.Create(Direction, this.PictureBox.Location + (this.PictureBox.Size / 2), onBulletCreated, onBulletExpired);
     }
 
     public double DistanceTo(Control control)
     {
-        if (PictureBox is null)
-            throw new InvalidOperationException("Player PictureBox is null!");
-
         return Util.EuclideanDistance(PictureBox.Location, control.Location);
+    }
+
+    public bool IntersectsWith(Control control)
+    {
+        return PictureBox.Bounds.IntersectsWith(control.Bounds);
+    }
+
+    public bool IsDead()
+    {
+        return Health == 0;
+    }
+
+    public bool IsLowHealth()
+    {
+        return Health is > 0 and <= (int)Constants.PlayerLowHealthLimit;
     }
 }

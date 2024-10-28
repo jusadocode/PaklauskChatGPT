@@ -2,19 +2,18 @@
 
 namespace Client.Drops;
 
-public class AnimalDrop(Point location, string animalName) : IDroppableItem
+public class MedicalDrop : IDroppableItem
 {
     public PictureBox PictureBox { get; private set; } = new();
-    public Point Location { get; private set; } = location;
-    public string AnimalName { get; private set; } = animalName;
+    public Point Location { get; private set; } = Rand.LocationOnScreen(Constants.DropSize);
 
     PictureBox IDroppableItem.Create()
     {
-        AnimalDropData data = DropManager.GetRandomAnimalDropDataByAnimalName(AnimalName);
+        MedicalDropData data = DropManager.GetRandomMedicalDropData();
 
         PictureBox = new()
         {
-            Tag = Constants.DropAnimalTag,
+            Tag = Constants.DropMedicalTag,
             Name = data.Name,
             Image = data.Image,
             Location = this.Location,
