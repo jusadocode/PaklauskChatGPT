@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.34929.205
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{301EC185-D400-4EAE-A42B-98F16CC1806D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAID2D.Client", "Src\RAID2D.Client\RAID2D.Client.csproj", "{301EC185-D400-4EAE-A42B-98F16CC1806D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{ED64D7C8-026F-4C27-9755-A798A1141FED}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{E6B35F68-65E7-4D41-9073-807F42DFB61A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,6 +22,9 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{301EC185-D400-4EAE-A42B-98F16CC1806D} = {ED64D7C8-026F-4C27-9755-A798A1141FED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3B40E3DE-7C55-457A-ACBC-383CC588562C}
