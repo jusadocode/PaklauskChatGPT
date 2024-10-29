@@ -21,68 +21,58 @@ public class UIManager
         return _instance;
     }
 
-    public Size Resolution { get; private set; }
-
     private Label fpsLabel = new();
     private Label ammoLabel = new();
     private Label killsLabel = new();
     private Label cashLabel = new();
     private ProgressBar healthBar = new();
+    public Size Resolution = new(1920, 1080);
 
-    private Button addAmmoButton = new();
-    private Button addHealthButton = new();
-    private Button spawnEntitiesButton = new();
-
-    public void Initialize(Label fps, Label ammo, Label kills, Label cash, ProgressBar health, Size res)
+    public void InitializeLabels(Label fps, Label ammo, Label kills, Label cash, ProgressBar health)
     {
         fpsLabel = fps;
         ammoLabel = ammo;
         killsLabel = kills;
         cashLabel = cash;
         healthBar = health;
-        Resolution = res;
+    }
+
+    public void InitializeResolution(Size resolution)
+    {
+        Resolution = resolution;
     }
 
     public void CreateDevUI(Player player, Action<uint>? onSpawnEntitiesButtonClick, Action<Button>? onButtonCreate)
     {
 #if DEBUG
-        addAmmoButton = new Button
-        {
-            Text = "Add 9999 Ammo",
-            Top = 10,
-            TabStop = false,
-            AutoSize = true,
-        };
-
-        addHealthButton = new Button
-        {
-            Text = "Add 9999 Health",
-            Top = 10,
-            TabStop = false,
-            AutoSize = true,
-        };
-
-        spawnEntitiesButton = new Button
-        {
-            Text = "Spawn 10 Entities",
-            Top = 10,
-            TabStop = false,
-            AutoSize = true,
-        };
-
-        addAmmoButton.Click += (s, e) => player.PickupAmmo(9999);
-        addHealthButton.Click += (s, e) => player.SetMaxHealth(9999);
-        spawnEntitiesButton.Click += (s, e) => onSpawnEntitiesButtonClick?.Invoke(10);
+        Button addAmmoButton = CreateDevButton("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999));
+        Button addHealthButton = CreateDevButton("Add 9999 Health", (s, e) => player.SetMaxHealth(9999));
+        Button spawnEntitiesButton = CreateDevButton("Spawn 10 Entities", (s, e) => onSpawnEntitiesButtonClick?.Invoke(10));
 
         onButtonCreate?.Invoke(addHealthButton);
         onButtonCreate?.Invoke(addAmmoButton);
         onButtonCreate?.Invoke(spawnEntitiesButton);
 
-        addAmmoButton.Left = Resolution.Width - addAmmoButton.Width - 20;
+        addAmmoButton.Left = Resolution.Width - addAmmoButton.Width - 10;
         addHealthButton.Left = addAmmoButton.Left - addHealthButton.Width - 10;
         spawnEntitiesButton.Left = addHealthButton.Left - spawnEntitiesButton.Width - 10;
 #endif
     }
+
+    private Button CreateDevButton(string text, EventHandler? clickHandler)
+    {
+        var button = new Button
+        {
+            Text = text,
+            Top = 10,
+            TabStop = false,
+            AutoSize = true,
+        };
+
+        button.Click += clickHandler;
+        return button;
+    }
+
 
     public void UpdateFPS(double fps)
     {

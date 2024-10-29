@@ -29,7 +29,8 @@ public partial class MainForm : Form
 
         InitializeFullscreenWindow();
         InitializeDayTimeCycle();
-        UI.Initialize(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar, ClientSize);
+        UI.InitializeLabels(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
+        UI.InitializeResolution(ClientSize);
         UI.CreateDevUI(player, SpawnEntities, AddControl);
         InitializePlayer();
         InitializeGameLoop();
