@@ -11,8 +11,6 @@ namespace Client;
 
 public partial class MainForm : Form
 {
-    readonly uint frameCount = 0;
-
     private readonly Player player = new();
 
     private readonly UIManager UI = UIManager.GetInstance();

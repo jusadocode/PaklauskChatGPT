@@ -1,5 +1,5 @@
-﻿global using Timer = System.Windows.Forms.Timer;
-global using RAID2D.Client.Properties;
+﻿global using RAID2D.Client.Properties;
+global using Timer = System.Windows.Forms.Timer;
 
 [STAThread]
 static void Main()
