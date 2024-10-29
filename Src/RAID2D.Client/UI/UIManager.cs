@@ -2,8 +2,8 @@
 
 public class UIManager
 {
-    private static UIManager? _instance = null; // Singleton instance
-    private static readonly object _lock = new(); // Lock object for thread safety
+    private static UIManager? _instance = null;
+    private static readonly object _lock = new();
 
     private UIManager() { } // Private constructor to prevent instantiation from outside
 
@@ -42,37 +42,39 @@ public class UIManager
         Resolution = resolution;
     }
 
-    public void CreateDevUI(Player player, Action<uint>? onSpawnEntitiesButtonClick, Action<Button>? onButtonCreate)
+    public void CreateDevUI(Player player, Action<uint>? onSpawnEntitiesClick, Action? onSendMessageClick, Action<Button>? onButtonCreate)
     {
 #if DEBUG
-        Button addAmmoButton = CreateDevButton("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999));
-        Button addHealthButton = CreateDevButton("Add 9999 Health", (s, e) => player.SetMaxHealth(9999));
-        Button spawnEntitiesButton = CreateDevButton("Spawn 10 Entities", (s, e) => onSpawnEntitiesButtonClick?.Invoke(10));
 
-        onButtonCreate?.Invoke(addHealthButton);
-        onButtonCreate?.Invoke(addAmmoButton);
-        onButtonCreate?.Invoke(spawnEntitiesButton);
-
-        addAmmoButton.Left = Resolution.Width - addAmmoButton.Width - 10;
-        addHealthButton.Left = addAmmoButton.Left - addHealthButton.Width - 10;
-        spawnEntitiesButton.Left = addHealthButton.Left - spawnEntitiesButton.Width - 10;
-#endif
-    }
-
-    private Button CreateDevButton(string text, EventHandler? clickHandler)
+        List<(string Text, EventHandler OnClick)> devButtons = new()
     {
-        var button = new Button
-        {
-            Text = text,
-            Top = 10,
-            TabStop = false,
-            AutoSize = true,
+            ("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999)),
+            ("Add 9999 Health", (s, e) => player.SetMaxHealth(9999)),
+            ("Spawn 10 Entities", (s, e) => onSpawnEntitiesClick?.Invoke(10)),
+            ("Send Message to Server", (s, e) => onSendMessageClick?.Invoke())
         };
 
-        button.Click += clickHandler;
-        return button;
-    }
+        Button? previousButton = null;
+        foreach (var (text, clickHandler) in devButtons)
+        {
+            var button = new Button
+            {
+                Text = text,
+                Top = 10,
+                TabStop = false,
+                AutoSize = true,
+            };
+            button.Click += clickHandler;
+            onButtonCreate?.Invoke(button);
 
+            button.Left = previousButton != null 
+                ? previousButton.Left - button.Width - 10 
+                : Resolution.Width - button.Width - 10;
+
+            previousButton = button;
+        }
+#endif
+    }
 
     public void UpdateFPS(double fps)
     {

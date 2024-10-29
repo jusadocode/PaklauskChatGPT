@@ -75,5 +75,4 @@ public static class Constants
         { AnimalBoarName, (Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar) },
         { AnimalGoatName, (Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat) }
     };
-
 }

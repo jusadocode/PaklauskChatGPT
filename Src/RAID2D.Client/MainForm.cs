@@ -1,4 +1,5 @@
-﻿using RAID2D.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
+using RAID2D.Client;
 using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Spawners;
@@ -11,6 +12,8 @@ namespace Client;
 
 public partial class MainForm : Form
 {
+    private HubConnection server;
+
     private readonly Player player = new();
 
     private readonly UIManager UI = UIManager.GetInstance();
@@ -27,11 +30,12 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
+        InitializeSignalR();
         InitializeFullscreenWindow();
         InitializeDayTimeCycle();
         UI.InitializeLabels(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
         UI.InitializeResolution(ClientSize);
-        UI.CreateDevUI(player, SpawnEntities, AddControl);
+        UI.CreateDevUI(player, SpawnEntities, SendDevMessage, AddControl);
         InitializePlayer();
         InitializeGameLoop();
         RestartGame();
@@ -57,6 +61,33 @@ public partial class MainForm : Form
 
             HandleEntityMovement(box);
         }
+    }
+
+    private async void InitializeSignalR()
+    {
+        server = new HubConnectionBuilder()
+            .WithUrl("https://localhost:7260/chathub")
+            .Build();
+
+        server.On<string, string>("ReceiveMessage", (user, message) =>
+        {
+            Invoke(() =>
+            {
+                Console.WriteLine($"Receivied message from server: \"{user}: {message}\"");
+            });
+        });
+
+        await server.StartAsync();
+    }
+
+    private async void SendMessage(string user, string message)
+    {
+        await server.InvokeAsync("SendMessage", user, message);
+    }
+
+    private async void SendDevMessage()
+    {
+        await server.InvokeAsync("SendMessage", "DEV", "Sending a test message");
     }
 
     private void InitializeFullscreenWindow()

@@ -14,6 +14,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Assets.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
