@@ -1,6 +1,0 @@
-@RAID2D.Server_HostAddress = http://localhost:5038
-
-GET {{RAID2D.Server_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
