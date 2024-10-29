@@ -1,6 +1,5 @@
 ﻿using Client.Drops;
 using Client.Drops.Spawners;
-using Client.Effects;
 using Client.Entities.Spawners;
 using Client.MovementStrategies;
 using Client.UI;
@@ -25,29 +24,25 @@ public partial class MainForm : Form
 
     public MainForm() { Initialize(); }
 
-    protected override void OnPaint(PaintEventArgs e)
-    {
-        base.OnPaint(e);
-        frameCount++;
-    }
-
     void Initialize() // Main initialization method, that gets run when the form is created, before the game loop starts
     {
         InitializeComponent();
 
         InitializeFullscreenWindow();
         InitializeDayTimeCycle();
-        InitializeFrameCounter();
         UI.Initialize(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar, ClientSize);
+        UI.CreateDevUI(player, SpawnEntities, AddControl);
         InitializePlayer();
-        RestartGame();
         InitializeGameLoop();
+        RestartGame();
 
         Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
 
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
     {
+        UI.UpdateFPS(1 / deltaTime);
+
         HandlePlayerInput();
 
         if (player.IsDead())
@@ -102,20 +97,6 @@ public partial class MainForm : Form
         };
     }
 
-    private void InitializeFrameCounter()
-    {
-        Timer frameCounter = new()
-        {
-            Interval = 1000,
-            Enabled = true
-        };
-        frameCounter.Tick += (s, e) =>
-        {
-            UI.UpdateFPS(frameCount);
-            frameCount = 0;
-        };
-    }
-
     private void InitializeGameLoop()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
@@ -152,7 +133,7 @@ public partial class MainForm : Form
             return;
         }
 
-        player.Move(); // uses PlayerMovement : IMovementStrategy
+        player.Move();
 
         if (KeyManager.IsKeyDownOnce(Keys.Space))
             player.ShootBullet(AddControl, RemoveControl);
@@ -274,7 +255,6 @@ public partial class MainForm : Form
         }
 
         movementStrategy.Move(entity);
-
     }
 
     private void HandleBulletCollision(PictureBox entity)
@@ -336,6 +316,15 @@ public partial class MainForm : Form
     {
         for (int i = 0; i < count; i++)
             SpawnEnemy();
+    }
+
+    private void SpawnEntities(uint count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            SpawnAnimal();
+            SpawnEnemy();
+        }
     }
 
     private void RestartGame()

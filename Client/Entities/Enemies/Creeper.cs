@@ -11,8 +11,8 @@ public class Creeper : IEnemy
         PictureBox = new()
         {
             Tag = Constants.EnemyTag,
-            Name = Constants.CreeperName,
-            Image = Assets.ZombieUp,
+            Name = Constants.EnemyCreeperName,
+            Image = Assets.EnemyCreeper,
             Location = Rand.LocationOnScreen(Constants.EnemySize),
             Size = Constants.EnemySize,
             SizeMode = Constants.SizeMode,

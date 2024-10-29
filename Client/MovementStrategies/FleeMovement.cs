@@ -1,6 +1,4 @@
-﻿using Client.Entities.Enemies;
-using Client.Utils;
-using System.Threading;
+﻿using Client.Utils;
 
 namespace Client.MovementStrategies;
 
@@ -24,13 +22,15 @@ public class FleeMovement(PictureBox characterToRunAwayFrom, int speed) : IMovem
             double directionY = delta.Height / distance;
 
             Point newLocation = new(
-                (int)(character.Location.X + directionX * this.Speed),
-                (int)(character.Location.Y + directionY * this.Speed)
+                (int)(character.Location.X + (directionX * this.Speed)),
+                (int)(character.Location.Y + (directionY * this.Speed))
             );
 
             newLocation = Util.ClampToBounds(newLocation, character.Size);
 
             character.Location = newLocation;
+
+            character.Image = Util.GetImageFromDirection(character.Name, directionX, directionY);
         }
     }
 }

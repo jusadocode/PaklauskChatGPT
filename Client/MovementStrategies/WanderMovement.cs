@@ -1,6 +1,6 @@
 ﻿using Client.Enums;
-using Client.UI;
 using Client.Utils;
+using System.IO;
 
 namespace Client.MovementStrategies;
 
@@ -36,6 +36,8 @@ public class WanderMovement(int speed) : IMovementStrategy
         newLocation = Util.ClampToBounds(newLocation, character.Size);
 
         character.Location = newLocation;
+
+        character.Image = Util.GetImageFromDirection(character.Name, displacement.Width, displacement.Height);
     }
 
     private void ChangeDirection()

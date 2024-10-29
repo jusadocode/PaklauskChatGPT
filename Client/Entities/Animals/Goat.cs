@@ -11,7 +11,7 @@ public class Goat : IAnimal
         PictureBox = new()
         {
             Tag = Constants.AnimalTag,
-            Name = Constants.GoatName,
+            Name = Constants.AnimalGoatName,
             Image = Assets.AnimalGoat,
             Location = Rand.LocationOnScreen(Constants.AnimalSize),
             Size = Constants.AnimalSize,

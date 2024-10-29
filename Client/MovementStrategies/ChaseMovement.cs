@@ -22,15 +22,15 @@ public class ChaseMovement(PictureBox characterToChase, int speed) : IMovementSt
             double directionY = delta.Height / distance;
 
             Point newLocation = new(
-                (int)(character.Location.X + directionX * this.Speed),
-                (int)(character.Location.Y + directionY * this.Speed)
+                (int)(character.Location.X + (directionX * this.Speed)),
+                (int)(character.Location.Y + (directionY * this.Speed))
             );
 
             newLocation = Util.ClampToBounds(newLocation, character.Size);
 
             character.Location = newLocation;
 
-            character.Image = Util.GetImageFromDirection(directionX, directionY, Assets.ZombieUp, Assets.ZombieDown, Assets.ZombieLeft, Assets.ZombieRight);
+            character.Image = Util.GetImageFromDirection(character.Name, directionX, directionY);
         }
     }
 }

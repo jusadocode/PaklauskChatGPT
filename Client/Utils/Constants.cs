@@ -1,7 +1,4 @@
-﻿using Client.Drops;
-using Client.Enums;
-
-namespace Client.Utils;
+﻿namespace Client.Utils;
 
 public static class Constants
 {
@@ -19,9 +16,9 @@ public static class Constants
     public const int DayTimeUpdateInterval = 1000;
     public const int HitmarkDuration = 200;
 
-    public const uint EnemyDamage = 3;
+    public const uint EnemyDamage = 1;
 
-    public const int PlayerMaxHealth = 1000;
+    public const int PlayerMaxHealth = 100;
     public const uint PlayerInitialAmmo = 10;
     public const uint PlayerLowHealthLimit = 20;
 
@@ -43,10 +40,11 @@ public static class Constants
     public const string DropMedicalTag = "DropMedical";
     public const string DropValuableTag = "DropValuable";
 
-    public const string ZombieName = "Zombie";
-    public const string CreeperName = "Creeper";
-    public const string BoarName = "Boar";
-    public const string GoatName = "Goat";
+    public const string PlayerName = "Player";
+    public const string EnemyZombieName = "Zombie";
+    public const string EnemyCreeperName = "Creeper";
+    public const string AnimalBoarName = "Boar";
+    public const string AnimalGoatName = "Goat";
     public const string ValuableGoldName = "ValuableGold";
     public const string ValuableRolexName = "ValuableRolex";
     public const string ValuableParcelBoxName = "ValuableParcelBox";
@@ -68,4 +66,14 @@ public static class Constants
     public static readonly Color BulletColor = Color.White;
     public static readonly Color DayColor = Color.FromArgb(0xFF, 0x8F, 0xBC, 0x8F); // Light green
     public static readonly Color NightColor = Color.FromArgb(0xFF, 0x2F, 0x4F, 0x2F); // Dark green
+
+    public static readonly Dictionary<string, (Bitmap Up, Bitmap Down, Bitmap Left, Bitmap Right)> EntityImages = new()
+    {
+        { PlayerName, (Assets.PlayerUp, Assets.PlayerDown, Assets.PlayerLeft, Assets.PlayerRight) },
+        { EnemyZombieName, (Assets.EnemyZombieUp, Assets.EnemyZombieDown, Assets.EnemyZombieLeft, Assets.EnemyZombieRight) },
+        { EnemyCreeperName, (Assets.EnemyCreeper, Assets.EnemyCreeper, Assets.EnemyCreeper, Assets.EnemyCreeper) },
+        { AnimalBoarName, (Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar) },
+        { AnimalGoatName, (Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat) }
+    };
+
 }

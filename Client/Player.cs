@@ -26,9 +26,9 @@ public class Player(
 
     public event Action? OnEmptyMagazine;
     public event Action? OnLowHealth;
+    private IMovementStrategy? MovementStrategy;
 
     private bool lowHealthTriggered = false;
-    private IMovementStrategy? MovementStrategy;
 
     public PictureBox Create()
     {
@@ -37,7 +37,7 @@ public class Player(
         PictureBox = new()
         {
             Tag = Constants.PlayerTag,
-            Name = Constants.PlayerTag,
+            Name = Constants.PlayerName,
             Image = Assets.PlayerUp,
             Location = Util.MiddleOfScreen(Constants.PlayerSize),
             Size = Constants.PlayerSize,
@@ -94,7 +94,14 @@ public class Player(
     public void PickupHealable(uint health)
     {
         Health += (int)health;
-        Health = Health > 100 ? 100 : Health;
+        Health = Health > MaxHealth ? MaxHealth : Health;
+        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
+    }
+
+    public void SetMaxHealth(int maxHealth)
+    {
+        MaxHealth = maxHealth;
+        Health = maxHealth;
         UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 

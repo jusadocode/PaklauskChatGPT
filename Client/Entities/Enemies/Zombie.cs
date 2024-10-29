@@ -11,8 +11,8 @@ public class Zombie : IEnemy
         PictureBox = new()
         {
             Tag = Constants.EnemyTag,
-            Name = Constants.ZombieName,
-            Image = Assets.ZombieUp,
+            Name = Constants.EnemyZombieName,
+            Image = Assets.EnemyZombieUp,
             Location = Rand.LocationOnScreen(Constants.EnemySize),
             Size = Constants.EnemySize,
             SizeMode = Constants.SizeMode,

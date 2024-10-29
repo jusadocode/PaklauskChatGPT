@@ -1,5 +1,4 @@
-﻿using Client.Enums;
-using Client.UI;
+﻿using Client.UI;
 
 namespace Client.Utils;
 
@@ -36,23 +35,25 @@ public static class Util
         );
     }
 
-    public static Bitmap GetImageFromDirection(double x, double y, Bitmap up, Bitmap down, Bitmap left, Bitmap right)
+    public static Bitmap GetImageFromDirection(string name, double x, double y)
     {
-        return Math.Abs(y) > Math.Abs(x)
-                ? y < 0 ? up : down
-                : x < 0 ? left : right;
+        return !Constants.EntityImages.TryGetValue(name, out var images)
+            ? throw new NotImplementedException($"No images found for {name}")
+            : Math.Abs(y) > Math.Abs(x)
+                ? y < 0 ? images.Up : images.Down
+                : x < 0 ? images.Left : images.Right;
     }
 
     private static void RotateImage(PictureBox box, double directionX, double directionY) // not used, but maybe could get implemented in the future
     {
         double angle = Math.Atan2(directionY, directionX) * (180 / Math.PI);
 
-        box.Image = RotateImage(Assets.ZombieRight, (float)angle);
+        box.Image = RotateImage(Assets.EnemyZombieRight, (float)angle);
     }
 
     private static Image RotateImage(Image img, float angle)
     {
-        Bitmap rotatedBmp = new Bitmap(img.Width, img.Height);
+        Bitmap rotatedBmp = new(img.Width, img.Height);
         rotatedBmp.SetResolution(img.HorizontalResolution, img.VerticalResolution);
 
         using (Graphics g = Graphics.FromImage(rotatedBmp))
@@ -67,7 +68,7 @@ public static class Util
         return rotatedBmp;
     }
 
-    private static Dictionary<float, Image> rotatedZombieImages = new Dictionary<float, Image>();
+    private static readonly Dictionary<float, Image> rotatedZombieImages = new();
 
     private static void PreRenderZombieImages(Image originalImage)
     {

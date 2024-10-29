@@ -1,6 +1,5 @@
 ﻿using Client.Enums;
 using Client.Utils;
-using System.Numerics;
 
 namespace Client.MovementStrategies;
 
@@ -16,15 +15,6 @@ public class PlayerMovement(Player player, int speed) : IMovementStrategy
             {
                 player.Direction = direction;
 
-                character.Image = direction switch
-                {
-                    Direction.Up => Assets.PlayerUp,
-                    Direction.Down => Assets.PlayerDown,
-                    Direction.Left => Assets.PlayerLeft,
-                    Direction.Right => Assets.PlayerRight,
-                    _ => throw new NotImplementedException()
-                };
-
                 Size displacement = direction switch
                 {
                     Direction.Up => new Size(0, -this.Speed),
@@ -38,6 +28,8 @@ public class PlayerMovement(Player player, int speed) : IMovementStrategy
                 newLocation = Util.ClampToBounds(newLocation, character.Size);
 
                 character.Location = newLocation;
+
+                character.Image = Util.GetImageFromDirection(character.Name, displacement.Width, displacement.Height);
             }
         }
     }

@@ -12,7 +12,7 @@ public class Hitmarker
         {
             Tag = Constants.HitmarkerTag,
             Name = Constants.HitmarkerTag,
-            Image = Assets.Hitmarker,
+            Image = Assets.EffectHitmarker,
             Location = hitmarkLocation,
             Size = Constants.HitmarkerSize,
             SizeMode = Constants.SizeMode,
