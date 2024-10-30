@@ -1,6 +1,4 @@
-﻿using RAID2D.Client.Utils;
-
-namespace RAID2D.Client.Effects;
+﻿namespace RAID2D.Client.Effects;
 
 public class Hitmarker
 {
@@ -31,8 +29,6 @@ public class Hitmarker
             timer.Dispose();
             timer = null;
         };
-
-        Console.WriteLine($"Spawned hitmarker at {PictureBox.Location}");
 
         return PictureBox;
     }

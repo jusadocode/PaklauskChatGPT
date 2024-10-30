@@ -39,7 +39,7 @@ public class Player(
             Tag = Constants.PlayerTag,
             Name = Constants.PlayerName,
             Image = Assets.PlayerUp,
-            Location = Util.MiddleOfScreen(Constants.PlayerSize),
+            Location = Location.MiddleOfScreen(Constants.PlayerSize),
             Size = Constants.PlayerSize,
             SizeMode = Constants.SizeMode,
         };
@@ -60,7 +60,7 @@ public class Player(
         Cash = 0;
         Kills = 0;
 
-        UIManager UI = UIManager.GetInstance();
+        GUI UI = GUI.GetInstance();
 
         UI.UpdateHealth(MaxHealth, Health);
         UI.UpdateCash(Cash);
@@ -86,33 +86,33 @@ public class Player(
             lowHealthTriggered = false;
         }
 
-        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
+        GUI.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 
     public void PickupHealable(uint health)
     {
         Health += (int)health;
         Health = Health > MaxHealth ? MaxHealth : Health;
-        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
+        GUI.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 
     public void SetMaxHealth(int maxHealth)
     {
         MaxHealth = maxHealth;
         Health = maxHealth;
-        UIManager.GetInstance().UpdateHealth(MaxHealth, Health);
+        GUI.GetInstance().UpdateHealth(MaxHealth, Health);
     }
 
     public void PickupValuable(uint cash)
     {
         Cash += cash;
-        UIManager.GetInstance().UpdateCash(Cash);
+        GUI.GetInstance().UpdateCash(Cash);
     }
 
     public void PickupAmmo(uint ammo)
     {
         Ammo += ammo;
-        UIManager.GetInstance().UpdateAmmo(Ammo);
+        GUI.GetInstance().UpdateAmmo(Ammo);
     }
 
     public void RegisterKill(Point hitmarkLocation, Action<PictureBox> onHitmarkerCreation, Action<PictureBox> onHitmarkerExpired)
@@ -121,7 +121,7 @@ public class Player(
         Hitmarker hitmark = new();
         hitmark.CreatePictureBox(hitmarkLocation, onHitmarkerExpired);
         onHitmarkerCreation(hitmark.PictureBox);
-        UIManager.GetInstance().UpdateKills(Kills);
+        GUI.GetInstance().UpdateKills(Kills);
     }
 
     public void Move()
@@ -135,7 +135,7 @@ public class Player(
             return;
 
         Ammo--;
-        UIManager.GetInstance().UpdateAmmo(Ammo);
+        GUI.GetInstance().UpdateAmmo(Ammo);
 
         if (Ammo == 0)
             OnEmptyMagazine?.Invoke();
@@ -145,7 +145,7 @@ public class Player(
 
     public double DistanceTo(Control control)
     {
-        return Util.EuclideanDistance(PictureBox.Location, control.Location);
+        return Location.Distance(PictureBox.Location, control.Location);
     }
 
     public bool IntersectsWith(Control control)

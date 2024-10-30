@@ -1,6 +1,5 @@
 ﻿using RAID2D.Client.Enums;
 using RAID2D.Client.UI;
-using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.Effects;
 
@@ -25,12 +24,12 @@ public static class Bullet
         };
         timer.Tick += (s, e) =>
         {
-            UIManager UI = UIManager.GetInstance();
+            GUI UI = GUI.GetInstance();
             DateTime now = DateTime.Now;
             double deltaTime = (now - lastUpdateTime).TotalSeconds;
             lastUpdateTime = now;
 
-            int deltaX = (int)(Constants.BulletSpeed * deltaTime * 100); // 100 is an arbitrary factor for scaling speed
+            int deltaX = (int)(Constants.BulletSpeed * deltaTime * 100);
 
             switch (direction)
             {
@@ -54,7 +53,6 @@ public static class Bullet
                 picture.Top > UI.Resolution.Height - Constants.FormBounds)
             {
                 onBulletExpired(picture);
-                Console.WriteLine($"Deleted bullet at {picture.Location}");
 
                 timer.Stop();
                 timer.Dispose();
@@ -63,7 +61,5 @@ public static class Bullet
         };
 
         onBulletCreated(picture);
-
-        Console.WriteLine($"Spawned bullet at {picture.Location}");
     }
 }

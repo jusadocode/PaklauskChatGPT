@@ -1,6 +1,4 @@
-﻿using RAID2D.Client.Utils;
-
-namespace RAID2D.Client.Drops.Spawners;
+﻿namespace RAID2D.Client.Drops.Spawners;
 
 public class DropSpawner : IDropSpawner
 {

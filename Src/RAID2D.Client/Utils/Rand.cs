@@ -31,8 +31,8 @@ public static class Rand
 
     public static Point LocationOnScreen(Size sizeOfControl)
     {
-        int x = Next(Constants.FormBounds, UIManager.GetInstance().Resolution.Width - Constants.FormBounds - sizeOfControl.Width);
-        int y = Next(Constants.FormBounds, UIManager.GetInstance().Resolution.Height - Constants.FormBounds - sizeOfControl.Height);
+        int x = Next(Constants.FormBounds, GUI.GetInstance().Resolution.Width - Constants.FormBounds - sizeOfControl.Width);
+        int y = Next(Constants.FormBounds, GUI.GetInstance().Resolution.Height - Constants.FormBounds - sizeOfControl.Height);
 
         return new Point(x, y);
     }

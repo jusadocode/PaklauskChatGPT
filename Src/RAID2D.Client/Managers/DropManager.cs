@@ -1,4 +1,6 @@
-﻿namespace RAID2D.Client.Utils;
+﻿using RAID2D.Client.Utils;
+
+namespace RAID2D.Client.Managers;
 
 public static class DropManager
 {

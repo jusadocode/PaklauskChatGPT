@@ -1,9 +1,9 @@
 ﻿using RAID2D.Client.Enums;
 using System.Runtime.InteropServices;
 
-namespace RAID2D.Client.Utils;
+namespace RAID2D.Client.Managers;
 
-public static class KeyManager
+public static class InputManager
 {
     [DllImport("user32.dll")]
     private static extern short GetAsyncKeyState(Keys key);

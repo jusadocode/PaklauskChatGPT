@@ -15,6 +15,6 @@ public class PlayerTests(ITestOutputHelper testOutputHelper)
 
         output.WriteLine(player.PictureBox.Location.ToString());
 
-        Assert.Equal(player.PictureBox.Location, Util.MiddleOfScreen(Constants.PlayerSize));
+        Assert.Equal(player.PictureBox.Location, Location.MiddleOfScreen(Constants.PlayerSize));
     }
 }

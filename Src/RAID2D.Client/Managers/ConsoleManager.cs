@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace RAID2D.Client.Utils;
+namespace RAID2D.Client.Managers;
 
 public static class ConsoleManager
 {

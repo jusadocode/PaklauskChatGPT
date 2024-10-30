@@ -1,4 +1,4 @@
-﻿namespace RAID2D.Client.Utils;
+﻿namespace RAID2D.Client;
 
 public static class Constants
 {
@@ -9,8 +9,9 @@ public static class Constants
 
     public const int FormBounds = 35; // Fake wall around the form for collision detection
 
-    public const uint MiddleOfDay = 12;
-    public const uint EndOfDay = 24;
+    public const double MiddleOfDayHour = 12.0f;
+    public const double EndOfDayHour = 24.0f;
+    public const double HourIncrementRate = 1.0f;
 
     public const int GameTimerInterval = 20; // milliseconds
     public const int DayTimeUpdateInterval = 1000;
@@ -29,6 +30,8 @@ public static class Constants
     public const uint EnemyCount = 3;
 
     public const PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
+
+    public const string DefaultServerLink = "https://localhost:7260/chathub";
 
     public const string PlayerTag = "Player";
     public const string AnimalTag = "Animal";

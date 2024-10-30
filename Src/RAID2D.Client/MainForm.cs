@@ -1,22 +1,22 @@
-﻿using Microsoft.AspNetCore.SignalR.Client;
-using RAID2D.Client;
+﻿using RAID2D.Client;
 using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Spawners;
+using RAID2D.Client.Managers;
 using RAID2D.Client.MovementStrategies;
+using RAID2D.Client.Services;
 using RAID2D.Client.UI;
-using RAID2D.Client.Utils;
 using System.Diagnostics;
 
 namespace Client;
 
 public partial class MainForm : Form
 {
-    private HubConnection server;
+    private readonly ServerConnection server = new();
 
     private readonly Player player = new();
 
-    private readonly UIManager UI = UIManager.GetInstance();
+    private readonly GUI UI = GUI.GetInstance();
 
     private readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
 
@@ -30,27 +30,24 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
-        InitializeSignalR();
-        InitializeFullscreenWindow();
-        InitializeDayTimeCycle();
-        UI.InitializeLabels(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
-        UI.InitializeResolution(ClientSize);
-        UI.CreateDevUI(player, SpawnEntities, SendDevMessage, AddControl);
-        InitializePlayer();
+        InitializeGUI();
         InitializeGameLoop();
-        RestartGame();
+        InitializePlayer();
 
         Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
 
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
     {
-        UI.UpdateFPS(1 / deltaTime);
-
         HandlePlayerInput();
 
         if (player.IsDead())
             return;
+
+        UI.UpdateFPS(1 / deltaTime);
+
+        DayTimeManager.Update(deltaTime);
+        entitySpawner = DayTimeManager.IsDay() ? new DayEntitySpawner() : new NightEntitySpawner();
 
         foreach (PictureBox box in this.Controls.OfType<PictureBox>().ToList())
         {
@@ -63,69 +60,19 @@ public partial class MainForm : Form
         }
     }
 
-    private async void InitializeSignalR()
+    private void InitializeGUI()
     {
-        server = new HubConnectionBuilder()
-            .WithUrl("https://localhost:7260/chathub")
-            .Build();
-
-        server.On<string, string>("ReceiveMessage", (user, message) =>
-        {
-            Invoke(() =>
-            {
-                Console.WriteLine($"Receivied message from server: \"{user}: {message}\"");
-            });
-        });
-
-        await server.StartAsync();
-    }
-
-    private async void SendMessage(string user, string message)
-    {
-        await server.InvokeAsync("SendMessage", user, message);
-    }
-
-    private async void SendDevMessage()
-    {
-        await server.InvokeAsync("SendMessage", "DEV", "Sending a test message");
-    }
-
-    private void InitializeFullscreenWindow()
-    {
+        // Force fullscreen on startup
         this.WindowState = FormWindowState.Normal;
         this.FormBorderStyle = FormBorderStyle.None;
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
-    }
 
-    private void InitializeDayTimeCycle()
-    {
-        this.BackColor = Constants.DayColor;
-        uint currentHour = Constants.MiddleOfDay;
+        UI.BindElements(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
+        UI.SetResolution(ClientSize);
+        UI.CreatePauseMenu(onConnectClick: server.InitializeConnection, onDisconnectClick: async () => await server.DisconnectAsync(), onQuitClick: Application.Exit, onPanelCreate: AddControl);
+        UI.CreateDevButtons(player, server, SpawnEntities, AddControl);
 
-        Timer dayNightTimer = new()
-        {
-            Enabled = true,
-            Interval = Constants.DayTimeUpdateInterval
-        };
-        dayNightTimer.Tick += (s, e) =>
-        {
-            currentHour = (currentHour + 1) % Constants.EndOfDay;
-
-            uint lowerBound = Constants.MiddleOfDay - (Constants.MiddleOfDay / 2);
-            uint upperBound = Constants.MiddleOfDay + (Constants.MiddleOfDay / 2);
-            entitySpawner = (currentHour > lowerBound && currentHour <= upperBound) ? new DayEntitySpawner() : new NightEntitySpawner();
-
-            float lerpFactor;
-            if (currentHour <= Constants.MiddleOfDay)
-                lerpFactor = (float)currentHour / Constants.MiddleOfDay;
-            else
-                lerpFactor = 1.0f - ((float)(currentHour - Constants.MiddleOfDay) / Constants.MiddleOfDay);
-
-            int r = (int)(Constants.NightColor.R + ((Constants.DayColor.R - Constants.NightColor.R) * lerpFactor));
-            int g = (int)(Constants.NightColor.G + ((Constants.DayColor.G - Constants.NightColor.G) * lerpFactor));
-            int b = (int)(Constants.NightColor.B + ((Constants.DayColor.B - Constants.NightColor.B) * lerpFactor));
-            this.BackColor = Color.FromArgb(0xFF, r, g, b);
-        };
+        DayTimeManager.Initialize(this);
     }
 
     private void InitializeGameLoop()
@@ -152,13 +99,15 @@ public partial class MainForm : Form
     {
         player.OnEmptyMagazine += SpawnAmmoDrop;
         player.OnLowHealth += SpawnMedicalDrop;
+
+        RestartGame();
     }
 
     private void HandlePlayerInput()
     {
         if (player.IsDead())
         {
-            if (KeyManager.IsKeyDown(Keys.Enter))
+            if (InputManager.IsKeyDown(Keys.Enter))
                 RestartGame();
 
             return;
@@ -166,8 +115,11 @@ public partial class MainForm : Form
 
         player.Move();
 
-        if (KeyManager.IsKeyDownOnce(Keys.Space))
+        if (InputManager.IsKeyDownOnce(Keys.Space))
             player.ShootBullet(AddControl, RemoveControl);
+
+        if (InputManager.IsKeyDownOnce(Keys.Escape))
+            UI.TogglePauseMenuVisibility();
     }
 
     private void HandleEnemyInteraction(PictureBox enemy)

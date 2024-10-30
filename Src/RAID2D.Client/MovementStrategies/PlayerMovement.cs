@@ -1,4 +1,5 @@
 ﻿using RAID2D.Client.Enums;
+using RAID2D.Client.Managers;
 using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.MovementStrategies;
@@ -9,9 +10,9 @@ public class PlayerMovement(Player player, int speed) : IMovementStrategy
 
     void IMovementStrategy.Move(PictureBox character)
     {
-        foreach (var (direction, keys) in KeyManager.MovementKeysMap)
+        foreach (var (direction, keys) in InputManager.MovementKeysMap)
         {
-            if (keys.Any(KeyManager.IsKeyDown))
+            if (keys.Any(InputManager.IsKeyDown))
             {
                 player.Direction = direction;
 
@@ -25,11 +26,11 @@ public class PlayerMovement(Player player, int speed) : IMovementStrategy
                 };
 
                 Point newLocation = character.Location + displacement;
-                newLocation = Util.ClampToBounds(newLocation, character.Size);
+                newLocation = Location.ClampToBounds(newLocation, character.Size);
 
                 character.Location = newLocation;
 
-                character.Image = Util.GetImageFromDirection(character.Name, displacement.Width, displacement.Height);
+                character.Image = ImageManager.GetImageFromDirection(character.Name, displacement.Width, displacement.Height);
             }
         }
     }

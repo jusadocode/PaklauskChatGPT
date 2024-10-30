@@ -1,4 +1,5 @@
-﻿using RAID2D.Client.Utils;
+﻿using RAID2D.Client.Managers;
+using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.MovementStrategies;
 
@@ -14,7 +15,7 @@ public class FleeMovement(PictureBox characterToRunAwayFrom, int speed) : IMovem
     void IMovementStrategy.Move(PictureBox character)
     {
         Size delta = (Size)character.Location - (Size)characterToRunAwayFrom.Location;
-        double distance = Util.EuclideanDistance(character.Location, characterToRunAwayFrom.Location);
+        double distance = Location.Distance(character.Location, characterToRunAwayFrom.Location);
 
         if (distance > 0)
         {
@@ -26,11 +27,11 @@ public class FleeMovement(PictureBox characterToRunAwayFrom, int speed) : IMovem
                 (int)(character.Location.Y + (directionY * this.Speed))
             );
 
-            newLocation = Util.ClampToBounds(newLocation, character.Size);
+            newLocation = Location.ClampToBounds(newLocation, character.Size);
 
             character.Location = newLocation;
 
-            character.Image = Util.GetImageFromDirection(character.Name, directionX, directionY);
+            character.Image = ImageManager.GetImageFromDirection(character.Name, directionX, directionY);
         }
     }
 }
