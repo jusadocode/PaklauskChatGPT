@@ -14,6 +14,7 @@ app.UseRouting();
 
 app.MapHub<ChatHub>("/chathub");
 
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "Hello World!!");
 
 app.Run();
+
