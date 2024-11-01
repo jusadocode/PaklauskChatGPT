@@ -1,5 +1,6 @@
 ﻿using RAID2D.Client.Services;
 using RAID2D.Client.Utils;
+using RAID2D.Shared;
 
 namespace RAID2D.Client.UI;
 
@@ -64,7 +65,7 @@ public class GUI
         TextBox serverLinkTextBox = new()
         {
             PlaceholderText = "Enter server link here",
-            Text = Constants.DefaultServerLink,
+            Text = $"{Constants.ServerBaseUrl}:{Constants.ServerPort}/{SharedConstants.ServerHub}",
             Width = 250,
             Location = new Point(25, 60)
         };
@@ -110,7 +111,7 @@ public class GUI
             ("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999)),
             ("Add 9999 Health", (s, e) => player.SetMaxHealth(9999)),
             ("Spawn 10 Entities", (s, e) => onSpawnEntitiesClick?.Invoke(10)),
-            ("Send Message to Server", async (s, e) => await server.SendMessageAsync("DEV", "Sending a test message"))
+            ("Send Player Data to Server", (s, e) => server.SendDevState())
         };
 
         Button? previousButton = null;

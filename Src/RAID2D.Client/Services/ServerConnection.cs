@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using RAID2D.Shared;
+using RAID2D.Shared.Models;
 
 namespace RAID2D.Client.Services;
 
@@ -23,7 +25,15 @@ public class ServerConnection
             return;
         }
 
-        SetupMessageHandlers();
+        connection.Closed += async (error) =>
+        {
+            Console.WriteLine("Connection closed. Attempting to reconnect...");
+            await Task.Delay(2000);
+            await ConnectAsync();
+        };
+
+        connection.On<GameState>(SharedConstants.ReceiveGameStateUpdate, HandleReceivedGameState);
+
         await ConnectAsync();
     }
 
@@ -65,43 +75,44 @@ public class ServerConnection
         }
     }
 
-    private void SetupMessageHandlers()
-    {
-        if (connection == null)
-        {
-            Console.WriteLine("Connection is not initialized.");
-            return;
-        }
-
-        connection.Closed += async (error) =>
-        {
-            Console.WriteLine("Connection closed. Attempting to reconnect...");
-            await Task.Delay(2000);
-            await ConnectAsync();
-        };
-
-        connection.On<string, string>("ReceiveMessage", (user, message) =>
-        {
-            Console.WriteLine($"Received message from server: \"{user}: {message}\"");
-        });
-    }
-
-    public async Task SendMessageAsync(string user, string message)
+    public async Task SendGameStateAsync(GameState gameState)
     {
         if (connection == null || connection.State != HubConnectionState.Connected)
         {
-            Console.WriteLine("Cannot send a message, Connection is not established.");
+            Console.WriteLine("Cannot send game state, Connection is not established.");
             return;
         }
-
         try
         {
-            await connection.InvokeAsync("SendMessage", user, message);
-            Console.WriteLine($"Sent message to the server: \"{user}: {message}\"");
+            await connection.InvokeAsync(SharedConstants.SendGameStateUpdate, gameState);
+            Console.WriteLine("Sent game state to the server.");
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to send message to the server: {ex.Message}");
+            Console.WriteLine($"Failed to send game state to the server: {ex.Message}");
         }
+    }
+
+    public void SendDevState()
+    {
+        if (connection == null || connection.State != HubConnectionState.Connected)
+        {
+            Console.WriteLine("Cannot send dev state, Connection is not established.");
+            return;
+        }
+
+        var gameState = new GameState
+        {
+            PlayerId = "dev",
+            PositionX = 123,
+            PositionY = 456,
+        };
+
+        SendGameStateAsync(gameState);
+    }
+
+    private void HandleReceivedGameState(GameState gameState)
+    {
+        Console.WriteLine("Received game state from the server.");
     }
 }

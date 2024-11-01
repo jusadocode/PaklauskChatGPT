@@ -1,8 +1,12 @@
 using RAID2D.Server.Hubs;
+using RAID2D.Server.Observers;
+using RAID2D.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddSignalR();
+
+builder.Services.AddSingleton<GameStateSubject>();
 
 var app = builder.Build();
 
@@ -12,9 +16,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseRouting();
 
-app.MapHub<ChatHub>("/chathub");
+app.MapHub<GameHub>($"/{SharedConstants.ServerHub}");
 
-app.MapGet("/", () => "Hello World!!");
+app.MapGet("/", () => "Hello World!");
 
 app.Run();
 

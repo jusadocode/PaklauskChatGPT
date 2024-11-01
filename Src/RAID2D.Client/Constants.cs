@@ -31,7 +31,8 @@ public static class Constants
 
     public const PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
 
-    public const string DefaultServerLink = "https://localhost:7260/chathub";
+    public const string ServerBaseUrl = "https://localhost";
+    public const string ServerPort = "7260";
 
     public const string PlayerTag = "Player";
     public const string AnimalTag = "Animal";
