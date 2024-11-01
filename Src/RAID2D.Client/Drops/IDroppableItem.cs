@@ -2,7 +2,8 @@
 
 public interface IDroppableItem
 {
-    public Point Location { get; }
-    public PictureBox PictureBox { get; }
-    public PictureBox Create();
+    Point Location { get; }
+    string Name { get; }
+    Image Image { get; }
+    Size Size { get; }
 }

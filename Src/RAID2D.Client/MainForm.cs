@@ -6,6 +6,7 @@ using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.Services;
 using RAID2D.Client.UI;
 using System.Diagnostics;
+using RAID2D.Client.Drops.Builders;
 
 namespace RAID2D.Client;
 
@@ -185,31 +186,68 @@ public partial class MainForm : Form
 
     private void SpawnAmmoDrop()
     {
-        IDroppableItem ammo = dropSpawner.CreateDrop(Constants.DropAmmoTag);
-        PictureBox ammoPictureBox = ammo.Create();
-        AddControl(ammoPictureBox);
+        IDroppableItem ammoDrop = dropSpawner.CreateDrop(Constants.DropAmmoTag);
+
+        PictureBox ammoDropPictureBox = new AmmoDropBuilder()
+            .SetTag(ammoDrop)
+            .SetName(ammoDrop.Name)
+            .SetImage(ammoDrop.Image)
+            .SetLocation(ammoDrop.Location)
+            .SetSize(ammoDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
+            .Build();
+
+        AddControl(ammoDropPictureBox);
     }
 
     private void SpawnAnimalDrop(Point location, string animalName)
     {
-        IDroppableItem animal = dropSpawner.CreateDrop(Constants.DropAnimalTag, location, animalName);
-        PictureBox animalPictureBox = animal.Create();
+        IDroppableItem animalDrop = dropSpawner.CreateDrop(Constants.DropAnimalTag, location, animalName);
+
+        PictureBox animalPictureBox = new AnimalDropBuilder()
+            .SetTag(animalDrop)
+            .SetName(animalDrop.Name)
+            .SetImage(animalDrop.Image)
+            .SetLocation(animalDrop.Location)
+            .SetSize(animalDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
+            .Build();
+
         AddControl(animalPictureBox);
     }
 
     private void SpawnMedicalDrop()
     {
-        IDroppableItem medical = dropSpawner.CreateDrop(Constants.DropMedicalTag);
-        PictureBox medicalPictureBox = medical.Create();
+        IDroppableItem medicalDrop = dropSpawner.CreateDrop(Constants.DropMedicalTag);
+
+        PictureBox medicalPictureBox = new MedicalDropBuilder()
+            .SetTag(medicalDrop)
+            .SetName(medicalDrop.Name)
+            .SetImage(medicalDrop.Image)
+            .SetLocation(medicalDrop.Location)
+            .SetSize(medicalDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
+            .Build();
+
         AddControl(medicalPictureBox);
     }
 
     private void SpawnValuableDrop(Point location)
     {
-        IDroppableItem valuable = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
-        PictureBox valuablePictureBox = valuable.Create();
+        IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
+
+        PictureBox valuablePictureBox = new ValuableDropBuilder()
+            .SetTag(valuableDrop)
+            .SetName(valuableDrop.Name)
+            .SetImage(valuableDrop.Image)
+            .SetLocation(valuableDrop.Location)
+            .SetSize(valuableDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
+            .Build();
+
         AddControl(valuablePictureBox);
     }
+
 
     private void HandleEntityMovement(PictureBox entity)
     {
