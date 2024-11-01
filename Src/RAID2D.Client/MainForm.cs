@@ -1,5 +1,4 @@
-﻿using RAID2D.Client;
-using RAID2D.Client.Drops;
+﻿using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Managers;
@@ -8,7 +7,7 @@ using RAID2D.Client.Services;
 using RAID2D.Client.UI;
 using System.Diagnostics;
 
-namespace Client;
+namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
