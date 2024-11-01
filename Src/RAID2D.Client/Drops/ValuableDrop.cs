@@ -1,28 +1,20 @@
 ﻿using RAID2D.Client.Managers;
 
-namespace RAID2D.Client.Drops;
-
-public class ValuableDrop(Point location) : IDroppableItem
+namespace RAID2D.Client.Drops
 {
-    public PictureBox PictureBox { get; private set; } = new();
-    public Point Location { get; private set; } = location;
-
-    PictureBox IDroppableItem.Create()
+    public class ValuableDrop : IDroppableItem
     {
-        ValuableDropData data = DropManager.GetRandomValuableDropData();
+        public Point Location { get; private set; }
+        public string Name { get; private set; }
+        public Image Image { get; private set; }
+        public Size Size => Constants.DropSize;
 
-        PictureBox = new()
+        public ValuableDrop(Point location)
         {
-            Tag = Constants.DropValuableTag,
-            Name = data.Name,
-            Image = data.Image,
-            Location = this.Location,
-            Size = Constants.DropSize,
-            SizeMode = Constants.SizeMode,
-        };
-
-        Console.WriteLine($"Spawned {data.Name} at {PictureBox.Location}");
-
-        return PictureBox;
+            Location = location;
+            var data = DropManager.GetRandomValuableDropData();
+            Name = data.Name;
+            Image = data.Image;
+        }
     }
 }

@@ -1,29 +1,22 @@
 ﻿using RAID2D.Client.Managers;
 
-namespace RAID2D.Client.Drops;
-
-public class AnimalDrop(Point location, string animalName) : IDroppableItem
+namespace RAID2D.Client.Drops
 {
-    public PictureBox PictureBox { get; private set; } = new();
-    public Point Location { get; private set; } = location;
-    public string AnimalName { get; private set; } = animalName;
-
-    PictureBox IDroppableItem.Create()
+    public class AnimalDrop : IDroppableItem
     {
-        AnimalDropData data = DropManager.GetRandomAnimalDropDataByAnimalName(AnimalName);
+        public Point Location { get; private set; }
+        public string Name { get; private set; }
+        public Image Image { get; private set; }
+        public Size Size => Constants.DropSize;
+        public string AnimalName { get; private set; }
 
-        PictureBox = new()
+        public AnimalDrop(Point location, string animalName)
         {
-            Tag = Constants.DropAnimalTag,
-            Name = data.Name,
-            Image = data.Image,
-            Location = this.Location,
-            Size = Constants.DropSize,
-            SizeMode = Constants.SizeMode,
-        };
-
-        Console.WriteLine($"Spawned {data.Name} at {PictureBox.Location}");
-
-        return PictureBox;
+            Location = location;
+            AnimalName = animalName;
+            var data = DropManager.GetRandomAnimalDropDataByAnimalName(animalName);
+            Name = data.Name;
+            Image = data.Image;
+        }
     }
 }
