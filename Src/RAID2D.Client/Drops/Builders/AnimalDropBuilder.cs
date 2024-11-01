@@ -1,56 +1,53 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
+﻿namespace RAID2D.Client.Drops.Builders;
 
-namespace RAID2D.Client.Drops.Builders;
-
-public class DropItemBuilder
+public class AnimalDropBuilder : IDropItemBuilder
 {
     private PictureBox pictureBox;
 
-    public DropItemBuilder()
+    public AnimalDropBuilder()
     {
         pictureBox = new PictureBox();
     }
 
-    public DropItemBuilder SetTag(IDroppableItem drop)
+    public IDropItemBuilder SetTag(IDroppableItem drop)
     {
         pictureBox.Tag = GetTagForDropType(drop);
-        return this; 
+        return this;
     }
 
-    public DropItemBuilder SetName(string name)
+    public IDropItemBuilder SetName(string name)
     {
         pictureBox.Name = name;
-        return this; 
+        return this;
     }
 
-    public DropItemBuilder SetImage(Image image)
+    public IDropItemBuilder SetImage(Image image)
     {
         pictureBox.Image = image;
-        return this; 
+        return this;
     }
 
-    public DropItemBuilder SetLocation(Point location)
+    public IDropItemBuilder SetLocation(Point location)
     {
         pictureBox.Location = location;
-        return this; 
+        return this;
     }
 
-    public DropItemBuilder SetSize(Size size)
+    public IDropItemBuilder SetSize(Size size)
     {
         pictureBox.Size = size;
-        return this; 
+        return this;
     }
 
-    public DropItemBuilder SetSizeMode(PictureBoxSizeMode sizeMode)
+    public IDropItemBuilder SetSizeMode(PictureBoxSizeMode sizeMode)
     {
         pictureBox.SizeMode = sizeMode;
-        return this; 
+        return this;
     }
 
     public PictureBox Build()
     {
-        return pictureBox; 
+        return pictureBox;
     }
     private string GetTagForDropType(IDroppableItem dropItem)
     {

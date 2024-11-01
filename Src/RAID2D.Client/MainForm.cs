@@ -189,7 +189,7 @@ public partial class MainForm : Form
     {
         IDroppableItem ammoDrop = dropSpawner.CreateDrop(Constants.DropAmmoTag);
 
-        PictureBox ammoDropPictureBox = new DropItemBuilder()
+        PictureBox ammoDropPictureBox = new AmmoDropBuilder()
             .SetTag(ammoDrop)
             .SetName(ammoDrop.Name)
             .SetImage(ammoDrop.Image)
@@ -205,7 +205,7 @@ public partial class MainForm : Form
     {
         IDroppableItem animalDrop = dropSpawner.CreateDrop(Constants.DropAnimalTag, location, animalName);
 
-        PictureBox animalPictureBox = new DropItemBuilder()
+        PictureBox animalPictureBox = new AnimalDropBuilder()
             .SetTag(animalDrop)
             .SetName(animalDrop.Name)
             .SetImage(animalDrop.Image)
@@ -221,7 +221,7 @@ public partial class MainForm : Form
     {
         IDroppableItem medicalDrop = dropSpawner.CreateDrop(Constants.DropMedicalTag);
 
-        PictureBox medicalPictureBox = new DropItemBuilder()
+        PictureBox medicalPictureBox = new MedicalDropBuilder()
             .SetTag(medicalDrop)
             .SetName(medicalDrop.Name)
             .SetImage(medicalDrop.Image)
@@ -237,7 +237,7 @@ public partial class MainForm : Form
     {
         IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
 
-        PictureBox valuablePictureBox = new DropItemBuilder()
+        PictureBox valuablePictureBox = new ValuableDropBuilder()
             .SetTag(valuableDrop)
             .SetName(valuableDrop.Name)
             .SetImage(valuableDrop.Image)
