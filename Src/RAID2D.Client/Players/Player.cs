@@ -1,10 +1,10 @@
 ﻿using RAID2D.Client.Effects;
-using RAID2D.Client.Enums;
 using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
+using RAID2D.Shared.Enums;
 
-namespace RAID2D.Client;
+namespace RAID2D.Client.Players;
 
 public class Player(
     int health = Constants.PlayerMaxHealth,

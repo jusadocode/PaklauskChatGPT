@@ -2,7 +2,7 @@
 
 public class MedicalDropBuilder : IDropItemBuilder
 {
-    private PictureBox pictureBox;
+    private readonly PictureBox pictureBox;
 
     public MedicalDropBuilder()
     {

@@ -18,6 +18,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RAID2D.Shared\RAID2D.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Assets.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>

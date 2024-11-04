@@ -1,5 +1,5 @@
-﻿using RAID2D.Client.Enums;
-using RAID2D.Client.UI;
+﻿using RAID2D.Client.UI;
+using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.Effects;
 

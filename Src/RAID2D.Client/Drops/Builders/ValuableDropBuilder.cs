@@ -2,7 +2,7 @@
 
 public class ValuableDropBuilder : IDropItemBuilder
 {
-    private PictureBox pictureBox;
+    private readonly PictureBox pictureBox;
 
     public ValuableDropBuilder()
     {

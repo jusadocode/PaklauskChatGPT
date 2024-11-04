@@ -1,19 +1,23 @@
-﻿using RAID2D.Client;
-using RAID2D.Client.Drops;
+﻿using RAID2D.Client.Drops;
+using RAID2D.Client.Drops.Builders;
 using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Managers;
 using RAID2D.Client.MovementStrategies;
+using RAID2D.Client.Players;
 using RAID2D.Client.Services;
 using RAID2D.Client.UI;
+using RAID2D.Shared.Enums;
+using RAID2D.Shared.Models;
 using System.Diagnostics;
-using RAID2D.Client.Drops.Builders;
 
-namespace Client;
+namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
     private readonly ServerConnection server = new();
+    private readonly GameState gameState = new(new Point(0, 0), Direction.Right);
+    public Dictionary<string, ServerPlayer> serverPlayers = [];
 
     private readonly Player player = new();
 
@@ -31,6 +35,8 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
+        InitializeServer();
+        InitializeDevTools();
         InitializeGUI();
         InitializeGameLoop();
         InitializePlayer();
@@ -40,15 +46,17 @@ public partial class MainForm : Form
 
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
     {
-        HandlePlayerInput();
+        SendDataToServer();
 
-        if (player.IsDead())
+        if (!IsFormFocused())
             return;
 
-        UI.UpdateFPS(1 / deltaTime);
+        HandlePlayerInput();
 
-        DayTimeManager.Update(deltaTime);
-        entitySpawner = DayTimeManager.IsDay() ? new DayEntitySpawner() : new NightEntitySpawner();
+        if (player.IsDead() || UI.IsPaused())
+            return;
+
+        HandleGUI(deltaTime);
 
         foreach (PictureBox box in this.Controls.OfType<PictureBox>().ToList())
         {
@@ -61,6 +69,19 @@ public partial class MainForm : Form
         }
     }
 
+    private void InitializeDevTools()
+    {
+#if DEBUG
+        UI.CreateDevButtons(player, server, SpawnEntities, AddControl);
+        server.Connect(Constants.ServerDefaultUrl);
+#endif
+    }
+
+    private void InitializeServer()
+    {
+        server.SetCallbacks(GetDataFromServer);
+    }
+
     private void InitializeGUI()
     {
         // Force fullscreen on startup
@@ -68,11 +89,21 @@ public partial class MainForm : Form
         this.FormBorderStyle = FormBorderStyle.None;
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
 
+        // Pause the game on alt-tab
+        this.Activated += (s, e) => UI.SetPauseMenuVisibility(false);
+        this.Deactivate += (s, e) => UI.SetPauseMenuVisibility(true);
+
+        // Initialize GUI elements
         UI.BindElements(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
         UI.SetResolution(ClientSize);
-        UI.CreatePauseMenu(onConnectClick: server.InitializeConnection, onDisconnectClick: async () => await server.DisconnectAsync(), onQuitClick: Application.Exit, onPanelCreate: AddControl);
+        UI.CreatePauseMenu(
+            onConnectClick: server.Connect,
+            onDisconnectClick: async () => await server.DisconnectAsync(),
+            onQuitClick: Application.Exit,
+            onPanelCreate: AddControl);
         UI.CreateDevButtons(player, server, SpawnEntities, AddControl);
 
+        // Initialize day/night cycle
         DayTimeManager.Initialize(this);
     }
 
@@ -104,6 +135,59 @@ public partial class MainForm : Form
         RestartGame();
     }
 
+    private void HandleGUI(double deltaTime)
+    {
+        UI.UpdateFPS(1 / deltaTime);
+
+        DayTimeManager.Update(deltaTime);
+        entitySpawner = DayTimeManager.IsDay() ? new DayEntitySpawner() : new NightEntitySpawner();
+    }
+
+    private async void SendDataToServer()
+    {
+        if (!server.IsConnected())
+            return;
+
+        gameState.Location = player.PictureBox.Location;
+        gameState.Direction = player.Direction;
+
+        await server.SendGameStateAsync(gameState);
+    }
+
+    private void GetDataFromServer(GameState gameState)
+    {
+        //Console.WriteLine($"Received gameState={gameState}");
+
+        serverPlayers.TryGetValue(gameState.ConnectionID, out ServerPlayer? serverPlayer);
+
+        if (serverPlayer == null)
+        {
+            ServerPlayer newPlayer = new();
+            newPlayer.Create(gameState);
+
+            serverPlayers.Add(gameState.ConnectionID, newPlayer);
+
+            if (!newPlayer.IsRendered && newPlayer.PictureBox != null)
+            {
+                newPlayer.IsRendered = true;
+
+                this.Invoke((MethodInvoker)delegate
+                {
+                    AddControl(newPlayer.PictureBox);
+                });
+
+                Console.WriteLine($"added new player at loc={newPlayer.PictureBox.Location}");
+            }
+        }
+        else
+        {
+            this.Invoke((MethodInvoker)delegate
+            {
+                serverPlayer.Update(gameState);
+            });
+        }
+    }
+
     private void HandlePlayerInput()
     {
         if (player.IsDead())
@@ -114,13 +198,16 @@ public partial class MainForm : Form
             return;
         }
 
+        if (InputManager.IsKeyDownOnce(Keys.Escape))
+            UI.TogglePauseMenuVisibility();
+
+        if (UI.IsPaused())
+            return;
+
         player.Move();
 
         if (InputManager.IsKeyDownOnce(Keys.Space))
             player.ShootBullet(AddControl, RemoveControl);
-
-        if (InputManager.IsKeyDownOnce(Keys.Escape))
-            UI.TogglePauseMenuVisibility();
     }
 
     private void HandleEnemyInteraction(PictureBox enemy)
@@ -363,6 +450,7 @@ public partial class MainForm : Form
     private static bool IsEnemy(Control enemy) => enemy.Tag as string is Constants.EnemyTag;
     private static bool IsAnimal(Control animal) => animal.Tag as string is Constants.AnimalTag;
     private static bool IsBullet(Control bullet) => bullet.Tag as string is Constants.BulletTag;
+    private bool IsFormFocused() => ActiveForm == this;
 
     private void AddControl(Control control)
     {

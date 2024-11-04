@@ -1,20 +1,33 @@
 ﻿using Microsoft.AspNetCore.SignalR.Client;
+using RAID2D.Shared;
+using RAID2D.Shared.Models;
 
 namespace RAID2D.Client.Services;
 
 public class ServerConnection
 {
     private HubConnection? connection;
+    private Action<GameState>? onGameStateReceive;
 
-    public ServerConnection() { }
+    public bool IsConnected()
+    {
+        return connection != null && connection.State == HubConnectionState.Connected;
+    }
 
-    public async void InitializeConnection(string serverUrl)
+    public async void Connect(string serverUrl)
     {
         try
         {
             connection = new HubConnectionBuilder()
                 .WithUrl(serverUrl)
                 .Build();
+
+            if (onGameStateReceive == null)
+                throw new InvalidOperationException("onGameStateReceive callback is not set.");
+
+            connection.On<GameState>(SharedConstants.ReceiveGameStateUpdate, ReceiveGameState);
+
+            await connection.StartAsync();
         }
         catch (Exception ex)
         {
@@ -23,32 +36,20 @@ public class ServerConnection
             return;
         }
 
-        SetupMessageHandlers();
-        await ConnectAsync();
+        Console.WriteLine("Connected to the server successfully.");
     }
 
-    public async Task ConnectAsync()
+    public void SetCallbacks(Action<GameState> onGameStateReceive)
     {
-        if (connection == null)
-        {
-            Console.WriteLine("Cannot connect to the server, connection is not initialized.");
-            return;
-        }
+        if (IsConnected())
+            throw new InvalidOperationException("Cannot set callbacks while connected to the server.");
 
-        try
-        {
-            await connection.StartAsync();
-            Console.WriteLine("Connected to the server successfully.");
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Failed to connect to the server: {ex.Message}");
-        }
+        this.onGameStateReceive = onGameStateReceive;
     }
 
     public async Task DisconnectAsync()
     {
-        if (connection == null)
+        if (!IsConnected())
         {
             Console.WriteLine("Cannot disconnect from server, Connection is not initialized.");
             return;
@@ -56,7 +57,7 @@ public class ServerConnection
 
         try
         {
-            await connection.StopAsync();
+            await connection!.StopAsync();
             Console.WriteLine("Disconnected from the server successfully.");
         }
         catch (Exception ex)
@@ -65,43 +66,36 @@ public class ServerConnection
         }
     }
 
-    private void SetupMessageHandlers()
+    public async Task SendGameStateAsync(GameState gameState)
     {
-        if (connection == null)
+        if (!IsConnected())
         {
-            Console.WriteLine("Connection is not initialized.");
-            return;
-        }
-
-        connection.Closed += async (error) =>
-        {
-            Console.WriteLine("Connection closed. Attempting to reconnect...");
-            await Task.Delay(2000);
-            await ConnectAsync();
-        };
-
-        connection.On<string, string>("ReceiveMessage", (user, message) =>
-        {
-            Console.WriteLine($"Received message from server: \"{user}: {message}\"");
-        });
-    }
-
-    public async Task SendMessageAsync(string user, string message)
-    {
-        if (connection == null || connection.State != HubConnectionState.Connected)
-        {
-            Console.WriteLine("Cannot send a message, Connection is not established.");
+            Console.WriteLine("Cannot send game state, Connection is not established.");
             return;
         }
 
         try
         {
-            await connection.InvokeAsync("SendMessage", user, message);
-            Console.WriteLine($"Sent message to the server: \"{user}: {message}\"");
+            //Console.WriteLine("Sent game state to the server.");
+
+            await connection!.InvokeAsync(SharedConstants.SendGameStateUpdate, gameState);
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Failed to send message to the server: {ex.Message}");
+            Console.WriteLine($"Failed to send game state to the server: {ex.Message}");
+        }
+    }
+
+    public void ReceiveGameState(GameState gameState)
+    {
+        try
+        {
+            onGameStateReceive?.Invoke(gameState);
+        }
+        catch (Exception e)
+        {
+            string message = $"Unhandled Exception:\n\n{e.Message}\n\nStack Trace:\n{e.StackTrace}";
+            MessageBox.Show(message, "Unhandled Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

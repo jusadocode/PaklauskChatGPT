@@ -1,4 +1,4 @@
-﻿namespace RAID2D.Client.Enums;
+﻿namespace RAID2D.Shared.Enums;
 
 public enum Direction
 {

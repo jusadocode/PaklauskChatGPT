@@ -1,4 +1,4 @@
-﻿namespace Client
+﻿namespace RAID2D.Client
 {
     partial class MainForm
     {

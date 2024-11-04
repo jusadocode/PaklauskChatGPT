@@ -1,4 +1,5 @@
-﻿using RAID2D.Client.Utils;
+﻿using RAID2D.Client.Players;
+using RAID2D.Client.Utils;
 using Xunit.Abstractions;
 
 namespace RAID2D.Client.Tests;

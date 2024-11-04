@@ -1,4 +1,4 @@
-﻿using RAID2D.Client.Enums;
+﻿using RAID2D.Shared.Enums;
 using System.Runtime.InteropServices;
 
 namespace RAID2D.Client.Managers;
