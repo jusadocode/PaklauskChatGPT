@@ -6,12 +6,12 @@ namespace RAID2D.Server.Hubs;
 
 public class GameHub : Hub
 {
-    private readonly GameStateSubject positionSubject;
+    private readonly GameStateSubject gameStateSubject;
     private readonly IHubContext<GameHub> hubContext;
 
     public GameHub(GameStateSubject positionSubject, IHubContext<GameHub> hubContext)
     {
-        this.positionSubject = positionSubject;
+        this.gameStateSubject = positionSubject;
         this.hubContext = hubContext;
     }
 
@@ -19,8 +19,8 @@ public class GameHub : Hub
     {
         Console.WriteLine($"Client connected: {Context.ConnectionId}");
 
-        var observer = new GameStateObserver(Context.ConnectionId, hubContext);
-        positionSubject.Attach(observer);
+        var observer = new GameStateObserver(gameStateSubject, Context.ConnectionId, hubContext);
+        gameStateSubject.Attach(observer);
 
         await base.OnConnectedAsync();
     }
@@ -29,17 +29,20 @@ public class GameHub : Hub
     {
         Console.WriteLine($"Client disconnected: {Context.ConnectionId} {(exception != null ? $"error: {exception.Message}" : "")}");
 
-        var observer = positionSubject.Observers.FirstOrDefault(o => o is GameStateObserver obs && obs.ID == Context.ConnectionId);
+        var observer = gameStateSubject.Observers.FirstOrDefault(o => o is GameStateObserver obs && obs.ConnectionID == Context.ConnectionId);
         if (observer != null)
-            positionSubject.Detach(observer);
+            gameStateSubject.Detach(observer);
 
         await base.OnDisconnectedAsync(exception);
     }
 
     public async Task SendGameStateUpdate(GameState gameState)
     {
-        Console.WriteLine($"Received game state from Client.");
+        //Console.WriteLine($"Received GameState:\"{gameState}\" from ClientID={Context.ConnectionId}.");
 
-        await positionSubject.NotifyAll(gameState);
+        gameState.ConnectionID = Context.ConnectionId;
+        gameStateSubject.SetState(gameState);
+
+        await gameStateSubject.NotifyAll();
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace RAID2D.Client;
+﻿using RAID2D.Shared;
+
+namespace RAID2D.Client;
 
 public static class Constants
 {
@@ -33,8 +35,10 @@ public static class Constants
 
     public const string ServerBaseUrl = "https://localhost";
     public const string ServerPort = "7260";
+    public const string ServerDefaultUrl = $"{ServerBaseUrl}:{ServerPort}/{SharedConstants.ServerHub}";
 
     public const string PlayerTag = "Player";
+    public const string ServerPlayerTag = "ServerPlayer";
     public const string AnimalTag = "Animal";
     public const string EnemyTag = "Enemy";
     public const string BulletTag = "Bullet";
@@ -45,6 +49,7 @@ public static class Constants
     public const string DropValuableTag = "DropValuable";
 
     public const string PlayerName = "Player";
+    public const string ServerPlayerName = "ServerPlayer";
     public const string EnemyZombieName = "Zombie";
     public const string EnemyCreeperName = "Creeper";
     public const string AnimalBoarName = "Boar";
@@ -71,7 +76,7 @@ public static class Constants
     public static readonly Color DayColor = Color.FromArgb(0xFF, 0x8F, 0xBC, 0x8F); // Light green
     public static readonly Color NightColor = Color.FromArgb(0xFF, 0x2F, 0x4F, 0x2F); // Dark green
 
-    public static readonly Dictionary<string, (Bitmap Up, Bitmap Down, Bitmap Left, Bitmap Right)> EntityImages = new()
+    public static readonly Dictionary<string, (Bitmap Up, Bitmap Down, Bitmap Left, Bitmap Right)> DirectionalImages = new()
     {
         { PlayerName, (Assets.PlayerUp, Assets.PlayerDown, Assets.PlayerLeft, Assets.PlayerRight) },
         { EnemyZombieName, (Assets.EnemyZombieUp, Assets.EnemyZombieDown, Assets.EnemyZombieLeft, Assets.EnemyZombieRight) },

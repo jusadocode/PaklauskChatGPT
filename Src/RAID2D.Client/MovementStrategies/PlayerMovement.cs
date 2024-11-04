@@ -1,6 +1,7 @@
-﻿using RAID2D.Client.Enums;
-using RAID2D.Client.Managers;
+﻿using RAID2D.Client.Managers;
+using RAID2D.Client.Players;
 using RAID2D.Client.Utils;
+using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.MovementStrategies;
 

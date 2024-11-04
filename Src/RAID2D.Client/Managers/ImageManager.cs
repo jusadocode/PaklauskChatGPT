@@ -1,14 +1,30 @@
-﻿namespace RAID2D.Client.Managers;
+﻿using RAID2D.Shared.Enums;
+
+namespace RAID2D.Client.Managers;
 
 public static class ImageManager
 {
     public static Bitmap GetImageFromDirection(string name, double x, double y)
     {
-        return !Constants.EntityImages.TryGetValue(name, out var images)
+        return !Constants.DirectionalImages.TryGetValue(name, out var images)
             ? throw new NotImplementedException($"No images found for {name}")
             : Math.Abs(y) > Math.Abs(x)
                 ? y < 0 ? images.Up : images.Down
                 : x < 0 ? images.Left : images.Right;
+    }
+
+    public static Bitmap GetImageFromDirection(string name, Direction direction)
+    {
+        return !Constants.DirectionalImages.TryGetValue(name, out var images)
+            ? throw new NotImplementedException($"No images found for {name}")
+            : direction switch
+            {
+                Direction.Up => images.Up,
+                Direction.Down => images.Down,
+                Direction.Left => images.Left,
+                Direction.Right => images.Right,
+                _ => throw new NotImplementedException($"No image found for {direction}")
+            };
     }
 
     // Code below is not used, but could get implemented in the future if needed

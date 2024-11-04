@@ -2,7 +2,7 @@
 
 public class AnimalDropBuilder : IDropItemBuilder
 {
-    private PictureBox pictureBox;
+    private readonly PictureBox pictureBox;
 
     public AnimalDropBuilder()
     {

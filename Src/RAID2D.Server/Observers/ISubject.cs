@@ -1,6 +1,4 @@
-﻿using RAID2D.Shared.Models;
-
-namespace RAID2D.Server.Observers;
+﻿namespace RAID2D.Server.Observers;
 
 public interface ISubject
 {
@@ -8,5 +6,5 @@ public interface ISubject
 
     void Attach(IObserver observer);
     void Detach(IObserver observer);
-    Task NotifyAll(GameState gameState);
+    Task NotifyAll();
 }

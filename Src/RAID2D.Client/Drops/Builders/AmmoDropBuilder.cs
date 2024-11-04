@@ -2,7 +2,7 @@
 
 public class AmmoDropBuilder : IDropItemBuilder
 {
-    private PictureBox pictureBox;
+    private readonly PictureBox pictureBox;
 
     public AmmoDropBuilder()
     {
@@ -12,42 +12,42 @@ public class AmmoDropBuilder : IDropItemBuilder
     public IDropItemBuilder SetTag(IDroppableItem drop)
     {
         pictureBox.Tag = GetTagForDropType(drop);
-        return this; 
+        return this;
     }
 
     public IDropItemBuilder SetName(string name)
     {
         pictureBox.Name = name;
-        return this; 
+        return this;
     }
 
     public IDropItemBuilder SetImage(Image image)
     {
         pictureBox.Image = image;
-        return this; 
+        return this;
     }
 
     public IDropItemBuilder SetLocation(Point location)
     {
         pictureBox.Location = location;
-        return this; 
+        return this;
     }
 
     public IDropItemBuilder SetSize(Size size)
     {
         pictureBox.Size = size;
-        return this; 
+        return this;
     }
 
     public IDropItemBuilder SetSizeMode(PictureBoxSizeMode sizeMode)
     {
         pictureBox.SizeMode = sizeMode;
-        return this; 
+        return this;
     }
 
     public PictureBox Build()
     {
-        return pictureBox; 
+        return pictureBox;
     }
     private string GetTagForDropType(IDroppableItem dropItem)
     {
