@@ -20,10 +20,12 @@ public static class Constants
     public const int HitmarkDuration = 200;
 
     public const uint EnemyDamage = 1;
+    public const uint PulsingEnemyDamage = 50;
 
     public const int PlayerMaxHealth = 100;
     public const uint PlayerInitialAmmo = 10;
     public const uint PlayerLowHealthLimit = 20;
+    public const int ShieldedEnemyMaxHealth = 50;
 
     public const uint EnemyFleeRadius = 500;
     public const uint AnimalFleeRadius = 300;
@@ -41,6 +43,8 @@ public static class Constants
     public const string ServerPlayerTag = "ServerPlayer";
     public const string AnimalTag = "Animal";
     public const string EnemyTag = "Enemy";
+    public const string PulsingEnemyTag = "PulsingEnemy";
+    public const string ShieldedEnemyTag = "ShieldedEnemy";
     public const string BulletTag = "Bullet";
     public const string HitmarkerTag = "Hitmarker";
     public const string DropAmmoTag = "DropAmmo";
