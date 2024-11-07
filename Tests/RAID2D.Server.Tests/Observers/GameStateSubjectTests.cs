@@ -1,13 +1,8 @@
-
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Threading.Tasks;
 using NSubstitute;
 using RAID2D.Server.Observers;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
-using Xunit;
+using System.Drawing;
 
 namespace RAID2D.Server.Tests.Observers;
 public class GameStateSubjectTests

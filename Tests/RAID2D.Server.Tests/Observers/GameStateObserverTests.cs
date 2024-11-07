@@ -1,11 +1,7 @@
-
-using System;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using NSubstitute;
 using RAID2D.Server.Hubs;
 using RAID2D.Server.Observers;
-using Xunit;
 
 namespace RAID2D.Server.Tests.Observers;
 public class GameStateObserverTests
@@ -49,7 +45,7 @@ public class GameStateObserverTests
     [InlineData(null)]
     [InlineData("")]
     [InlineData("   ")]
-    public void CannotConstructWithInvalidConnectionID(string value)
+    public void CannotConstructWithInvalidConnectionID(string? value)
     {
         Assert.Throws<ArgumentNullException>(() => new GameStateObserver(_subject, value, _hubContext));
     }
