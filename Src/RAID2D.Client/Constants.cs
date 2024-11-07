@@ -33,6 +33,8 @@ public static class Constants
     public const uint AnimalCount = 3;
     public const uint EnemyCount = 3;
 
+    public const uint MutatedEnemySpawnChance = 20;
+
     public const PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
 
     public const string ServerBaseUrl = "https://localhost";

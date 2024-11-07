@@ -1,13 +1,11 @@
-﻿using System.Windows.Forms;
-using RAID2D.Client.Entities.Enemies.Prototype;
+﻿using RAID2D.Client.Entities.Enemies.Prototype;
 using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.Entities.Enemies;
 
 public class Zombie : IEnemy, IPrototype
 {
-    public PictureBox PictureBox { get; set; } = new();
-
+    public PictureBox PictureBox { get; private set; } = new();
 
     public Zombie()
     {
@@ -29,18 +27,14 @@ public class Zombie : IEnemy, IPrototype
         return PictureBox;
     }
 
-
     public IPrototype ShallowClone()
     {
         return (IPrototype)this.MemberwiseClone();
     }
 
-
     public IPrototype DeepClone()
     {
-
         var clonedZombie = (Zombie)this.MemberwiseClone();
-
 
         clonedZombie.PictureBox = new PictureBox
         {
@@ -54,9 +48,4 @@ public class Zombie : IEnemy, IPrototype
 
         return clonedZombie;
     }
-    public PictureBox GetPictureBox()
-    {
-        return this.PictureBox;
-    }
 }
-

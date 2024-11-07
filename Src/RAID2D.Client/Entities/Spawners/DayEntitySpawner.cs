@@ -6,11 +6,14 @@ namespace RAID2D.Client.Entities.Spawners;
 
 public class DayEntitySpawner : IEntitySpawner
 {
-    private readonly IPrototype creeperPrototype = new Creeper();
+    private Creeper? creeperPrototype;
+
     public IEnemy CreateEnemy()
     {
+        creeperPrototype ??= new Creeper();
+
         IPrototype clonedCreeper = creeperPrototype.DeepClone();
-        return clonedCreeper as IEnemy;
+        return clonedCreeper as IEnemy ?? throw new InvalidOperationException("This should not happen");
     }
 
     public IAnimal CreateAnimal()

@@ -1,20 +1,16 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-
-namespace RAID2D.Client.Entities.Enemies.Decorators;
+﻿namespace RAID2D.Client.Entities.Enemies.Decorators;
 
 internal class PulsingEnemyDecorator : EnemyDecorator
 {
-    private int pulseSpeed = 1; 
-    private float currentIntensity = 0f; 
+    private int pulseSpeed = 1;
+    private float currentIntensity = 0f;
 
-    private Timer pulseTimer;
+    private readonly Timer pulseTimer;
 
     public PulsingEnemyDecorator(IEnemy enemy) : base(enemy)
     {
         pulseTimer = new Timer();
-        pulseTimer.Interval = 100; 
+        pulseTimer.Interval = 100;
         pulseTimer.Tick += (sender, e) => UpdatePulseEffect();
         pulseTimer.Start();
         this.PictureBox.Tag += Constants.PulsingEnemyTag;
@@ -26,8 +22,8 @@ internal class PulsingEnemyDecorator : EnemyDecorator
     // Updates the appearance of the enemy, applying a pulsing effect
     public override void UpdateAppearance()
     {
-        Bitmap originalImage = new Bitmap(this.PictureBox.Image);
-        Bitmap pulsingImage = new Bitmap(originalImage.Width, originalImage.Height);
+        Bitmap originalImage = new(this.PictureBox.Image);
+        Bitmap pulsingImage = new(originalImage.Width, originalImage.Height);
 
         using (Graphics g = Graphics.FromImage(pulsingImage))
         {
@@ -40,7 +36,7 @@ internal class PulsingEnemyDecorator : EnemyDecorator
         }
 
         this.PictureBox.Image = pulsingImage;
-            
+
     }
 
     private void UpdatePulseEffect()

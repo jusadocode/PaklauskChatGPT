@@ -1,11 +1,11 @@
-﻿using System.Windows.Forms;
-using RAID2D.Client.Entities.Enemies.Prototype;
+﻿using RAID2D.Client.Entities.Enemies.Prototype;
 using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.Entities.Enemies;
 public class Creeper : IEnemy, IPrototype
 {
     public PictureBox PictureBox { get; private set; } = new();
+
     public Creeper()
     {
         Create();
@@ -26,18 +26,14 @@ public class Creeper : IEnemy, IPrototype
         return PictureBox;
     }
 
-
     public IPrototype ShallowClone()
     {
         return (IPrototype)this.MemberwiseClone();
     }
 
-
     public IPrototype DeepClone()
     {
-
         var clonedCreeper = (Creeper)this.MemberwiseClone();
-
 
         clonedCreeper.PictureBox = new PictureBox
         {
