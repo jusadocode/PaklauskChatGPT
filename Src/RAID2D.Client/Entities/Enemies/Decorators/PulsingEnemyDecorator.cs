@@ -29,10 +29,8 @@ internal class PulsingEnemyDecorator : EnemyDecorator
         {
             g.DrawImage(originalImage, 0, 0);
 
-            using (Brush redBrush = new SolidBrush(Color.FromArgb((int)(currentIntensity * 255), Color.Red)))
-            {
-                g.FillRectangle(redBrush, 0, 0, pulsingImage.Width, pulsingImage.Height);
-            }
+            using Brush redBrush = new SolidBrush(Color.FromArgb((int)(currentIntensity * 255), Color.Red));
+            g.FillRectangle(redBrush, 0, 0, pulsingImage.Width, pulsingImage.Height);
         }
 
         this.PictureBox.Image = pulsingImage;
@@ -43,7 +41,7 @@ internal class PulsingEnemyDecorator : EnemyDecorator
     {
         currentIntensity += pulseSpeed * 0.05f;
 
-        if (currentIntensity >= 1f || currentIntensity <= 0f)
+        if (currentIntensity is >= 1f or <= 0f)
         {
             pulseSpeed = -pulseSpeed;
         }
