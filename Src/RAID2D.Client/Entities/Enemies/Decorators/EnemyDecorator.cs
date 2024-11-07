@@ -1,5 +1,4 @@
-﻿using RAID2D.Client;
-using RAID2D.Client.Entities.Enemies;
+﻿using RAID2D.Client.Entities.Enemies;
 
 public abstract class EnemyDecorator : IEnemy
 {
@@ -20,5 +19,4 @@ public abstract class EnemyDecorator : IEnemy
         UpdateAppearance();
         return pictureBox;
     }
-
 }

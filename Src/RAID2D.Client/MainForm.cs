@@ -1,6 +1,7 @@
 ﻿using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Builders;
 using RAID2D.Client.Drops.Spawners;
+using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Managers;
@@ -8,6 +9,7 @@ using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.Players;
 using RAID2D.Client.Services;
 using RAID2D.Client.UI;
+using RAID2D.Client.Utils;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
 using System.Diagnostics;
@@ -39,8 +41,8 @@ public partial class MainForm : Form
         InitializeComponent();
 
         InitializeServer();
-        InitializeDevTools();
         InitializeGUI();
+        InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
 
@@ -105,7 +107,6 @@ public partial class MainForm : Form
             onDisconnectClick: async () => await server.DisconnectAsync(),
             onQuitClick: Application.Exit,
             onPanelCreate: AddControl);
-        UI.CreateDevButtons(player, server, SpawnEntities, AddControl);
 
         // Initialize day/night cycle
         DayTimeManager.Initialize(this);
@@ -135,7 +136,6 @@ public partial class MainForm : Form
     {
         player.OnEmptyMagazine += SpawnAmmoDrop;
         player.OnLowHealth += SpawnMedicalDrop;
-
         RestartGame();
     }
 
@@ -358,7 +358,6 @@ public partial class MainForm : Form
         AddControl(valuablePictureBox);
     }
 
-
     private void HandleEntityMovement(PictureBox entity)
     {
         if (!IsEnemyOrAnimal(entity))
@@ -376,9 +375,7 @@ public partial class MainForm : Form
             if (IsAnimal(entity) && movementStrategy is not FleeMovement)
                 entityMovementStrategies[entity] = new FleeMovement(player.PictureBox, speed);
             else if (IsEnemy(entity) && movementStrategy is not ChaseMovement)
-            {
                 entityMovementStrategies[entity] = new ChaseMovement(player.PictureBox, speed);
-            }
         }
         else
         {
@@ -388,7 +385,6 @@ public partial class MainForm : Form
 
         movementStrategy.Move(entity);
     }
-
 
     private void HandleBulletCollision(PictureBox entity)
     {
@@ -409,7 +405,6 @@ public partial class MainForm : Form
 
             player.RegisterKill(bullet.Bounds.Location, AddControl, RemoveControl);
 
- 
             if (IsEnemy(entity))
             {
                 SpawnValuableDrop(entity.Location);
@@ -429,47 +424,35 @@ public partial class MainForm : Form
 
     private void SpawnEnemy()
     {
-        var enemy = entitySpawner.CreateEnemy();
-        var pictureBox = enemy.PictureBox;
+        IEnemy enemy = entitySpawner.CreateEnemy();
 
-        entityMovementStrategies[pictureBox] = new WanderMovement(Constants.EnemySpeed / 2);
-
-        AddControl(pictureBox);
-    }
-
-    private void SpawnMutatedEnemy()
-    {
-        var enemy = entitySpawner.CreateEnemy();
-
-        Random rand = new Random();
-
-        int mutationChoice = rand.Next(0, 3);
-
-        switch (mutationChoice)
+        if (Rand.Next(0, 101) < Constants.MutatedEnemySpawnChance)
         {
-            case 0:
-                enemy = new ShieldedEnemyDecorator(enemy);
-                break;
-            case 1:
-                enemy = new PulsingEnemyDecorator(enemy);
-                break;
-            case 2:
-                enemy = new ShieldedEnemyDecorator(new PulsingEnemyDecorator(enemy));
-                break;
-            default:
-                break;
+            switch (Rand.Next(0, 3))
+            {
+                case 0:
+                    enemy = new ShieldedEnemyDecorator(enemy);
+                    break;
+                case 1:
+                    enemy = new PulsingEnemyDecorator(enemy);
+                    break;
+                case 2:
+                    enemy = new ShieldedEnemyDecorator(new PulsingEnemyDecorator(enemy));
+                    break;
+                default:
+                    break;
+            }
         }
-        
-        var pictureBox = enemy.PictureBox;
+
+        PictureBox pictureBox = enemy.PictureBox;
 
         if (IsShieldedEnemy(pictureBox))
-            InitializeShieldedEnemyHealth(pictureBox);
+            shieldedEnemyHealth[pictureBox] = Constants.ShieldedEnemyMaxHealth;
 
         entityMovementStrategies[pictureBox] = new WanderMovement(Constants.EnemySpeed / 2);
 
         AddControl(pictureBox);
     }
-
 
     private void SpawnAnimal()
     {
@@ -481,30 +464,13 @@ public partial class MainForm : Form
         AddControl(pictureBox);
     }
 
-    private void SpawnAnimals(uint count)
+    private void SpawnEntities()
     {
-        for (int i = 0; i < count; i++)
+        for (int i = 0; i < Constants.AnimalCount; i++)
             SpawnAnimal();
-    }
 
-    private void SpawnEnemies(uint count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (i % 3 == 0)
-               SpawnMutatedEnemy();
-            else
-                SpawnEnemy();
-        }
-    }
-
-    private void SpawnEntities(uint count)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            SpawnAnimal();
+        for (int i = 0; i < Constants.EnemyCount; i++)
             SpawnEnemy();
-        }
     }
 
     private void RestartGame()
@@ -513,8 +479,7 @@ public partial class MainForm : Form
             RemoveControl(control);
 
         AddControl(player.Respawn());
-        SpawnAnimals(Constants.AnimalCount);
-        SpawnEnemies(Constants.EnemyCount);
+        SpawnEntities();
     }
 
     private static bool IsDrop(Control drop) => drop.Tag as string is Constants.DropAmmoTag or Constants.DropAnimalTag or Constants.DropMedicalTag or Constants.DropValuableTag;
@@ -552,18 +517,9 @@ public partial class MainForm : Form
             {
                 RemoveControl(enemy);
                 SpawnValuableDrop(enemy.Location);
+                SpawnEnemy();
                 shieldedEnemyHealth.Remove(enemy);
             }
         }
     }
-
-    private void InitializeShieldedEnemyHealth(PictureBox enemy)
-    {
-        if (IsShieldedEnemy(enemy))
-        {
-            shieldedEnemyHealth[enemy] = Constants.ShieldedEnemyMaxHealth; 
-        }
-    }
-
-
 }

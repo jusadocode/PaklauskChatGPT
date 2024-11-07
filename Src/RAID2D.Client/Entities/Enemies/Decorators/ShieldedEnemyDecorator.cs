@@ -1,7 +1,4 @@
-﻿using RAID2D.Client;
-using RAID2D.Client.Entities.Enemies;
-
-namespace RAID2D.Client.Entities.Enemies.Decorators;
+﻿namespace RAID2D.Client.Entities.Enemies.Decorators;
 public class ShieldedEnemyDecorator : EnemyDecorator
 {
     public ShieldedEnemyDecorator(IEnemy baseEnemy) : base(baseEnemy)
@@ -17,17 +14,17 @@ public class ShieldedEnemyDecorator : EnemyDecorator
     private void AddShieldIcon()
     {
         //PictureBox.Image = CombineImages(PictureBox.Image, Assets.Shield); // Use a proper shield icon
-        this.PictureBox.BorderStyle =  BorderStyle.FixedSingle; // Use a proper shield icon
+        this.PictureBox.BorderStyle = BorderStyle.FixedSingle; // Use a proper shield icon
     }
 
     private Image CombineImages(Image baseImage, Image overlay)
     {
-        Bitmap combined = new(baseImage.Width, baseImage.Height); 
+        Bitmap combined = new(baseImage.Width, baseImage.Height);
         using (Graphics g = Graphics.FromImage(combined))
         {
-            g.Clear(Color.Transparent); 
-            g.DrawImage(baseImage, 0, 0); 
-            g.DrawImage(overlay, baseImage.Width - overlay.Width, 0); 
+            g.Clear(Color.Transparent);
+            g.DrawImage(baseImage, 0, 0);
+            g.DrawImage(overlay, baseImage.Width - overlay.Width, 0);
         }
 
         return combined;

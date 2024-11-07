@@ -104,16 +104,16 @@ public class GUI
         onPanelCreate?.Invoke(pauseMenuPanel);
     }
 
-    public void CreateDevButtons(Player player, ServerConnection server, Action<uint>? onSpawnEntitiesClick, Action<Button>? onButtonCreate)
+    public void CreateDevButtons(Player player, ServerConnection server, Action? onSpawnEntitiesClick, Action<Button>? onButtonCreate)
     {
 #if DEBUG
-        List<(string Text, EventHandler OnClick)> devButtons = new()
-        {
+        List<(string Text, EventHandler OnClick)> devButtons =
+        [
             ("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999)),
             ("Add 9999 Health", (s, e) => player.SetMaxHealth(9999)),
-            ("Spawn 10 Entities", (s, e) => onSpawnEntitiesClick?.Invoke(10)),
+            ("Spawn 6 Entities", (s, e) => onSpawnEntitiesClick?.Invoke()),
             ("Send Player Data to Server", async (s, e) => await server.SendGameStateAsync(new GameState(player.PictureBox.Location, player.Direction)))
-        };
+        ];
 
         Button? previousButton = null;
         foreach (var (text, clickHandler) in devButtons)
