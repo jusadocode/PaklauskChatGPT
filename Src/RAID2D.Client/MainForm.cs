@@ -19,23 +19,23 @@ namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
-    private readonly ServerConnection server = new();
-    private readonly GameState gameState = new(new Point(0, 0), Direction.Right);
+    public readonly ServerConnection server = new();
+    public readonly GameState gameState = new(new Point(0, 0), Direction.Right);
     public Dictionary<string, ServerPlayer> serverPlayers = [];
 
-    private readonly Player player = new();
+    public readonly Player player = new();
 
-    private readonly GUI UI = GUI.GetInstance();
+    public readonly GUI UI = GUI.GetInstance();
 
-    private readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
+    public readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
 
-    private readonly Dictionary<PictureBox, int> shieldedEnemyHealth = new();
+    public readonly Dictionary<PictureBox, int> shieldedEnemyHealth = new();
 
-    private readonly IDropSpawner dropSpawner = new DropSpawner();
+    public readonly IDropSpawner dropSpawner = new DropSpawner();
 
-    private readonly DayTime dayTime = new();
-    private readonly DayTimeController dayTimeController = new();
-    private IEntitySpawner entitySpawner = new DayEntitySpawner();
+    public readonly DayTimeUnit dayTime = new();
+    public readonly DayTimeController dayTimeController = new();
+    public IEntitySpawner entitySpawner = new DayEntitySpawner();
 
     public MainForm() { Initialize(); }
 
@@ -53,7 +53,7 @@ public partial class MainForm : Form
         Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
 
-    private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
+    public void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
     {
         SendDataToServer();
 
@@ -80,7 +80,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void InitializeDevTools()
+    public void InitializeDevTools()
     {
 #if DEBUG
         UI.CreateDevButtons(
@@ -93,12 +93,12 @@ public partial class MainForm : Form
 #endif
     }
 
-    private void InitializeServer()
+    public void InitializeServer()
     {
         server.SetCallbacks(GetDataFromServer);
     }
 
-    private void InitializeGUI()
+    public void InitializeGUI()
     {
         // Force fullscreen on startup
         this.WindowState = FormWindowState.Normal;
@@ -119,7 +119,7 @@ public partial class MainForm : Form
             onPanelCreate: AddControl);
     }
 
-    private void InitializeDayTime()
+    public void InitializeDayTime()
     {
         dayTime.Initialize(
             this,
@@ -141,7 +141,7 @@ public partial class MainForm : Form
         dayTimeController.Run();
     }
 
-    private void InitializeGameLoop()
+    public void InitializeGameLoop()
     {
         Stopwatch stopwatch = Stopwatch.StartNew();
         double lastUpdateTime = stopwatch.Elapsed.TotalSeconds;
@@ -161,24 +161,24 @@ public partial class MainForm : Form
         };
     }
 
-    private void InitializePlayer()
+    public void InitializePlayer()
     {
         player.OnEmptyMagazine += SpawnAmmoDrop;
         player.OnLowHealth += SpawnMedicalDrop;
         RestartGame();
     }
 
-    private void HandleGUI(double deltaTime)
+    public void HandleGUI(double deltaTime)
     {
         UI.UpdateFPS(1 / deltaTime);
     }
 
-    private void HandleDayTime(double deltaTime)
+    public void HandleDayTime(double deltaTime)
     {
         dayTime.Update(deltaTime);
     }
 
-    private async void SendDataToServer()
+    public async void SendDataToServer()
     {
         if (!server.IsConnected())
             return;
@@ -189,7 +189,7 @@ public partial class MainForm : Form
         await server.SendGameStateAsync(gameState);
     }
 
-    private void GetDataFromServer(GameState gameState)
+    public void GetDataFromServer(GameState gameState)
     {
         //Console.WriteLine($"Received gameState={gameState}");
 
@@ -223,7 +223,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void HandlePlayerInput()
+    public void HandlePlayerInput()
     {
         if (player.IsDead())
         {
@@ -244,7 +244,7 @@ public partial class MainForm : Form
             player.ShootBullet(AddControl, RemoveControl);
     }
 
-    private void HandleEnemyInteraction(PictureBox enemy)
+    public void HandleEnemyInteraction(PictureBox enemy)
     {
         if (!player.IntersectsWith(enemy) || !IsEnemy(enemy))
             return;
@@ -252,7 +252,7 @@ public partial class MainForm : Form
         player.TakeDamage(Constants.EnemyDamage);
     }
 
-    private void HandleMutatedEnemyInteraction(PictureBox enemy)
+    public void HandleMutatedEnemyInteraction(PictureBox enemy)
     {
         if (!player.IntersectsWith(enemy) || (!IsPulsingEnemy(enemy) && !IsShieldedEnemy(enemy)))
             return;
@@ -271,7 +271,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void HandleDropPickup(PictureBox drop)
+    public void HandleDropPickup(PictureBox drop)
     {
         if (!player.IntersectsWith(drop) || !IsDrop(drop))
             return;
@@ -293,7 +293,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void PickupAmmoDrop(PictureBox ammoDropPicture)
+    public void PickupAmmoDrop(PictureBox ammoDropPicture)
     {
         AmmoDropData ammoDrop = DropManager.GetAmmoDropData(ammoDropPicture.Name);
 
@@ -301,7 +301,7 @@ public partial class MainForm : Form
         RemoveControl(ammoDropPicture);
     }
 
-    private void PickupAnimalDrop(PictureBox animalDropPicture)
+    public void PickupAnimalDrop(PictureBox animalDropPicture)
     {
         AnimalDropData animalDrop = DropManager.GetAnimalDropData(animalDropPicture.Name);
 
@@ -309,7 +309,7 @@ public partial class MainForm : Form
         RemoveControl(animalDropPicture);
     }
 
-    private void PickupMedicalDrop(PictureBox medicalDropPicture)
+    public void PickupMedicalDrop(PictureBox medicalDropPicture)
     {
         MedicalDropData medicalDrop = DropManager.GetMedicalDropData(medicalDropPicture.Name);
 
@@ -317,7 +317,7 @@ public partial class MainForm : Form
         RemoveControl(medicalDropPicture);
     }
 
-    private void PickupValuableDrop(PictureBox valuableDropPicture)
+    public void PickupValuableDrop(PictureBox valuableDropPicture)
     {
         ValuableDropData valuableDrop = DropManager.GetValuableDropData(valuableDropPicture.Name);
 
@@ -325,7 +325,7 @@ public partial class MainForm : Form
         RemoveControl(valuableDropPicture);
     }
 
-    private void SpawnAmmoDrop()
+    public void SpawnAmmoDrop()
     {
         IDroppableItem ammoDrop = dropSpawner.CreateDrop(Constants.DropAmmoTag);
 
@@ -341,7 +341,7 @@ public partial class MainForm : Form
         AddControl(ammoDropPictureBox);
     }
 
-    private void SpawnAnimalDrop(Point location, string animalName)
+    public void SpawnAnimalDrop(Point location, string animalName)
     {
         IDroppableItem animalDrop = dropSpawner.CreateDrop(Constants.DropAnimalTag, location, animalName);
 
@@ -357,7 +357,7 @@ public partial class MainForm : Form
         AddControl(animalPictureBox);
     }
 
-    private void SpawnMedicalDrop()
+    public void SpawnMedicalDrop()
     {
         IDroppableItem medicalDrop = dropSpawner.CreateDrop(Constants.DropMedicalTag);
 
@@ -373,7 +373,7 @@ public partial class MainForm : Form
         AddControl(medicalPictureBox);
     }
 
-    private void SpawnValuableDrop(Point location)
+    public void SpawnValuableDrop(Point location)
     {
         IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
 
@@ -389,7 +389,7 @@ public partial class MainForm : Form
         AddControl(valuablePictureBox);
     }
 
-    private void HandleEntityMovement(PictureBox entity)
+    public void HandleEntityMovement(PictureBox entity)
     {
         if (!IsEnemyOrAnimal(entity))
             return;
@@ -417,7 +417,7 @@ public partial class MainForm : Form
         movementStrategy.Move(entity);
     }
 
-    private void HandleBulletCollision(PictureBox entity)
+    public void HandleBulletCollision(PictureBox entity)
     {
         if (!IsEnemyOrAnimal(entity))
             return;
@@ -453,7 +453,7 @@ public partial class MainForm : Form
         }
     }
 
-    private void SpawnEnemy()
+    public void SpawnEnemy()
     {
         IEnemy enemy = entitySpawner.CreateEnemy();
 
@@ -485,7 +485,7 @@ public partial class MainForm : Form
         AddControl(pictureBox);
     }
 
-    private void SpawnAnimal()
+    public void SpawnAnimal()
     {
         var animal = entitySpawner.CreateAnimal();
         var pictureBox = animal.PictureBox;
@@ -495,7 +495,7 @@ public partial class MainForm : Form
         AddControl(pictureBox);
     }
 
-    private void SpawnEntities()
+    public void SpawnEntities()
     {
         for (int i = 0; i < Constants.AnimalCount; i++)
             SpawnAnimal();
@@ -504,7 +504,7 @@ public partial class MainForm : Form
             SpawnEnemy();
     }
 
-    private void RestartGame()
+    public void RestartGame()
     {
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
             RemoveControl(control);
@@ -513,30 +513,30 @@ public partial class MainForm : Form
         SpawnEntities();
     }
 
-    private static bool IsDrop(Control drop) => drop.Tag as string is Constants.DropAmmoTag or Constants.DropAnimalTag or Constants.DropMedicalTag or Constants.DropValuableTag;
-    private static bool IsEnemyOrAnimal(Control control) => IsAnimal(control) || IsEnemy(control);
-    private static bool IsEnemy(Control enemy) => enemy.Tag is string tag && (tag == Constants.EnemyTag || IsPulsingEnemy(enemy) || IsShieldedEnemy(enemy));
-    private static bool IsPulsingEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.PulsingEnemyTag);
-    private static bool IsShieldedEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.ShieldedEnemyTag);
-    private static bool IsAnimal(Control animal) => animal.Tag as string is Constants.AnimalTag;
-    private static bool IsBullet(Control bullet) => bullet.Tag as string is Constants.BulletTag;
+    public static bool IsDrop(Control drop) => drop.Tag as string is Constants.DropAmmoTag or Constants.DropAnimalTag or Constants.DropMedicalTag or Constants.DropValuableTag;
+    public static bool IsEnemyOrAnimal(Control control) => IsAnimal(control) || IsEnemy(control);
+    public static bool IsEnemy(Control enemy) => enemy.Tag is string tag && (tag == Constants.EnemyTag || IsPulsingEnemy(enemy) || IsShieldedEnemy(enemy));
+    public static bool IsPulsingEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.PulsingEnemyTag);
+    public static bool IsShieldedEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.ShieldedEnemyTag);
+    public static bool IsAnimal(Control animal) => animal.Tag as string is Constants.AnimalTag;
+    public static bool IsBullet(Control bullet) => bullet.Tag as string is Constants.BulletTag;
 
-    private bool IsFormFocused() => ActiveForm == this;
+    public bool IsFormFocused() => ActiveForm == this;
 
-    private void AddControl(Control control)
+    public void AddControl(Control control)
     {
         this.Controls.Add(control);
         control.BringToFront();
         this.player.PictureBox.BringToFront();
     }
 
-    private void RemoveControl(Control control)
+    public void RemoveControl(Control control)
     {
         this.Controls.Remove(control);
         control.Dispose();
     }
 
-    private void ManageShieldedEnemyHealth(PictureBox enemy)
+    public void ManageShieldedEnemyHealth(PictureBox enemy)
     {
         if (shieldedEnemyHealth.TryGetValue(enemy, out int currentHealth))
         {

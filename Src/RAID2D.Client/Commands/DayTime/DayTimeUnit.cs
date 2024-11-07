@@ -11,7 +11,7 @@ enum TimeOfDay
 /// <summary>
 /// The day time changer class. (Receiver)
 /// </summary>
-public class DayTime
+public class DayTimeUnit
 {
     private double currentHour = Constants.MiddleOfDayHour;
     private Control backgroundControl = new();

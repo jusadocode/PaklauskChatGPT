@@ -1,6 +1,6 @@
 ﻿namespace RAID2D.Client.Commands.DayTime;
 
-public class SetDayCommand(DayTime dayTime) : ICommand
+public class SetDayCommand(DayTimeUnit dayTime) : ICommand
 {
     public void Execute()
     {

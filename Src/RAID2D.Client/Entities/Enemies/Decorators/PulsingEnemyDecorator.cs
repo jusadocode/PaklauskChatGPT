@@ -1,6 +1,6 @@
 ﻿namespace RAID2D.Client.Entities.Enemies.Decorators;
 
-internal class PulsingEnemyDecorator : EnemyDecorator
+public class PulsingEnemyDecorator : EnemyDecorator
 {
     private int pulseSpeed = 1;
     private float currentIntensity = 0f;
