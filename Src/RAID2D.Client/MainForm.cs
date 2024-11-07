@@ -1,7 +1,9 @@
 ﻿using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Builders;
 using RAID2D.Client.Drops.Spawners;
+using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
+using RAID2D.Client.Entities.Enemies.Prototype;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Managers;
 using RAID2D.Client.MovementStrategies;
@@ -30,7 +32,9 @@ public partial class MainForm : Form
 
     private readonly IDropSpawner dropSpawner = new DropSpawner();
 
-    private IEntitySpawner entitySpawner = new DayEntitySpawner();
+    private IEntitySpawner entitySpawner;
+
+
 
     public MainForm() { Initialize(); }
 
@@ -43,8 +47,10 @@ public partial class MainForm : Form
         InitializeGUI();
         InitializeGameLoop();
         InitializePlayer();
-
+        
+       
         Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
+        
     }
 
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
@@ -135,10 +141,9 @@ public partial class MainForm : Form
     {
         player.OnEmptyMagazine += SpawnAmmoDrop;
         player.OnLowHealth += SpawnMedicalDrop;
-
         RestartGame();
     }
-
+  
     private void HandleGUI(double deltaTime)
     {
         UI.UpdateFPS(1 / deltaTime);
@@ -413,7 +418,14 @@ public partial class MainForm : Form
             if (IsEnemy(entity))
             {
                 SpawnValuableDrop(entity.Location);
-                SpawnEnemy();
+                if (ShouldSpawnMutatedEnemy())
+                {
+                    SpawnMutatedEnemy();
+                }
+                else
+                {
+                    SpawnEnemy();
+                }
             }
             else if (IsAnimal(entity))
             {
@@ -429,18 +441,18 @@ public partial class MainForm : Form
 
     private void SpawnEnemy()
     {
-        var enemy = entitySpawner.CreateEnemy();
-        var pictureBox = enemy.PictureBox;
-
+        IEnemy enemy = entitySpawner.CreateEnemy();
+        PictureBox pictureBox = enemy.PictureBox;
         entityMovementStrategies[pictureBox] = new WanderMovement(Constants.EnemySpeed / 2);
-
         AddControl(pictureBox);
     }
 
+
+
     private void SpawnMutatedEnemy()
     {
-        var enemy = entitySpawner.CreateEnemy();
-
+        IEnemy enemy = entitySpawner.CreateEnemy();
+        
         Random rand = new Random();
 
         int mutationChoice = rand.Next(0, 3);
@@ -466,7 +478,7 @@ public partial class MainForm : Form
             InitializeShieldedEnemyHealth(pictureBox);
 
         entityMovementStrategies[pictureBox] = new WanderMovement(Constants.EnemySpeed / 2);
-
+        
         AddControl(pictureBox);
     }
 
@@ -493,7 +505,7 @@ public partial class MainForm : Form
         {
             if (i % 3 == 0)
                SpawnMutatedEnemy();
-            else
+           else
                 SpawnEnemy();
         }
     }
@@ -511,7 +523,7 @@ public partial class MainForm : Form
     {
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
             RemoveControl(control);
-
+        entitySpawner = new DayEntitySpawner();
         AddControl(player.Respawn());
         SpawnAnimals(Constants.AnimalCount);
         SpawnEnemies(Constants.EnemyCount);
@@ -519,7 +531,15 @@ public partial class MainForm : Form
 
     private static bool IsDrop(Control drop) => drop.Tag as string is Constants.DropAmmoTag or Constants.DropAnimalTag or Constants.DropMedicalTag or Constants.DropValuableTag;
     private static bool IsEnemyOrAnimal(Control control) => IsAnimal(control) || IsEnemy(control);
-    private static bool IsEnemy(Control enemy) => enemy.Tag is string tag && (tag == Constants.EnemyTag || IsPulsingEnemy(enemy) || IsShieldedEnemy(enemy));
+    private static bool IsEnemy(Control enemy)
+    {
+        if (enemy.Tag is string tag)
+        {
+            return tag.Contains(Constants.EnemyTag) || IsPulsingEnemy(enemy) || IsShieldedEnemy(enemy);
+        }
+        return false;
+    }
+
     private static bool IsPulsingEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.PulsingEnemyTag);
     private static bool IsShieldedEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.ShieldedEnemyTag);
     private static bool IsAnimal(Control animal) => animal.Tag as string is Constants.AnimalTag;
@@ -564,6 +584,14 @@ public partial class MainForm : Form
             shieldedEnemyHealth[enemy] = Constants.ShieldedEnemyMaxHealth; 
         }
     }
+    private bool ShouldSpawnMutatedEnemy()
+    {
+        Random rand = new Random();
+        int chance = rand.Next(0, 100);  
+
+        return chance < 20;  
+    }
+   
 
 
 }

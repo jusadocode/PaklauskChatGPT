@@ -1,16 +1,16 @@
 ﻿using RAID2D.Client.Entities.Animals;
 using RAID2D.Client.Entities.Enemies;
+using RAID2D.Client.Entities.Enemies.Prototype;
 
 namespace RAID2D.Client.Entities.Spawners;
 
 public class DayEntitySpawner : IEntitySpawner
 {
+    private readonly IPrototype creeperPrototype = new Creeper();
     public IEnemy CreateEnemy()
     {
-        IEnemy enemy = new Creeper();
-        enemy.Create();
-
-        return enemy;
+        IPrototype clonedCreeper = creeperPrototype.DeepClone();
+        return clonedCreeper as IEnemy;
     }
 
     public IAnimal CreateAnimal()

@@ -1,16 +1,16 @@
 ﻿using RAID2D.Client.Entities.Animals;
 using RAID2D.Client.Entities.Enemies;
+using RAID2D.Client.Entities.Enemies.Prototype;
 
 namespace RAID2D.Client.Entities.Spawners;
 
 public class NightEntitySpawner : IEntitySpawner
 {
+    private readonly IPrototype zombiePrototype = new Zombie();
     public IEnemy CreateEnemy()
     {
-        IEnemy enemy = new Zombie();
-        enemy.Create();
-
-        return enemy;
+        IPrototype clonedZombie = zombiePrototype.DeepClone();
+        return clonedZombie as IEnemy;
     }
 
     public IAnimal CreateAnimal()
