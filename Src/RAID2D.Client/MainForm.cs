@@ -1,4 +1,5 @@
-﻿using RAID2D.Client.Drops;
+﻿using RAID2D.Client.Commands.DayTime;
+using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Builders;
 using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Enemies;
@@ -32,6 +33,8 @@ public partial class MainForm : Form
 
     private readonly IDropSpawner dropSpawner = new DropSpawner();
 
+    private readonly DayTime dayTime = new();
+    private readonly DayTimeController dayTimeController = new();
     private IEntitySpawner entitySpawner = new DayEntitySpawner();
 
     public MainForm() { Initialize(); }
@@ -40,9 +43,10 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
-        InitializeServer();
         InitializeGUI();
+        InitializeDayTime();
         InitializeDevTools();
+        InitializeServer();
         InitializeGameLoop();
         InitializePlayer();
 
@@ -62,6 +66,7 @@ public partial class MainForm : Form
             return;
 
         HandleGUI(deltaTime);
+        HandleDayTime(deltaTime);
 
         foreach (PictureBox box in this.Controls.OfType<PictureBox>().ToList())
         {
@@ -78,7 +83,12 @@ public partial class MainForm : Form
     private void InitializeDevTools()
     {
 #if DEBUG
-        UI.CreateDevButtons(player, server, SpawnEntities, AddControl);
+        UI.CreateDevButtons(
+            onUndoClick: dayTimeController.Undo,
+            player: player,
+            server: server,
+            onSpawnEntitiesClick: SpawnEntities,
+            onButtonCreate: AddControl);
         server.Connect(Constants.ServerDefaultUrl);
 #endif
     }
@@ -107,9 +117,28 @@ public partial class MainForm : Form
             onDisconnectClick: async () => await server.DisconnectAsync(),
             onQuitClick: Application.Exit,
             onPanelCreate: AddControl);
+    }
 
-        // Initialize day/night cycle
-        DayTimeManager.Initialize(this);
+    private void InitializeDayTime()
+    {
+        dayTime.Initialize(
+            this,
+            onDayStart: () =>
+            {
+                dayTimeController.SetCommand(new SetDayCommand(dayTime));
+                dayTimeController.Run();
+
+                entitySpawner = new DayEntitySpawner();
+            },
+            onNightStart: () =>
+            {
+                dayTimeController.SetCommand(new SetNightCommand(dayTime));
+                dayTimeController.Run();
+                entitySpawner = new NightEntitySpawner();
+            });
+
+        dayTimeController.SetCommand(new SetDayCommand(dayTime));
+        dayTimeController.Run();
     }
 
     private void InitializeGameLoop()
@@ -142,9 +171,11 @@ public partial class MainForm : Form
     private void HandleGUI(double deltaTime)
     {
         UI.UpdateFPS(1 / deltaTime);
+    }
 
-        DayTimeManager.Update(deltaTime);
-        entitySpawner = DayTimeManager.IsDay() ? new DayEntitySpawner() : new NightEntitySpawner();
+    private void HandleDayTime(double deltaTime)
+    {
+        dayTime.Update(deltaTime);
     }
 
     private async void SendDataToServer()

@@ -1,4 +1,4 @@
-﻿using RAID2D.Client.Entities.Enemies;
+﻿namespace RAID2D.Client.Entities.Enemies.Decorators;
 
 public abstract class EnemyDecorator : IEnemy
 {

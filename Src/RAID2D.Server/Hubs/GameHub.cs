@@ -9,9 +9,9 @@ public class GameHub : Hub
     private readonly GameStateSubject gameStateSubject;
     private readonly IHubContext<GameHub> hubContext;
 
-    public GameHub(GameStateSubject positionSubject, IHubContext<GameHub> hubContext)
+    public GameHub(GameStateSubject gameStateSubject, IHubContext<GameHub> hubContext)
     {
-        this.gameStateSubject = positionSubject;
+        this.gameStateSubject = gameStateSubject;
         this.hubContext = hubContext;
     }
 

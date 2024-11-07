@@ -104,7 +104,7 @@ public class GUI
         onPanelCreate?.Invoke(pauseMenuPanel);
     }
 
-    public void CreateDevButtons(Player player, ServerConnection server, Action? onSpawnEntitiesClick, Action<Button>? onButtonCreate)
+    public void CreateDevButtons(Player player, ServerConnection server, Action? onSpawnEntitiesClick, Action? onUndoClick, Action<Button>? onButtonCreate)
     {
 #if DEBUG
         List<(string Text, EventHandler OnClick)> devButtons =
@@ -112,7 +112,8 @@ public class GUI
             ("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999)),
             ("Add 9999 Health", (s, e) => player.SetMaxHealth(9999)),
             ("Spawn 6 Entities", (s, e) => onSpawnEntitiesClick?.Invoke()),
-            ("Send Player Data to Server", async (s, e) => await server.SendGameStateAsync(new GameState(player.PictureBox.Location, player.Direction)))
+            ("Send Player Data to Server", async (s, e) => await server.SendGameStateAsync(new GameState(player.PictureBox.Location, player.Direction))),
+            ("Undo daytime", (s, e) => onUndoClick?.Invoke())
         ];
 
         Button? previousButton = null;
