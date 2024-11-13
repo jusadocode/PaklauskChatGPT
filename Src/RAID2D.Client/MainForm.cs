@@ -459,7 +459,7 @@ public partial class MainForm : Form
 
         if (Rand.Next(0, 101) < Constants.MutatedEnemySpawnChance)
         {
-            switch (Rand.Next(0, 3))
+            switch (Rand.Next(0, 4))
             {
                 case 0:
                     enemy = new ShieldedEnemyDecorator(enemy);
@@ -469,6 +469,9 @@ public partial class MainForm : Form
                     break;
                 case 2:
                     enemy = new ShieldedEnemyDecorator(new PulsingEnemyDecorator(enemy));
+                    break;
+                case 3:
+                    enemy = new CloakedEnemyDecorator(enemy);
                     break;
                 default:
                     break;
