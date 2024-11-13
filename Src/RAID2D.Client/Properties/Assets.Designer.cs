@@ -73,9 +73,29 @@ namespace RAID2D.Client.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap AnimalCow {
+            get {
+                object obj = ResourceManager.GetObject("AnimalCow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AnimalGoat {
             get {
                 object obj = ResourceManager.GetObject("AnimalGoat", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AnimalSheep {
+            get {
+                object obj = ResourceManager.GetObject("AnimalSheep", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -196,6 +216,26 @@ namespace RAID2D.Client.Properties {
         internal static System.Drawing.Bitmap EnemyCreeper {
             get {
                 object obj = ResourceManager.GetObject("EnemyCreeper", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap EnemyEnderman {
+            get {
+                object obj = ResourceManager.GetObject("EnemyEnderman", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap EnemySpider {
+            get {
+                object obj = ResourceManager.GetObject("EnemySpider", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

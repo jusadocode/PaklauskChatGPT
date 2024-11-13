@@ -6,33 +6,26 @@ using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.Players;
 
-public class Player(
-    int health = Constants.PlayerMaxHealth,
-    int maxHealth = Constants.PlayerMaxHealth,
-    int speed = Constants.PlayerSpeed,
-    uint ammo = Constants.PlayerInitialAmmo,
-    uint cash = 0,
-    uint kills = 0,
-    Direction direction = Direction.Up)
+public class Player
 {
-    public int Health { get; private set; } = health;
-    public int MaxHealth { get; private set; } = maxHealth;
-    public int Speed { get; private set; } = speed;
-    public uint Ammo { get; private set; } = ammo;
-    public uint Cash { get; private set; } = cash;
-    public uint Kills { get; private set; } = kills;
-    public Direction Direction { get; set; } = direction;
+    public int Health { get; private set; } = Constants.PlayerMaxHealth;
+    public int MaxHealth { get; private set; } = Constants.PlayerMaxHealth;
+    public int Speed { get; private set; } = Constants.PlayerSpeed;
+    public uint Ammo { get; private set; } = Constants.PlayerInitialAmmo;
+    public uint Cash { get; private set; } = 0;
+    public uint Kills { get; private set; } = 0;
+    public Direction Direction { get; set; } = Direction.Up;
     public PictureBox PictureBox { get; private set; } = new();
 
     public event Action? OnEmptyMagazine;
     public event Action? OnLowHealth;
-    private IMovementStrategy? MovementStrategy;
+    private IMovementStrategy? movementStrategy;
 
     private bool lowHealthTriggered = false;
 
     public PictureBox Create()
     {
-        MovementStrategy = new PlayerMovement(this, Speed);
+        movementStrategy = new PlayerMovement(this, Speed);
 
         PictureBox = new()
         {
@@ -119,14 +112,14 @@ public class Player(
     {
         Kills++;
         Hitmarker hitmark = new();
-        hitmark.CreatePictureBox(hitmarkLocation, onHitmarkerExpired);
+        hitmark.Create(hitmarkLocation, onHitmarkerExpired);
         onHitmarkerCreation(hitmark.PictureBox);
         GUI.GetInstance().UpdateKills(Kills);
     }
 
     public void Move()
     {
-        MovementStrategy?.Move(this.PictureBox);
+        movementStrategy?.Move(this.PictureBox);
     }
 
     public void ShootBullet(Action<PictureBox> onBulletCreated, Action<PictureBox> onBulletExpired)

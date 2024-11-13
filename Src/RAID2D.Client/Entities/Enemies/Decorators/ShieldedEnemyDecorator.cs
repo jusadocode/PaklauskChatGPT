@@ -1,4 +1,5 @@
 ﻿namespace RAID2D.Client.Entities.Enemies.Decorators;
+
 public class ShieldedEnemyDecorator : EnemyDecorator
 {
     public ShieldedEnemyDecorator(IEnemy baseEnemy) : base(baseEnemy)
@@ -11,12 +12,14 @@ public class ShieldedEnemyDecorator : EnemyDecorator
         AddShieldIcon();
         this.PictureBox.Tag += Constants.ShieldedEnemyTag;
     }
+
     private void AddShieldIcon()
     {
         //PictureBox.Image = CombineImages(PictureBox.Image, Assets.Shield); // Use a proper shield icon
         this.PictureBox.BorderStyle = BorderStyle.FixedSingle; // Use a proper shield icon
     }
 
+    /*
     private Image CombineImages(Image baseImage, Image overlay)
     {
         Bitmap combined = new(baseImage.Width, baseImage.Height);
@@ -29,4 +32,5 @@ public class ShieldedEnemyDecorator : EnemyDecorator
 
         return combined;
     }
+    */
 }
