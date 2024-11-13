@@ -5,18 +5,17 @@ internal class PulsingEnemyDecorator : EnemyDecorator
     private int pulseSpeed = 1;
     private float currentIntensity = 0f;
 
-    private readonly Timer pulseTimer;
-
     public PulsingEnemyDecorator(IEnemy enemy) : base(enemy)
     {
-        pulseTimer = new Timer();
-        pulseTimer.Interval = 100;
+        Timer pulseTimer = new()
+        {
+            Enabled = true,
+            Interval = 100
+        };
         pulseTimer.Tick += (sender, e) => UpdatePulseEffect();
-        pulseTimer.Start();
         this.PictureBox.Tag += Constants.PulsingEnemyTag;
 
         UpdateAppearance();
-
     }
 
     // Updates the appearance of the enemy, applying a pulsing effect
@@ -49,4 +48,3 @@ internal class PulsingEnemyDecorator : EnemyDecorator
         UpdateAppearance();
     }
 }
-

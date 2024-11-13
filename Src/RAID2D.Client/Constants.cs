@@ -58,8 +58,12 @@ public static class Constants
     public const string ServerPlayerName = "ServerPlayer";
     public const string EnemyZombieName = "Zombie";
     public const string EnemyCreeperName = "Creeper";
+    public const string EnemySpiderName = "Spider";
+    public const string EnemyEndermanName = "Enderman";
     public const string AnimalBoarName = "Boar";
     public const string AnimalGoatName = "Goat";
+    public const string AnimalSheepName = "Sheep";
+    public const string AnimalCowName = "Cow";
     public const string ValuableGoldName = "ValuableGold";
     public const string ValuableRolexName = "ValuableRolex";
     public const string ValuableParcelBoxName = "ValuableParcelBox";
@@ -69,6 +73,8 @@ public static class Constants
     public const string MedicalHealthPotionName = "MedicalHealthPotion";
     public const string AnimalBoarMeatName = "AnimalBoarMeat";
     public const string AnimalGoatMeatName = "AnimalGoatMeat";
+    public const string AnimalSheepMeatName = "AnimalSheepMeat";
+    public const string AnimalCowMeatName = "AnimalCowMeat";
     public const string AmmoBoxName = "AmmoBox";
 
     public static readonly Size PlayerSize = new(90, 90);
@@ -87,7 +93,11 @@ public static class Constants
         { PlayerName, (Assets.PlayerUp, Assets.PlayerDown, Assets.PlayerLeft, Assets.PlayerRight) },
         { EnemyZombieName, (Assets.EnemyZombieUp, Assets.EnemyZombieDown, Assets.EnemyZombieLeft, Assets.EnemyZombieRight) },
         { EnemyCreeperName, (Assets.EnemyCreeper, Assets.EnemyCreeper, Assets.EnemyCreeper, Assets.EnemyCreeper) },
+        { EnemySpiderName, (Assets.EnemySpider, Assets.EnemySpider, Assets.EnemySpider, Assets.EnemySpider) },
+        { EnemyEndermanName, (Assets.EnemyEnderman, Assets.EnemyEnderman, Assets.EnemyEnderman, Assets.EnemyEnderman) },
         { AnimalBoarName, (Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar, Assets.AnimalBoar) },
-        { AnimalGoatName, (Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat) }
+        { AnimalGoatName, (Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat, Assets.AnimalGoat) },
+        { AnimalSheepName, (Assets.AnimalSheep, Assets.AnimalSheep, Assets.AnimalSheep, Assets.AnimalSheep) },
+        { AnimalCowName, (Assets.AnimalCow, Assets.AnimalCow, Assets.AnimalCow, Assets.AnimalCow) },
     };
 }

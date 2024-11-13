@@ -55,6 +55,8 @@ public static class DropManager
     {
         { Constants.AnimalBoarMeatName, new AnimalDropData(Constants.AnimalBoarMeatName, Constants.AnimalBoarName, 100, 100, Assets.DropBoarMeat)},
         { Constants.AnimalGoatMeatName, new AnimalDropData(Constants.AnimalGoatMeatName, Constants.AnimalGoatName, 100, 100, Assets.DropGoatMeat)},
+        { Constants.AnimalSheepMeatName, new AnimalDropData(Constants.AnimalSheepMeatName, Constants.AnimalSheepName, 100, 100, Assets.DropGoatMeat)}, // TODO: Change to sheep meat
+        { Constants.AnimalCowMeatName, new AnimalDropData(Constants.AnimalCowMeatName, Constants.AnimalCowName, 100, 100, Assets.DropGoatMeat)} // TODO: Change to cow meat
     };
 
     private static readonly Dictionary<string, MedicalDropData> MedicalDropsMap = new()

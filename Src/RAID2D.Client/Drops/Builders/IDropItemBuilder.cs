@@ -1,4 +1,5 @@
 ﻿namespace RAID2D.Client.Drops.Builders;
+
 public interface IDropItemBuilder
 {
     IDropItemBuilder SetTag(IDroppableItem tag);
@@ -8,5 +9,4 @@ public interface IDropItemBuilder
     IDropItemBuilder SetSize(Size size);
     IDropItemBuilder SetSizeMode(PictureBoxSizeMode sizeMode);
     PictureBox Build();
-
 }

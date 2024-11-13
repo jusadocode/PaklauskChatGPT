@@ -4,7 +4,7 @@ public class Hitmarker
 {
     public PictureBox PictureBox { get; private set; } = new();
 
-    public PictureBox CreatePictureBox(Point hitmarkLocation, Action<PictureBox>? onHitmarkerExpired)
+    public PictureBox Create(Point hitmarkLocation, Action<PictureBox>? onHitmarkerExpired)
     {
         PictureBox = new()
         {

@@ -7,11 +7,6 @@ public class Zombie : IEnemy, IPrototype
 {
     public PictureBox PictureBox { get; private set; } = new();
 
-    public Zombie()
-    {
-        Create();
-    }
-
     public PictureBox Create()
     {
         PictureBox = new()

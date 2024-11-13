@@ -28,7 +28,7 @@ public static class ImageManager
     }
 
     // Code below is not used, but could get implemented in the future if needed
-
+    /*
     private static readonly Dictionary<float, Image> rotatedImages = [];
     private static void PreRenderImages(Image originalImage)
     {
@@ -66,4 +66,5 @@ public static class ImageManager
 
         return rotatedBmp;
     }
+    */
 }

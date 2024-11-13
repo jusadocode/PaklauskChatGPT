@@ -3,7 +3,7 @@ using RAID2D.Client.Utils;
 
 namespace RAID2D.Client.Entities.Enemies;
 
-public class Creeper : IEnemy, IPrototype
+public class Spider : IEnemy, IPrototype
 {
     public PictureBox PictureBox { get; private set; } = new();
 
@@ -12,8 +12,8 @@ public class Creeper : IEnemy, IPrototype
         PictureBox = new()
         {
             Tag = Constants.EnemyTag,
-            Name = Constants.EnemyCreeperName,
-            Image = Assets.EnemyCreeper,
+            Name = Constants.EnemySpiderName,
+            Image = Assets.EnemySpider,
             Location = Rand.LocationOnScreen(Constants.EnemySize),
             Size = Constants.EnemySize,
             SizeMode = Constants.SizeMode,
@@ -29,9 +29,9 @@ public class Creeper : IEnemy, IPrototype
 
     public IPrototype DeepClone()
     {
-        var clonedCreeper = (Creeper)this.MemberwiseClone();
+        var cloned = (Spider)this.MemberwiseClone();
 
-        clonedCreeper.PictureBox = new PictureBox
+        cloned.PictureBox = new PictureBox
         {
             Tag = this.PictureBox.Tag,
             Name = this.PictureBox.Name,
@@ -41,7 +41,7 @@ public class Creeper : IEnemy, IPrototype
             SizeMode = this.PictureBox.SizeMode
         };
 
-        return clonedCreeper;
+        return cloned;
     }
 }
 
