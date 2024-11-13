@@ -2,6 +2,7 @@
 using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Builders;
 using RAID2D.Client.Drops.Spawners;
+using RAID2D.Client.Entities.Animals;
 using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
 using RAID2D.Client.Entities.Spawners;
@@ -29,7 +30,7 @@ public partial class MainForm : Form
 
     private readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
 
-    private readonly Dictionary<PictureBox, int> shieldedEnemyHealth = new();
+    private readonly Dictionary<PictureBox, int> shieldedEnemiesHealth = [];
 
     private readonly IDropSpawner dropSpawner = new DropSpawner();
 
@@ -47,8 +48,8 @@ public partial class MainForm : Form
 
         InitializeGUI();
         InitializeDayTime();
-        InitializeDevTools();
         InitializeServer();
+        InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
 
@@ -480,7 +481,7 @@ public partial class MainForm : Form
         PictureBox pictureBox = enemy.PictureBox;
 
         if (IsShieldedEnemy(pictureBox))
-            shieldedEnemyHealth[pictureBox] = Constants.ShieldedEnemyMaxHealth;
+            shieldedEnemiesHealth[pictureBox] = Constants.ShieldedEnemyMaxHealth;
 
         entityMovementStrategies[pictureBox] = new WanderMovement(Constants.EnemySpeed / 2);
 
@@ -489,8 +490,8 @@ public partial class MainForm : Form
 
     private void SpawnAnimal()
     {
-        var animal = entitySpawner.CreateAnimal();
-        var pictureBox = animal.PictureBox;
+        IAnimal animal = entitySpawner.CreateAnimal();
+        PictureBox pictureBox = animal.PictureBox;
 
         entityMovementStrategies[pictureBox] = new WanderMovement(Constants.AnimalSpeed / 2);
 
@@ -540,18 +541,18 @@ public partial class MainForm : Form
 
     private void ManageShieldedEnemyHealth(PictureBox enemy)
     {
-        if (shieldedEnemyHealth.TryGetValue(enemy, out int currentHealth))
+        if (shieldedEnemiesHealth.TryGetValue(enemy, out int currentHealth))
         {
             currentHealth -= 10;
 
-            shieldedEnemyHealth[enemy] = currentHealth;
+            shieldedEnemiesHealth[enemy] = currentHealth;
 
             if (currentHealth <= 0)
             {
                 RemoveControl(enemy);
                 SpawnValuableDrop(enemy.Location);
                 SpawnEnemy();
-                shieldedEnemyHealth.Remove(enemy);
+                shieldedEnemiesHealth.Remove(enemy);
             }
         }
     }
