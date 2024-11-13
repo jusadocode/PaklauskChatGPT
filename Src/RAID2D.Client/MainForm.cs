@@ -35,7 +35,9 @@ public partial class MainForm : Form
 
     private readonly DayTime dayTime = new();
     private readonly DayTimeController dayTimeController = new();
-    private IEntitySpawner entitySpawner = new DayEntitySpawner();
+    private static readonly IEntitySpawner dayEntitySpawner = new DayEntitySpawner();
+    private static readonly IEntitySpawner nightEntitySpawner = new NightEntitySpawner();
+    private IEntitySpawner entitySpawner = dayEntitySpawner;
 
     public MainForm() { Initialize(); }
 
@@ -128,13 +130,13 @@ public partial class MainForm : Form
                 dayTimeController.SetCommand(new SetDayCommand(dayTime));
                 dayTimeController.Run();
 
-                entitySpawner = new DayEntitySpawner();
+                entitySpawner = dayEntitySpawner;
             },
             onNightStart: () =>
             {
                 dayTimeController.SetCommand(new SetNightCommand(dayTime));
                 dayTimeController.Run();
-                entitySpawner = new NightEntitySpawner();
+                entitySpawner = nightEntitySpawner;
             });
 
         dayTimeController.SetCommand(new SetDayCommand(dayTime));
