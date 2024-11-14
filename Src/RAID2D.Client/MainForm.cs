@@ -14,6 +14,7 @@ using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
+using System;
 using System.Diagnostics;
 
 namespace RAID2D.Client;
@@ -53,7 +54,11 @@ public partial class MainForm : Form
         InitializeGameLoop();
         InitializePlayer();
 
-        Console.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
+
+        PrototypeTest.Run();
+
+
+        Debug.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
 
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
@@ -315,7 +320,7 @@ public partial class MainForm : Form
     private void PickupMedicalDrop(PictureBox medicalDropPicture)
     {
         MedicalDropData medicalDrop = DropManager.GetMedicalDropData(medicalDropPicture.Name);
-
+        
         player.PickupHealable(medicalDrop.HealthAmount);
         RemoveControl(medicalDropPicture);
     }

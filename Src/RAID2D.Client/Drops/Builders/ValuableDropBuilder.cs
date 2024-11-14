@@ -3,6 +3,9 @@
 public class ValuableDropBuilder : IDropItemBuilder
 {
     private readonly PictureBox pictureBox;
+    private Timer glowTimer;
+    private int glowAlpha = 0;
+    private bool increasingGlow = true;
 
     public ValuableDropBuilder()
     {
@@ -45,10 +48,53 @@ public class ValuableDropBuilder : IDropItemBuilder
         return this;
     }
 
+    private void ApplyGlow()
+    {
+        
+        glowTimer = new Timer { Interval = 50 };  
+        glowTimer.Tick += (sender, e) =>
+        {
+            if (increasingGlow)
+            {
+                glowAlpha += 5;
+                if (glowAlpha >= 255)
+                {
+                    increasingGlow = false;  
+                }
+            }
+            else
+            {
+                glowAlpha -= 5;
+                if (glowAlpha <= 0)
+                {
+                    increasingGlow = true;  
+                }
+            }
+
+            pictureBox.Invalidate();  
+        };
+
+        pictureBox.Paint += (sender, e) =>
+        {
+            
+            using (Brush brush = new SolidBrush(Color.FromArgb(glowAlpha, Color.Yellow)))
+            {
+                e.Graphics.FillEllipse(brush, -5, -5, pictureBox.Width + 10, pictureBox.Height + 10);
+            }
+        };
+
+        glowTimer.Start();
+    }
+
     public PictureBox Build()
     {
+        ApplyGlow();
+
+
+
         return pictureBox;
     }
+
     private string GetTagForDropType(IDroppableItem dropItem)
     {
         return dropItem switch
@@ -61,3 +107,4 @@ public class ValuableDropBuilder : IDropItemBuilder
         };
     }
 }
+
