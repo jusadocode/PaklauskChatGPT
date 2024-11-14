@@ -5,7 +5,7 @@ public class MedicalDropBuilder : IDropItemBuilder
     private readonly PictureBox pictureBox;
     private Timer pulseTimer;
     private int pulseRadius = 10;  // Initial pulse radius
-    private int maxRadius = 90;    // Maximum pulse radius
+    private readonly int maxRadius = 90;    // Maximum pulse radius
 
     public MedicalDropBuilder()
     {
@@ -50,29 +50,27 @@ public class MedicalDropBuilder : IDropItemBuilder
 
     private void ApplyPulsingAura()
     {
-        
+
         pulseTimer = new Timer { Interval = 100 };
         pulseTimer.Tick += (sender, e) =>
         {
             if (pulseRadius >= maxRadius)
             {
-                pulseRadius = 10;  
+                pulseRadius = 10;
             }
             else
             {
-                pulseRadius += 5; 
+                pulseRadius += 5;
             }
 
-            pictureBox.Invalidate();  
+            pictureBox.Invalidate();
         };
 
         pictureBox.Paint += (sender, e) =>
         {
-            
-            using (Brush brush = new SolidBrush(Color.FromArgb(50, Color.Green)))
-            {
-                e.Graphics.FillEllipse(brush, pictureBox.Width / 2 - pulseRadius / 2, pictureBox.Height / 2 - pulseRadius / 2, pulseRadius, pulseRadius);
-            }
+
+            using Brush brush = new SolidBrush(Color.FromArgb(50, Color.Green));
+            e.Graphics.FillEllipse(brush, (pictureBox.Width / 2) - (pulseRadius / 2), (pictureBox.Height / 2) - (pulseRadius / 2), pulseRadius, pulseRadius);
         };
 
         pulseTimer.Start();

@@ -5,6 +5,7 @@ using RAID2D.Client.Drops.Spawners;
 using RAID2D.Client.Entities.Animals;
 using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
+using RAID2D.Client.Entities.Enemies.Prototype;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Managers;
 using RAID2D.Client.MovementStrategies;
@@ -14,7 +15,6 @@ using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
-using System;
 using System.Diagnostics;
 
 namespace RAID2D.Client;
@@ -54,9 +54,7 @@ public partial class MainForm : Form
         InitializeGameLoop();
         InitializePlayer();
 
-
         PrototypeTest.Run();
-
 
         Debug.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
@@ -320,7 +318,7 @@ public partial class MainForm : Form
     private void PickupMedicalDrop(PictureBox medicalDropPicture)
     {
         MedicalDropData medicalDrop = DropManager.GetMedicalDropData(medicalDropPicture.Name);
-        
+
         player.PickupHealable(medicalDrop.HealthAmount);
         RemoveControl(medicalDropPicture);
     }
