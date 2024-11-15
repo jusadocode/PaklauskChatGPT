@@ -18,30 +18,30 @@ public class GUITests
     [Fact]
     public void CanCallGetInstance()
     {
-        // Act
-        var result = GUI.GetInstance();
+        var instance1 = GUI.GetInstance();
+        var instance2 = GUI.GetInstance();
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.NotNull(instance1);
+        Assert.Same(instance1, instance2); // Check if both instances are the same (singleton)
     }
 
     [Fact]
     public void CanCallBindElements()
     {
-        // Arrange
         var fps = new Label();
         var ammo = new Label();
         var kills = new Label();
         var cash = new Label();
         var health = new ProgressBar();
 
-        // Act
         _testClass.BindElements(fps, ammo, kills, cash, health);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.NotNull(fps);
+        Assert.NotNull(ammo);
+        Assert.NotNull(kills);
+        Assert.NotNull(cash);
+        Assert.NotNull(health);
     }
-
     [Fact]
     public void CannotCallBindElementsWithNullFps()
     {
@@ -75,34 +75,31 @@ public class GUITests
     [Fact]
     public void CanCallCreatePauseMenu()
     {
-        // Arrange
+        bool panelCreated = false;
         Action<string> onConnectClick = x => { };
         Action onDisconnectClick = () => { };
         Action onQuitClick = () => { };
-        Action<Panel> onPanelCreate = x => { };
+        Action<Panel> onPanelCreate = x => panelCreated = true;
 
-        // Act
         _testClass.CreatePauseMenu(onConnectClick, onDisconnectClick, onQuitClick, onPanelCreate);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.True(panelCreated);
+        Assert.NotNull(_testClass.IsPaused()); 
     }
 
     [Fact]
     public void CanCallCreateDevButtons()
     {
-        // Arrange
         var player = new Player(388690451, 1559467632, 1593578414, (uint)105457404, (uint)1894067367, (uint)1804847295, Direction.Down);
         var server = new ServerConnection();
+        bool buttonCreated = false;
         Action onSpawnEntitiesClick = () => { };
         Action onUndoClick = () => { };
-        Action<Button> onButtonCreate = x => { };
+        Action<Button> onButtonCreate = x => buttonCreated = true;
 
-        // Act
         _testClass.CreateDevButtons(player, server, onSpawnEntitiesClick, onUndoClick, onButtonCreate);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.True(buttonCreated);
     }
 
     [Fact]
@@ -120,41 +117,38 @@ public class GUITests
     [Fact]
     public void CanCallSetResolution()
     {
-        // Arrange
-        var resolution = new Size();
+        var resolution = new Size(1920, 1080);
 
-        // Act
         _testClass.SetResolution(resolution);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.Equal(resolution, _testClass.Resolution);
     }
 
     [Fact]
     public void CanCallUpdateFPS()
     {
-        // Arrange
-        var fps = 1198792480.05;
+        var fps = 60.0;
+        var fpsLabel = new Label();
+        _testClass.BindElements(fpsLabel, new Label(), new Label(), new Label(), new ProgressBar());
 
-        // Act
         _testClass.UpdateFPS(fps);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.Equal("FPS: 60", fpsLabel.Text);
     }
 
     [Fact]
     public void CanCallUpdateHealth()
     {
-        // Arrange
-        var maxHealth = 1997177572;
-        var currentHealth = 1958449232;
+        var maxHealth = 100;
+        var currentHealth = 75;
+        var healthBar = new ProgressBar();
+        _testClass.BindElements(new Label(), new Label(), new Label(), new Label(), healthBar);
 
-        // Act
         _testClass.UpdateHealth(maxHealth, currentHealth);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.Equal(0, healthBar.Minimum);
+        Assert.Equal(maxHealth, healthBar.Maximum);
+        Assert.Equal(currentHealth, healthBar.Value);
     }
 
     [Fact]
@@ -209,14 +203,11 @@ public class GUITests
     [Fact]
     public void CanCallSetPauseMenuVisibility()
     {
-        // Arrange
         var isVisible = true;
 
-        // Act
         _testClass.SetPauseMenuVisibility(isVisible);
 
-        // Assert
-        throw new NotImplementedException("Create or modify test");
+        Assert.Equal(isVisible, _testClass.IsPaused());
     }
 
     [Fact]

@@ -19,7 +19,7 @@ namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
-    public readonly ServerConnection server = new();
+    public ServerConnection server = new();
     public readonly GameState gameState = new(new Point(0, 0), Direction.Right);
     public Dictionary<string, ServerPlayer> serverPlayers = [];
 
@@ -38,6 +38,7 @@ public partial class MainForm : Form
     public IEntitySpawner entitySpawner = new DayEntitySpawner();
 
     public MainForm() { Initialize(); }
+    public MainForm(ServerConnection serverConnection) { Initialize(); server = serverConnection; }
 
     void Initialize() // Main initialization method, that gets run when the form is created, before the game loop starts
     {
