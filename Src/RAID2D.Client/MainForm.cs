@@ -105,7 +105,7 @@ public partial class MainForm : Form
     {
         // Force fullscreen on startup
         this.WindowState = FormWindowState.Normal;
-        this.FormBorderStyle = FormBorderStyle.None;
+        this.FormBorderStyle = FormBorderStyle.Sizable;
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
 
         // Pause the game on alt-tab

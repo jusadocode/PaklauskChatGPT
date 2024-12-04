@@ -37,8 +37,8 @@ public static class Constants
 
     public const PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
 
-    public const string ServerBaseUrl = "https://localhost";
-    public const string ServerPort = "7260";
+    public const string ServerBaseUrl = "http://localhost";
+    public const string ServerPort = "8080";
     public const string ServerDefaultUrl = $"{ServerBaseUrl}:{ServerPort}/{SharedConstants.ServerHub}";
 
     public const string PlayerTag = "Player";
