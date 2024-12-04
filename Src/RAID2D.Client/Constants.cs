@@ -37,9 +37,13 @@ public static class Constants
 
     public const PictureBoxSizeMode SizeMode = PictureBoxSizeMode.Zoom;
 
-    public const string ServerBaseUrl = "https://localhost";
-    public const string ServerPort = "7260";
-    public const string ServerDefaultUrl = $"{ServerBaseUrl}:{ServerPort}/{SharedConstants.ServerHub}";
+    public const string LocalServerBaseUrl = "http://localhost";
+    public const string CloudServerBaseUrl = "http://46.101.218.250";
+    public const string LocalServerPort = "8080";
+    public const string CloudServerPort = "8080";
+    public const string LocalServerDefaultUrl = $"{LocalServerBaseUrl}:{LocalServerPort}/{SharedConstants.ServerHub}";
+    public const string CloudServerDefaultUrl = $"{CloudServerBaseUrl}:{CloudServerPort}/{SharedConstants.ServerHub}";
+    public const string ServerUrl = LocalServerDefaultUrl;
 
     public const string PlayerTag = "Player";
     public const string ServerPlayerTag = "ServerPlayer";

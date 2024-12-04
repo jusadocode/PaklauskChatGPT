@@ -66,7 +66,7 @@ public class GUI
         TextBox serverLinkTextBox = new()
         {
             PlaceholderText = "Enter server link here",
-            Text = $"{Constants.ServerDefaultUrl}",
+            Text = $"{Constants.ServerUrl}",
             Width = 250,
             Location = new Point(25, 60)
         };
