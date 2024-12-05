@@ -114,6 +114,7 @@ clientbin/
 compiled/
 .bundle/
 .env.local
+.env
 .env.*.local
 
 # Resharper files
