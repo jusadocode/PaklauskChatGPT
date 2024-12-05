@@ -7,10 +7,13 @@ using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
 using RAID2D.Client.Entities.Enemies.Prototype;
 using RAID2D.Client.Entities.Spawners;
+using RAID2D.Client.Handlers;
 using RAID2D.Client.Managers;
+using RAID2D.Client.Mementos;
 using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.Players;
 using RAID2D.Client.Services;
+using RAID2D.Client.States;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
 using RAID2D.Shared.Enums;
@@ -24,23 +27,20 @@ public partial class MainForm : Form
     private readonly ServerConnection server = new();
     private readonly GameState gameState = new(new Point(0, 0), Direction.Right);
     public Dictionary<string, ServerPlayer> serverPlayers = [];
-
+    private InteractionHandler? enemyHandlerChain;
     private readonly Player player = new();
-
     private readonly GUI UI = GUI.GetInstance();
-
+    private readonly Stack<PlayerMemento> undoStack = new Stack<PlayerMemento>();
     private readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
-
     private readonly Dictionary<PictureBox, int> shieldedEnemiesHealth = [];
-
     private readonly IDropSpawner dropSpawner = new DropSpawner();
-
     private readonly DayTime dayTime = new();
     private readonly DayTimeController dayTimeController = new();
     private static readonly IEntitySpawner dayEntitySpawner = new DayEntitySpawner();
     private static readonly IEntitySpawner nightEntitySpawner = new NightEntitySpawner();
+    private readonly Dictionary<PictureBox, EntityContext> entityContexts = new();
     private IEntitySpawner entitySpawner = dayEntitySpawner;
-
+    private int killCounter = 0;
     public MainForm() { Initialize(); }
 
     void Initialize() // Main initialization method, that gets run when the form is created, before the game loop starts
@@ -53,12 +53,44 @@ public partial class MainForm : Form
         InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
-
+        InitializeHandlers();
         PrototypeTest.Run();
 
         Debug.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
+    private void InitializeHandlers()
+    {
+       
+        var enemyHandler = new EnemyHandler();
+        var pulsingEnemyHandler = new PulsingEnemyHandler();
+        var shieldedEnemyHandler = new ShieldedEnemyHandler();
 
+        
+        enemyHandler.SetNext(pulsingEnemyHandler);
+        pulsingEnemyHandler.SetNext(shieldedEnemyHandler);
+
+       
+        enemyHandlerChain = enemyHandler;
+    }
+    private void SaveState()
+    {
+        undoStack.Push(player.SaveState());
+        Console.WriteLine("SAVINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
+
+    }
+    private void Undo()
+    {
+        if (undoStack.Count > 0)
+        {
+            PlayerMemento lastState = undoStack.Pop();
+            player.RestoreState(lastState);
+            killCounter = 0;
+        }
+        else
+        {
+            Console.WriteLine("No saved states to undo.");
+        }
+    }
     private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
     {
         SendDataToServer();
@@ -80,8 +112,7 @@ public partial class MainForm : Form
 
             HandleDropPickup(box);
             HandleEnemyInteraction(box);
-            HandleMutatedEnemyInteraction(box);
-
+            //HandleMutatedEnemyInteraction(box);
             HandleEntityMovement(box);
         }
     }
@@ -122,6 +153,11 @@ public partial class MainForm : Form
             onConnectClick: server.Connect,
             onDisconnectClick: async () => await server.DisconnectAsync(),
             onQuitClick: Application.Exit,
+            onLastCheckpointClick: () =>
+            {
+                Undo();
+                UI.SetPauseMenuVisibility(false);
+            },
             onPanelCreate: AddControl);
     }
 
@@ -252,28 +288,10 @@ public partial class MainForm : Form
 
     private void HandleEnemyInteraction(PictureBox enemy)
     {
-        if (!player.IntersectsWith(enemy) || !IsEnemy(enemy))
-            return;
-
-        player.TakeDamage(Constants.EnemyDamage);
-    }
-
-    private void HandleMutatedEnemyInteraction(PictureBox enemy)
-    {
-        if (!player.IntersectsWith(enemy) || (!IsPulsingEnemy(enemy) && !IsShieldedEnemy(enemy)))
-            return;
-
-        if (IsPulsingEnemy(enemy))
+        if (player.IntersectsWith(enemy))
         {
-            player.TakeDamage(Constants.PulsingEnemyDamage);
-
-            RemoveControl(enemy);
-            entityMovementStrategies.Remove(enemy);
-        }
-
-        if (IsShieldedEnemy(enemy))
-        {
-            player.TakeDamage(Constants.EnemyDamage);
+            
+            enemyHandlerChain?.Handle(enemy, player);
         }
     }
 
@@ -384,12 +402,7 @@ public partial class MainForm : Form
         IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
 
         PictureBox valuablePictureBox = new ValuableDropBuilder()
-            .SetTag(valuableDrop)
-            .SetName(valuableDrop.Name)
-            .SetImage(valuableDrop.Image)
-            .SetLocation(valuableDrop.Location)
-            .SetSize(valuableDrop.Size)
-            .SetSizeMode(Constants.SizeMode)
+            
             .Build();
 
         AddControl(valuablePictureBox);
@@ -400,27 +413,28 @@ public partial class MainForm : Form
         if (!IsEnemyOrAnimal(entity))
             return;
 
-        entityMovementStrategies.TryGetValue(entity, out IMovementStrategy? movementStrategy);
-        if (movementStrategy is null)
-            return;
+        if (!entityContexts.TryGetValue(entity, out EntityContext? context))
+        {
+            context = new EntityContext();
+            entityContexts[entity] = context;
+        }
 
         uint fleeRadius = IsEnemy(entity) ? Constants.EnemyFleeRadius : Constants.AnimalFleeRadius;
-        int speed = IsEnemy(entity) ? Constants.EnemySpeed : Constants.AnimalSpeed;
 
         if (player.DistanceTo(entity) < fleeRadius)
         {
-            if (IsAnimal(entity) && movementStrategy is not FleeMovement)
-                entityMovementStrategies[entity] = new FleeMovement(player.PictureBox, speed);
-            else if (IsEnemy(entity) && movementStrategy is not ChaseMovement)
-                entityMovementStrategies[entity] = new ChaseMovement(player.PictureBox, speed);
+            if (IsAnimal(entity))
+                context.SetState(new FleeState());
+            else if (IsEnemy(entity))
+                context.SetState(new ChaseState()); 
         }
         else
         {
-            if (movementStrategy is not WanderMovement)
-                entityMovementStrategies[entity] = new WanderMovement(speed / 2); ;
+            context.SetState(new IdleState());
         }
 
-        movementStrategy.Move(entity);
+       
+        context.UpdateState(entity, player);
     }
 
     private void HandleBulletCollision(PictureBox entity)
@@ -441,6 +455,12 @@ public partial class MainForm : Form
             }
 
             player.RegisterKill(bullet.Bounds.Location, AddControl, RemoveControl);
+            killCounter++;
+            if(killCounter == 10)
+            {
+                SaveState();
+                killCounter = 0;
+            }
 
             if (IsEnemy(entity))
             {
@@ -457,6 +477,7 @@ public partial class MainForm : Form
             RemoveControl(bullet);
             entityMovementStrategies.Remove(entity);
         }
+        
     }
 
     private void SpawnEnemy()
@@ -518,6 +539,7 @@ public partial class MainForm : Form
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
             RemoveControl(control);
 
+        killCounter = 0;
         AddControl(player.Respawn());
         SpawnEntities();
     }

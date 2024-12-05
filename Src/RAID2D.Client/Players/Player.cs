@@ -1,4 +1,5 @@
 ﻿using RAID2D.Client.Effects;
+using RAID2D.Client.Mementos;
 using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
@@ -22,6 +23,23 @@ public class Player
     private IMovementStrategy? movementStrategy;
 
     private bool lowHealthTriggered = false;
+    public PlayerMemento SaveState()
+    {
+        return new PlayerMemento(PictureBox.Location, Health, Ammo, Kills);
+    }
+
+    public void RestoreState(PlayerMemento memento)
+    {
+        PictureBox.Location = memento.Position;
+        Health = memento.Health;
+        Ammo = memento.Ammo;
+        Kills = memento.Kills;
+
+        GUI ui = GUI.GetInstance();
+        ui.UpdateHealth(MaxHealth, Health);
+        ui.UpdateAmmo(Ammo);
+        ui.UpdateKills(Kills);
+    }
 
     public PictureBox Create()
     {
