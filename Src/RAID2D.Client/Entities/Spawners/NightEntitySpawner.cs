@@ -20,7 +20,8 @@ public class NightEntitySpawner : IEntitySpawner
             {
                 spiderPrototype = new Spider();
                 spiderPrototype.Create();
-                clone = spiderPrototype.ShallowClone();
+                //clone = spiderPrototype.ShallowClone();
+                clone = spiderPrototype.DeepClone();
             }
             else
             {
@@ -33,7 +34,8 @@ public class NightEntitySpawner : IEntitySpawner
             {
                 zombiePrototype = new Zombie();
                 zombiePrototype.Create();
-                clone = zombiePrototype.ShallowClone();
+                //clone = zombiePrototype.ShallowClone();
+                clone = zombiePrototype.DeepClone();
             }
             else
             {

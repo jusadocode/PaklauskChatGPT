@@ -44,7 +44,7 @@ public class GUI
         healthBar = health;
     }
 
-    public void CreatePauseMenu(Action<string>? onConnectClick, Action? onDisconnectClick, Action? onQuitClick, Action<Panel>? onPanelCreate)
+    public void CreatePauseMenu(Action<string>? onConnectClick, Action? onDisconnectClick, Action? onQuitClick, Action? onLastCheckpointClick, Action<Panel>? onPanelCreate)
     {
         pauseMenuPanel = new Panel
         {
@@ -95,11 +95,20 @@ public class GUI
         };
         quitButton.Click += (s, e) => onQuitClick?.Invoke();
 
+        Button lastCheckpoint = new()
+        {
+            Text = "Last Checkpoint",
+            Width = 250,
+            Location = new Point(25, 220)
+        };
+        lastCheckpoint.Click += (s, e) => onLastCheckpointClick?.Invoke();
+
         pauseMenuPanel.Controls.Add(pauseMenuLabel);
         pauseMenuPanel.Controls.Add(serverLinkTextBox);
         pauseMenuPanel.Controls.Add(connectButton);
         pauseMenuPanel.Controls.Add(disconnectButton);
         pauseMenuPanel.Controls.Add(quitButton);
+        pauseMenuPanel.Controls.Add(lastCheckpoint);
 
         onPanelCreate?.Invoke(pauseMenuPanel);
     }
