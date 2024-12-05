@@ -43,7 +43,7 @@ public partial class MainForm : Form
     private int killCounter = 0;
     public MainForm() { Initialize(); }
 
-    void Initialize() // Main initialization method, that gets run when the form is created, before the game loop starts
+    void Initialize() 
     {
         InitializeComponent();
 
@@ -60,23 +60,17 @@ public partial class MainForm : Form
     }
     private void InitializeHandlers()
     {
-       
         var enemyHandler = new EnemyHandler();
         var pulsingEnemyHandler = new PulsingEnemyHandler();
         var shieldedEnemyHandler = new ShieldedEnemyHandler();
 
-        
         enemyHandler.SetNext(pulsingEnemyHandler);
         pulsingEnemyHandler.SetNext(shieldedEnemyHandler);
-
-       
         enemyHandlerChain = enemyHandler;
     }
     private void SaveState()
     {
         undoStack.Push(player.SaveState());
-        Console.WriteLine("SAVINGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG");
-
     }
     private void Undo()
     {
@@ -91,7 +85,7 @@ public partial class MainForm : Form
             Console.WriteLine("No saved states to undo.");
         }
     }
-    private void FixedUpdate(double deltaTime) // Main game loop, that gets run every frame, deltaTime = time since last frame
+    private void FixedUpdate(double deltaTime)
     {
         SendDataToServer();
 
@@ -289,8 +283,7 @@ public partial class MainForm : Form
     private void HandleEnemyInteraction(PictureBox enemy)
     {
         if (player.IntersectsWith(enemy))
-        {
-            
+        {   
             enemyHandlerChain?.Handle(enemy, player);
         }
     }
@@ -433,7 +426,6 @@ public partial class MainForm : Form
             context.SetState(new IdleState());
         }
 
-       
         context.UpdateState(entity, player);
     }
 

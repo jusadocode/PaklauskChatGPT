@@ -9,16 +9,11 @@ using System.Threading.Tasks;
 namespace RAID2D.Client.States;
 public class FleeState : IEntityState
 {
-    public IMovementStrategy Handle(PictureBox entity, Player player, IMovementStrategy currentStrategy)
+    public IMovementStrategy Handle(PictureBox entity, Player player)
     {
-        if (player.DistanceTo(entity) < Constants.AnimalFleeRadius)
-        {
             IMovementStrategy fleeStrategy = new FleeMovement(player.PictureBox, Constants.AnimalSpeed);
             fleeStrategy.Move(entity);
             return fleeStrategy; 
-        }
-        currentStrategy.Move(entity); 
-        return currentStrategy;
     }
 }
 

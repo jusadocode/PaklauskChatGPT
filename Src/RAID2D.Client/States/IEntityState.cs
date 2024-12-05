@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace RAID2D.Client.States;
 public interface IEntityState
 {
-    IMovementStrategy Handle(PictureBox entity, Player player, IMovementStrategy currentStrategy);
+    IMovementStrategy Handle(PictureBox entity, Player player);
 }
 
 
