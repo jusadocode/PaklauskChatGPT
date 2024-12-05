@@ -20,7 +20,8 @@ public class DayEntitySpawner : IEntitySpawner
             {
                 endermanPrototype = new Enderman();
                 endermanPrototype.Create();
-                clone = endermanPrototype.ShallowClone();
+                //clone = endermanPrototype.ShallowClone();
+                clone = endermanPrototype.DeepClone();
             }
             else
             {
@@ -33,7 +34,8 @@ public class DayEntitySpawner : IEntitySpawner
             {
                 creeperPrototype = new Creeper();
                 creeperPrototype.Create();
-                clone = creeperPrototype.ShallowClone();
+                //clone = creeperPrototype.ShallowClone();
+                clone = creeperPrototype.DeepClone();
             }
             else
             {
