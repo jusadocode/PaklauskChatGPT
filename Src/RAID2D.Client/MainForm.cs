@@ -43,7 +43,7 @@ public partial class MainForm : Form
     private int killCounter = 0;
     public MainForm() { Initialize(); }
 
-    void Initialize() 
+    void Initialize()
     {
         InitializeComponent();
 
@@ -283,7 +283,7 @@ public partial class MainForm : Form
     private void HandleEnemyInteraction(PictureBox enemy)
     {
         if (player.IntersectsWith(enemy))
-        {   
+        {
             enemyHandlerChain?.Handle(enemy, player);
         }
     }
@@ -395,7 +395,12 @@ public partial class MainForm : Form
         IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
 
         PictureBox valuablePictureBox = new ValuableDropBuilder()
-            
+            .SetTag(valuableDrop)
+            .SetName(valuableDrop.Name)
+            .SetImage(valuableDrop.Image)
+            .SetLocation(valuableDrop.Location)
+            .SetSize(valuableDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
             .Build();
 
         AddControl(valuablePictureBox);
@@ -419,7 +424,7 @@ public partial class MainForm : Form
             if (IsAnimal(entity))
                 context.SetState(new FleeState());
             else if (IsEnemy(entity))
-                context.SetState(new ChaseState()); 
+                context.SetState(new ChaseState());
         }
         else
         {
@@ -448,7 +453,7 @@ public partial class MainForm : Form
 
             player.RegisterKill(bullet.Bounds.Location, AddControl, RemoveControl);
             killCounter++;
-            if(killCounter == 10)
+            if (killCounter == 10)
             {
                 SaveState();
                 killCounter = 0;
@@ -469,7 +474,7 @@ public partial class MainForm : Form
             RemoveControl(bullet);
             entityMovementStrategies.Remove(entity);
         }
-        
+
     }
 
     private void SpawnEnemy()
