@@ -417,13 +417,13 @@ public partial class MainForm : Form
         if (player.DistanceTo(entity) < fleeRadius)
         {
             if (IsAnimal(entity))
-                context.SetState(new FleeState());
+                context.SetState(StateFlyweightFactory.GetState("Flee"));
             else if (IsEnemy(entity))
-                context.SetState(new ChaseState()); 
+                context.SetState(StateFlyweightFactory.GetState("Chase"));
         }
         else
         {
-            context.SetState(new IdleState());
+            context.SetState(StateFlyweightFactory.GetState("Idle"));
         }
 
         context.UpdateState(entity, player);
