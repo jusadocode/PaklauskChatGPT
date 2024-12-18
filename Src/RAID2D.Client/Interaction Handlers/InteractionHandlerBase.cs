@@ -1,4 +1,5 @@
 ﻿using RAID2D.Client.Drops.Spawners;
+using RAID2D.Client.Effects;
 using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Players;
 
@@ -19,8 +20,18 @@ public abstract class InteractionHandlerBase
             return;
         }
 
-        OnCollisionWithPlayer(entity);
-        OnControlRemove(entity);
+        try
+        {
+            OnCollisionWithPlayer(entity);
+            OnControlRemove(entity);
+        }
+        catch (Exception e)
+        {
+            if (e is not NotImplementedException)
+            {
+                throw new Exception("This shouldnt happen");
+            }
+        }
     }
 
     public void HandleInteractionWithBullet(PictureBox entity, PictureBox bullet)
@@ -33,9 +44,19 @@ public abstract class InteractionHandlerBase
             return;
         }
 
-        OnCollisionWithBullet(entity, bullet);
-        OnControlRemove(entity);
-        OnControlRemove(entity);
+        try
+        {
+            OnCollisionWithBullet(entity, bullet);
+            OnControlRemove(entity);
+            OnControlRemove(bullet);
+        }
+        catch (Exception e)
+        {
+            if (e is not NotImplementedException)
+            {
+                throw new Exception("This shouldnt happen");
+            }
+        }
     }
 
     public void SpawnEntity()
@@ -52,16 +73,25 @@ public abstract class InteractionHandlerBase
 
     protected abstract bool IsValidEntity(PictureBox entity);
 
-    protected virtual void OnCollisionWithPlayer(PictureBox entity) { }
-    protected virtual void OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { }
-    protected virtual void OnControlAdd(PictureBox entity) { }
-    protected virtual void OnControlRemove(PictureBox entity) { }
+    protected virtual void OnCollisionWithPlayer(PictureBox entity) { throw new NotImplementedException(); }
+    protected virtual void OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { throw new NotImplementedException(); }
     protected virtual PictureBox? GetSpawnEntity() { return null; }
+
+    protected void OnControlAdd(PictureBox entity)
+    {
+        Player?.AddControl(entity);
+    }
+
+    protected void OnControlRemove(PictureBox entity)
+    {
+        Player?.RemoveControl(entity);
+    }
 
     private bool Intersects(PictureBox box1, PictureBox box2)
     {
         return box1.Bounds.IntersectsWith(box2.Bounds);
     }
+
     private bool Intersects(PictureBox box, Player player)
     {
         return box.Bounds.IntersectsWith(player.PictureBox.Bounds);

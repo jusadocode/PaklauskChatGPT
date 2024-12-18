@@ -49,13 +49,13 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
+        InitializeHandlers();
         InitializeGUI();
         InitializeDayTime();
         InitializeServer();
         InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
-        InitializeHandlers();
 
         Debug.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
@@ -319,8 +319,6 @@ public partial class MainForm : Form
         AddControl(ammoDropPictureBox);
     }
 
-
-
     private void SpawnMedicalDrop()
     {
         IDroppableItem medicalDrop = dropSpawner.CreateDrop(Constants.DropMedicalTag);
@@ -386,7 +384,6 @@ public partial class MainForm : Form
     private static bool IsEnemyOrAnimal(Control control) => IsAnimal(control) || IsEnemy(control);
     private static bool IsEnemy(Control enemy) => enemy.Tag is string tag && tag.Contains(Constants.EnemyTag);
     private static bool IsAnimal(Control animal) => animal.Tag as string is Constants.AnimalTag;
-    private static bool IsBullet(Control bullet) => bullet.Tag as string is Constants.BulletTag;
 
     private bool IsFormFocused() => ActiveForm == this;
 
