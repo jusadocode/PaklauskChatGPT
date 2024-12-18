@@ -126,12 +126,12 @@ public class Player
         GUI.GetInstance().UpdateAmmo(Ammo);
     }
 
-    public void RegisterKill(Point hitmarkLocation, Action<PictureBox> onHitmarkerCreation, Action<PictureBox> onHitmarkerExpired)
+    public void RegisterKill(Point hitmarkLocation)
     {
         Kills++;
         Hitmarker hitmark = new();
-        hitmark.Create(hitmarkLocation, onHitmarkerExpired);
-        onHitmarkerCreation(hitmark.PictureBox);
+        hitmark.Create(hitmarkLocation, this.RemoveControl);
+        this.AddControl(hitmark.PictureBox);
         GUI.GetInstance().UpdateKills(Kills);
     }
 
@@ -172,5 +172,24 @@ public class Player
     public bool IsLowHealth()
     {
         return Health is > 0 and <= (int)Constants.PlayerLowHealthLimit;
+    }
+
+    public void AddControl(Control control)
+    {
+        if (this.PictureBox.Parent == null)
+            return;
+
+        this.PictureBox.Parent.Controls.Add(control);
+        control.BringToFront();
+        this.PictureBox.BringToFront();
+    }
+
+    public void RemoveControl(Control control)
+    {
+        if (this.PictureBox.Parent == null)
+            return;
+
+        this.PictureBox.Parent.Controls.Remove(control);
+        control.Dispose();
     }
 }

@@ -25,10 +25,6 @@ public class EntityContext
 
     public void UpdateState(PictureBox entity, Player player)
     {
-       
         MovementStrategy = _currentState.Handle(entity, player);
     }
 }
-
-
-

@@ -1,8 +1,7 @@
 ﻿using RAID2D.Client.Players;
-using System;
-using System.Windows.Forms;
 
 namespace RAID2D.Client.Handlers;
+
 public class EnemyHandler : InteractionHandler
 {
     public override void Handle(PictureBox entity, Player player)
