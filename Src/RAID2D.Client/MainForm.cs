@@ -16,6 +16,7 @@ using RAID2D.Client.Services;
 using RAID2D.Client.States;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
+using RAID2D.Client.Visitors;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
 using System.Diagnostics;
@@ -25,8 +26,10 @@ namespace RAID2D.Client;
 public partial class MainForm : Form
 {
     private readonly ServerConnection server = new();
-    private readonly GameState gameState = new(new Point(0, 0), Direction.Right);
+    private readonly GameState gameState = new(new Point(0, 0), Direction.Right, false, 0, 0);
     public Dictionary<string, ServerPlayer> serverPlayers = [];
+    ScoreVisitor scoreVisitor = new ScoreVisitor();
+
     private InteractionHandler? enemyHandlerChain;
     private readonly Player player = new();
     private readonly GUI UI = GUI.GetInstance();
@@ -47,9 +50,9 @@ public partial class MainForm : Form
     {
         InitializeComponent();
 
-        InitializeGUI();
         InitializeDayTime();
         InitializeServer();
+        InitializeGUI();
         InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
@@ -89,14 +92,18 @@ public partial class MainForm : Form
     {
         SendDataToServer();
 
-        if (!IsFormFocused())
-            return;
+        if (!server.IsConnected())
+        {
+            if (player.IsDead() || UI.IsPaused())
+                return;
+
+            if (!IsFormFocused())
+                return;
+        }
 
         HandlePlayerInput();
 
-        if (player.IsDead() || UI.IsPaused())
-            return;
-
+        
         HandleGUI(deltaTime);
         HandleDayTime(deltaTime);
 
@@ -109,6 +116,10 @@ public partial class MainForm : Form
             //HandleMutatedEnemyInteraction(box);
             HandleEntityMovement(box);
         }
+
+        RefreshScores();
+
+
     }
 
     private void InitializeDevTools()
@@ -138,7 +149,13 @@ public partial class MainForm : Form
 
         // Pause the game on alt-tab
         this.Activated += (s, e) => UI.SetPauseMenuVisibility(false);
-        this.Deactivate += (s, e) => UI.SetPauseMenuVisibility(true);
+        this.Deactivate += (s, e) =>
+        { if(server.IsConnected())
+            UI.SetPauseMenuVisibility(true);
+        };
+
+
+
 
         // Initialize GUI elements
         UI.BindElements(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
@@ -153,6 +170,12 @@ public partial class MainForm : Form
                 UI.SetPauseMenuVisibility(false);
             },
             onPanelCreate: AddControl);
+
+        UI.CreateScoreboard(
+            onPanelCreate: AddControl
+        );
+
+
     }
 
     private void InitializeDayTime()
@@ -219,8 +242,12 @@ public partial class MainForm : Form
         if (!server.IsConnected())
             return;
 
+        Console.WriteLine(player);
         gameState.Location = player.PictureBox.Location;
         gameState.Direction = player.Direction;
+        gameState.IsDead = player.IsDead();
+        gameState.Kills = player.Kills;
+
 
         await server.SendGameStateAsync(gameState);
     }
@@ -245,6 +272,7 @@ public partial class MainForm : Form
                 this.Invoke((MethodInvoker)delegate
                 {
                     AddControl(newPlayer.PictureBox);
+                    UI.AddPlayerKillsEntry(gameState.ConnectionID, gameState.Kills);
                 });
 
                 Console.WriteLine($"added new player at loc={newPlayer.PictureBox.Location}");
@@ -255,6 +283,7 @@ public partial class MainForm : Form
             this.Invoke((MethodInvoker)delegate
             {
                 serverPlayer.Update(gameState);
+                UI.UpdatePlayersKills(gameState.ConnectionID, gameState.Kills);
             });
         }
     }
@@ -417,13 +446,13 @@ public partial class MainForm : Form
         if (player.DistanceTo(entity) < fleeRadius)
         {
             if (IsAnimal(entity))
-                context.SetState(new FleeState());
+                context.SetState(StateFlyweightFactory.GetState("Flee"));
             else if (IsEnemy(entity))
-                context.SetState(new ChaseState()); 
+                context.SetState(StateFlyweightFactory.GetState("Chase"));
         }
         else
         {
-            context.SetState(new IdleState());
+            context.SetState(StateFlyweightFactory.GetState("Idle"));
         }
 
         context.UpdateState(entity, player);
@@ -529,7 +558,12 @@ public partial class MainForm : Form
     private void RestartGame()
     {
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
+        {
+            if (control.Tag == "test123") // server players, no reset picture box
+                continue;
             RemoveControl(control);
+
+        }
 
         killCounter = 0;
         AddControl(player.Respawn());
@@ -575,5 +609,18 @@ public partial class MainForm : Form
                 shieldedEnemiesHealth.Remove(enemy);
             }
         }
+    }
+
+    private void RefreshScores()
+    {
+        foreach (ServerPlayer serverPlayer in serverPlayers.Values)
+        {
+            serverPlayer.Accept(scoreVisitor);
+        }
+
+        player.Accept(scoreVisitor);
+
+        UI.UpdateHighestScore(scoreVisitor.HighestScore);
+        UI.UpdateHighestCash(scoreVisitor.HighestCash);
     }
 }

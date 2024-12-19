@@ -3,11 +3,12 @@ using RAID2D.Client.Mementos;
 using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
+using RAID2D.Client.Visitors;
 using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.Players;
 
-public class Player
+public class Player : IPlayerElement
 {
     public int Health { get; private set; } = Constants.PlayerMaxHealth;
     public int MaxHealth { get; private set; } = Constants.PlayerMaxHealth;
@@ -129,6 +130,7 @@ public class Player
     public void RegisterKill(Point hitmarkLocation, Action<PictureBox> onHitmarkerCreation, Action<PictureBox> onHitmarkerExpired)
     {
         Kills++;
+        Console.WriteLine($"Kills incremented to: {Kills}");
         Hitmarker hitmark = new();
         hitmark.Create(hitmarkLocation, onHitmarkerExpired);
         onHitmarkerCreation(hitmark.PictureBox);
@@ -172,5 +174,10 @@ public class Player
     public bool IsLowHealth()
     {
         return Health is > 0 and <= (int)Constants.PlayerLowHealthLimit;
+    }
+
+    public void Accept(IPlayerVisitor visitor)
+    {
+        visitor.Visit(this);
     }
 }
