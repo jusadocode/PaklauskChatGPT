@@ -25,7 +25,7 @@ public class Player
     private bool lowHealthTriggered = false;
     public PlayerMemento SaveState()
     {
-        return new PlayerMemento(PictureBox.Location, Health, Ammo, Kills);
+        return new PlayerMemento(PictureBox.Location, Health, Ammo, Kills, Cash);
     }
 
     public void RestoreState(PlayerMemento memento)

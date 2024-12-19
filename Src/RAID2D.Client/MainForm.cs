@@ -24,13 +24,15 @@ namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
+    private bool isSavingCheckpoint = true;
     private readonly ServerConnection server = new();
     private readonly GameState gameState = new(new Point(0, 0), Direction.Right);
     public Dictionary<string, ServerPlayer> serverPlayers = [];
     private InteractionHandler? enemyHandlerChain;
     private readonly Player player = new();
     private readonly GUI UI = GUI.GetInstance();
-    private readonly Stack<PlayerMemento> undoStack = new Stack<PlayerMemento>();
+    private readonly List<PlayerMemento> savedStates = new List<PlayerMemento> { null, null, null };
+    private int selectedSaveIndex = -1;
     private readonly Dictionary<PictureBox, IMovementStrategy> entityMovementStrategies = [];
     private readonly Dictionary<PictureBox, int> shieldedEnemiesHealth = [];
     private readonly IDropSpawner dropSpawner = new DropSpawner();
@@ -40,7 +42,7 @@ public partial class MainForm : Form
     private static readonly IEntitySpawner nightEntitySpawner = new NightEntitySpawner();
     private readonly Dictionary<PictureBox, EntityContext> entityContexts = new();
     private IEntitySpawner entitySpawner = dayEntitySpawner;
-    private int killCounter = 0;
+   
     public MainForm() { Initialize(); }
 
     void Initialize() 
@@ -68,21 +70,32 @@ public partial class MainForm : Form
         pulsingEnemyHandler.SetNext(shieldedEnemyHandler);
         enemyHandlerChain = enemyHandler;
     }
-    private void SaveState()
+    private void SaveState(int checkPointIndex)
     {
-        undoStack.Push(player.SaveState());
+        var saveState = player.SaveState();
+        savedStates[checkPointIndex] = saveState;
+        Debug.WriteLine($"Saved state at position {saveState.Position}, health {saveState.Health}, ammo {saveState.Ammo}, kills {saveState.Kills}");
     }
-    private void Undo()
+    private void RestoreState(int saveIndex)
     {
-        if (undoStack.Count > 0)
+        if (saveIndex >= 0 && saveIndex < savedStates.Count)
         {
-            PlayerMemento lastState = undoStack.Pop();
-            player.RestoreState(lastState);
-            killCounter = 0;
+            PlayerMemento selectedState = savedStates[saveIndex];
+            player.RestoreState(selectedState);
+            selectedSaveIndex = saveIndex; 
+            Debug.WriteLine($"Restored state #{saveIndex}: position {selectedState.Position}, health {selectedState.Health}, ammo {selectedState.Ammo}, kills {selectedState.Kills}");
         }
         else
         {
-            Console.WriteLine("No saved states to undo.");
+            Console.WriteLine("Invalid save index.");
+        }
+    }
+    private void DisplaySavedStates()
+    {
+        for (int i = 0; i < savedStates.Count; i++)
+        {
+            PlayerMemento state = savedStates[i];
+            Debug.WriteLine($"Save #{i}: Position={state.Position}, Health={state.Health}, Ammo={state.Ammo}, Kills={state.Kills}");
         }
     }
     private void FixedUpdate(double deltaTime)
@@ -133,7 +146,7 @@ public partial class MainForm : Form
     {
         // Force fullscreen on startup
         this.WindowState = FormWindowState.Normal;
-        this.FormBorderStyle = FormBorderStyle.Sizable;
+        this.FormBorderStyle = FormBorderStyle.None;
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
 
         // Pause the game on alt-tab
@@ -147,9 +160,24 @@ public partial class MainForm : Form
             onConnectClick: server.Connect,
             onDisconnectClick: async () => await server.DisconnectAsync(),
             onQuitClick: Application.Exit,
-            onLastCheckpointClick: () =>
+            onCheckPointClick: (checkPointIndex) =>
             {
-                Undo();
+
+                if (isSavingCheckpoint)
+                {
+                    SaveState(checkPointIndex);  
+                    Debug.WriteLine("Checkpoint saved.");
+                }
+                else
+                {
+                   
+                    RestoreState(checkPointIndex); 
+                    Debug.WriteLine("Checkpoint loaded.");
+                }
+
+               
+                isSavingCheckpoint = !isSavingCheckpoint;
+
                 UI.SetPauseMenuVisibility(false);
             },
             onPanelCreate: AddControl);
@@ -395,7 +423,12 @@ public partial class MainForm : Form
         IDroppableItem valuableDrop = dropSpawner.CreateDrop(Constants.DropValuableTag, location);
 
         PictureBox valuablePictureBox = new ValuableDropBuilder()
-            
+            .SetTag(valuableDrop)
+            .SetName(valuableDrop.Name)
+            .SetImage(valuableDrop.Image)
+            .SetLocation(valuableDrop.Location)
+            .SetSize(valuableDrop.Size)
+            .SetSizeMode(Constants.SizeMode)
             .Build();
 
         AddControl(valuablePictureBox);
@@ -447,12 +480,7 @@ public partial class MainForm : Form
             }
 
             player.RegisterKill(bullet.Bounds.Location, AddControl, RemoveControl);
-            killCounter++;
-            if(killCounter == 10)
-            {
-                SaveState();
-                killCounter = 0;
-            }
+           
 
             if (IsEnemy(entity))
             {
@@ -531,7 +559,7 @@ public partial class MainForm : Form
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
             RemoveControl(control);
 
-        killCounter = 0;
+     
         AddControl(player.Respawn());
         SpawnEntities();
     }

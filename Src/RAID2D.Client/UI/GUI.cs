@@ -18,6 +18,7 @@ public class GUI
     private Label cashLabel = new();
     private ProgressBar healthBar = new();
     private Panel pauseMenuPanel = new();
+    private bool isSaveMode = true;
 
     private GUI() { } // Private constructor to prevent instantiation from outside
 
@@ -43,12 +44,34 @@ public class GUI
         cashLabel = cash;
         healthBar = health;
     }
+    public void ToggleSaveLoadMode()
+    {
+        isSaveMode = !isSaveMode;
+        UpdateCheckpointButtonText();
+    }
 
-    public void CreatePauseMenu(Action<string>? onConnectClick, Action? onDisconnectClick, Action? onQuitClick, Action? onLastCheckpointClick, Action<Panel>? onPanelCreate)
+    private void UpdateCheckpointButtonText()
+    {
+        foreach (Control control in pauseMenuPanel.Controls)
+        {
+            if (control is Button button)
+            {
+                if (button.Text.StartsWith("Save Check"))
+                {
+                    button.Text = "Load " + button.Text.Substring(5);
+                }
+                else if (button.Text.StartsWith("Load Check"))
+                {
+                    button.Text= "Save " + button.Text.Substring(5);
+                }
+            }
+        }
+    }
+    public void CreatePauseMenu(Action<string>? onConnectClick, Action? onDisconnectClick, Action? onQuitClick, Action<int>? onCheckPointClick, Action<Panel>? onPanelCreate)
     {
         pauseMenuPanel = new Panel
         {
-            Size = new Size(300, 250),
+            Size = new Size(300, 500),
             Location = Location.MiddleOfScreen(new Size(300, 250)),
             BackColor = Color.Gray,
             Visible = false
@@ -95,20 +118,45 @@ public class GUI
         };
         quitButton.Click += (s, e) => onQuitClick?.Invoke();
 
-        Button lastCheckpoint = new()
+        Button Checkpoint1 = new()
         {
-            Text = "Last Checkpoint",
+            Text = isSaveMode ? "Save Checkpoint 1" : "Load Checkpoint 1",
             Width = 250,
             Location = new Point(25, 220)
         };
-        lastCheckpoint.Click += (s, e) => onLastCheckpointClick?.Invoke();
+        Checkpoint1.Click += (s, e) => onCheckPointClick?.Invoke(0);
+        Button Checkpoint2 = new()
+        {
+            Text = isSaveMode ? "Save Checkpoint 2" : "Load Checkpoint 2",
+            Width = 250,
+            Location = new Point(25, 260)
+        };
+        Checkpoint2.Click += (s, e) => onCheckPointClick?.Invoke(1);
+        Button Checkpoint3 = new()
+        {
+            Text = isSaveMode ? "Save Checkpoint 3" : "Load Checkpoint 3",
+            Width = 250,
+            Location = new Point(25, 300)
+        };
+        Checkpoint3.Click += (s, e) => onCheckPointClick?.Invoke(2);
+
+        Button toggleSaveLoadModeButton = new()
+        {
+            Text = "Toggle Save/Load Mode",
+            Width = 250,
+            Location = new Point(25, 340)
+        };
+        toggleSaveLoadModeButton.Click += (s, e) => ToggleSaveLoadMode();
 
         pauseMenuPanel.Controls.Add(pauseMenuLabel);
         pauseMenuPanel.Controls.Add(serverLinkTextBox);
         pauseMenuPanel.Controls.Add(connectButton);
         pauseMenuPanel.Controls.Add(disconnectButton);
         pauseMenuPanel.Controls.Add(quitButton);
-        pauseMenuPanel.Controls.Add(lastCheckpoint);
+        pauseMenuPanel.Controls.Add(Checkpoint1);
+        pauseMenuPanel.Controls.Add(Checkpoint2);
+        pauseMenuPanel.Controls.Add(Checkpoint3);
+        pauseMenuPanel.Controls.Add(toggleSaveLoadModeButton);
 
         onPanelCreate?.Invoke(pauseMenuPanel);
     }

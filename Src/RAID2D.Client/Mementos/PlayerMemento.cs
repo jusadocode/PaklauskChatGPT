@@ -11,12 +11,14 @@ public class PlayerMemento
     public int Health { get; }
     public uint Ammo { get; }
     public uint Kills { get; }
+    public uint Cash { get; }
 
-    public PlayerMemento(Point position, int health, uint ammo, uint kills)
+    public PlayerMemento(Point position, int health, uint ammo, uint kills, uint cash)
     {
-        Position = position;
-        Health = health;
-        Ammo = ammo;
-        Kills = kills;
+        this.Position = position;
+        this.Health = health;
+        this.Ammo = ammo;
+        this.Kills = kills;
+        this.Cash = cash;
     }
 }
