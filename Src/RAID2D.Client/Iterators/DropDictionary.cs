@@ -2,7 +2,7 @@
 
 namespace RAID2D.Client.Iterators;
 
-public class DropList : IAggregate<IDroppableItem>
+public class DropDictionary : IAggregate<IDroppableItem>
 {
     private readonly Dictionary<PictureBox, IDroppableItem> _drops = [];
 

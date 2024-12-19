@@ -63,7 +63,7 @@ public class ServerConnectionProxy : IServerConnection
     {
         if (!isAuthorized)
         {
-            Console.WriteLine("Proxy: Access denied - Unauthorized connection attempt.");
+            Console.WriteLine("Proxy: Access denied - Unauthorized send game state attempt.");
             return;
         }
 
@@ -75,5 +75,16 @@ public class ServerConnectionProxy : IServerConnection
 
         //Console.WriteLine("Proxy forwarding game state...");
         await realConnection.SendGameStateAsync(gameState);
+    }
+
+    public void ReceiveGameState(GameState gameState)
+    {
+        if (!isAuthorized)
+        {
+            Console.WriteLine("Proxy: Access denied - Unauthorized receive game state attempt.");
+            return;
+        }
+
+        realConnection.ReceiveGameState(gameState);
     }
 }

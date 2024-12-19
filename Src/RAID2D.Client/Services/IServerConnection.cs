@@ -9,4 +9,5 @@ public interface IServerConnection
     void SetCallbacks(Action<GameState> onGameStateReceive);
     Task DisconnectAsync();
     Task SendGameStateAsync(GameState gameState);
+    void ReceiveGameState(GameState gameState);
 }

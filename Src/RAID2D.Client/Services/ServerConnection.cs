@@ -86,9 +86,9 @@ public class ServerConnection : IServerConnection
 
             await connection!.InvokeAsync(SharedConstants.SendGameStateUpdate, gameState);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            Console.WriteLine($"Failed to send game state to the server: {ex.Message}");
+            Console.WriteLine($"Failed to send game state to the server: {e.Message}");
         }
     }
 
@@ -100,8 +100,7 @@ public class ServerConnection : IServerConnection
         }
         catch (Exception e)
         {
-            string message = $"Unhandled Exception:\n\n{e.Message}\n\nStack Trace:\n{e.StackTrace}";
-            MessageBox.Show(message, "Unhandled Exception", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            Console.WriteLine($"Failed to receive game state from the server: {e.Message}");
         }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace RAID2D.Client.Iterators;
 
-public class BulletList : IAggregate<Bullet>
+public class BulletLinkedList : IAggregate<Bullet>
 {
     private readonly LinkedList<Bullet> _bullets = [];
 

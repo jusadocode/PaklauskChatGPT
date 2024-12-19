@@ -48,8 +48,8 @@ public partial class MainForm : Form
     public readonly InteractionHandlerBase enemyInteractionHandler = new EnemyInteractionHandler();
 
     public readonly EntityList entityList = new();
-    public readonly DropList dropList = new();
-    public readonly BulletList bulletList = new();
+    public readonly DropDictionary dropList = new();
+    public readonly BulletLinkedList bulletList = new();
 
     private readonly List<PlayerMemento?> savedStates = [null, null, null];
 

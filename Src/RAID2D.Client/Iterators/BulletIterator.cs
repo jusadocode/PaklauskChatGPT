@@ -4,12 +4,10 @@ namespace RAID2D.Client.Iterators;
 
 public class BulletIterator : IIterator<Bullet>
 {
-    private readonly LinkedList<Bullet> _bullets;
     private LinkedListNode<Bullet>? _currentNode;
 
     public BulletIterator(LinkedList<Bullet> bullets)
     {
-        _bullets = bullets;
         _currentNode = bullets.First;
     }
 
