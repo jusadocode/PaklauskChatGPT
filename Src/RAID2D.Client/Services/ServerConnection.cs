@@ -16,6 +16,12 @@ public class ServerConnection
 
     public async void Connect(string serverUrl)
     {
+        if (IsConnected())
+        {
+            Console.WriteLine("Already connected to the server.");
+            return;
+        }
+
         try
         {
             connection = new HubConnectionBuilder()

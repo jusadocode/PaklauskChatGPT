@@ -20,6 +20,7 @@ public class GUI
     private Panel pauseMenuPanel = new();
     public bool isSaveMode = true;
     private Panel scoreboardPanel = new();
+
     private GUI() { } // Private constructor to prevent instantiation from outside
 
     public static GUI GetInstance()
@@ -88,21 +89,13 @@ public class GUI
             Location = new Point(pauseMenuPanel.Width / 4, 10)
         };
 
-        TextBox serverLinkTextBox = new()
-        {
-            PlaceholderText = "Enter server link here",
-            Text = $"{Constants.ServerUrl}",
-            Width = 250,
-            Location = new Point(25, 60)
-        };
-
         Button connectButton = new()
         {
             Text = "Connect to Server",
             Width = 250,
             Location = new Point(25, 100)
         };
-        connectButton.Click += (s, e) => onConnectClick?.Invoke(serverLinkTextBox.Text);
+        connectButton.Click += (s, e) => onConnectClick?.Invoke(Constants.ServerUrl);
 
         Button disconnectButton = new()
         {
@@ -151,7 +144,6 @@ public class GUI
         toggleSaveLoadModeButton.Click += (s, e) => ToggleSaveLoadMode();
 
         pauseMenuPanel.Controls.Add(pauseMenuLabel);
-        pauseMenuPanel.Controls.Add(serverLinkTextBox);
         pauseMenuPanel.Controls.Add(connectButton);
         pauseMenuPanel.Controls.Add(disconnectButton);
         pauseMenuPanel.Controls.Add(quitButton);
