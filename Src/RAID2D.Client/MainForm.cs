@@ -10,6 +10,7 @@ using RAID2D.Client.Entities.Spawners;
 using RAID2D.Client.Interaction_Handlers;
 using RAID2D.Client.Iterators;
 using RAID2D.Client.Managers;
+using RAID2D.Client.Mediator;
 using RAID2D.Client.Mementos;
 using RAID2D.Client.Players;
 using RAID2D.Client.Services;
@@ -47,6 +48,8 @@ public partial class MainForm : Form
     public readonly InteractionHandlerBase dropInteractionHandler = new DropInteractionHandler();
     public readonly InteractionHandlerBase enemyInteractionHandler = new EnemyInteractionHandler();
 
+    private readonly InteractionMediator interactionMediator = new();
+
     public readonly EntityList entityList = new();
     public readonly DropDictionary dropList = new();
     public readonly BulletLinkedList bulletList = new();
@@ -60,14 +63,15 @@ public partial class MainForm : Form
     void Initialize()
     {
         InitializeComponent();
-
         InitializeHandlers();
+        InitializeMediator();
         InitializeDayTime();
         InitializeServer();
         InitializeGUI();
         InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
+
 
         Debug.WriteLine($"Game initialized. Current resolution: {ClientSize.Width}x{ClientSize.Height}");
     }
@@ -95,14 +99,14 @@ public partial class MainForm : Form
             IEntity entity = it.Next();
 
             HandleEntityMovement(entity);
-            enemyInteractionHandler.HandleInteractionWithPlayer(entity.PictureBox);
+            //enemyInteractionHandler.HandleInteractionWithPlayer(entity.PictureBox);
+            interactionMediator.NotifyEntityCollision(entity.PictureBox); 
 
             for (var it2 = bulletList.GetIterator(); it2.HasNext();)
             {
                 Bullet bullet = it2.Next();
 
-                animalInteractionHandler.HandleInteractionWithBullet(entity.PictureBox, bullet.PictureBox);
-                enemyInteractionHandler.HandleInteractionWithBullet(entity.PictureBox, bullet.PictureBox);
+                interactionMediator.NotifyBulletCollision(entity.PictureBox, bullet.PictureBox);
             }
         }
 
@@ -110,7 +114,7 @@ public partial class MainForm : Form
         {
             IDroppableItem drop = it.Next();
 
-            dropInteractionHandler.HandleInteractionWithPlayer(drop.PictureBox);
+            interactionMediator.NotifyEntityCollision(drop.PictureBox);
         }
 
         RefreshScores();
@@ -121,6 +125,13 @@ public partial class MainForm : Form
         animalInteractionHandler.Form = this;
         dropInteractionHandler.Form = this;
         enemyInteractionHandler.Form = this;
+    }
+
+    public void InitializeMediator()
+    {
+        interactionMediator.AnimalHandlerColleague = animalInteractionHandler;
+        interactionMediator.EnemyHandlerColleague = enemyInteractionHandler;
+        interactionMediator.DropHandlerColleague = dropInteractionHandler;
     }
 
     private void SaveState(int checkPointIndex)
@@ -154,7 +165,7 @@ public partial class MainForm : Form
             onUndoClick: dayTimeController.Undo,
             player: player,
             server: server,
-            onSpawnEntitiesClick: SpawnEntities,
+            onSpawnEntitiesClick: interactionMediator.SpawnEntities,
             onButtonCreate: AddControl);
         server.Connect(Constants.ServerUrl);
 #endif
@@ -174,7 +185,7 @@ public partial class MainForm : Form
     {
         // Force fullscreen on startup
         this.WindowState = FormWindowState.Normal;
-        this.FormBorderStyle = FormBorderStyle.None; // paliekam fullscreen prasau
+        this.FormBorderStyle = FormBorderStyle.Sizable; // paliekam fullscreen prasau
         this.Bounds = Screen.PrimaryScreen?.Bounds ?? new Rectangle(0, 0, 1920, 1080);
 
         // Pause the game on alt-tab
@@ -420,14 +431,7 @@ public partial class MainForm : Form
         context.UpdateState(entity.PictureBox, player);
     }
 
-    public void SpawnEntities()
-    {
-        for (int i = 0; i < Constants.AnimalCount; i++)
-            animalInteractionHandler.SpawnEntity();
 
-        for (int i = 0; i < Constants.EnemyCount; i++)
-            enemyInteractionHandler.SpawnEntity();
-    }
 
     public void RestartGame()
     {
@@ -437,10 +441,12 @@ public partial class MainForm : Form
             {
                 continue;
             }
+
+            RemoveControl(control);
         }
 
         AddControl(player.Respawn());
-        SpawnEntities();
+        interactionMediator.SpawnEntities();
     }
 
     private void RefreshScores()

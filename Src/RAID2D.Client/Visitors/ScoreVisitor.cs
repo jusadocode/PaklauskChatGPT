@@ -15,7 +15,7 @@ public class ScoreVisitor : IPlayerVisitor
 
         if (player.MaxCash > HighestCash)
         {
-            HighestScore = (int)player.MaxKills;
+            HighestCash = (int)player.MaxCash;
         }
     }
 
