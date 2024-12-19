@@ -1,9 +1,10 @@
-﻿using RAID2D.Client.Entities.Enemies.Decorators;
+﻿using RAID2D.Client.Drops;
+using RAID2D.Client.Drops.Builders;
+using RAID2D.Client.Entities;
 using RAID2D.Client.Entities.Enemies;
+using RAID2D.Client.Entities.Enemies.Decorators;
 using RAID2D.Client.Handlers;
 using RAID2D.Client.Utils;
-using RAID2D.Client.Drops.Builders;
-using RAID2D.Client.Drops;
 
 namespace RAID2D.Client.Interaction_Handlers;
 
@@ -31,7 +32,7 @@ public class EnemyInteractionHandler : InteractionHandlerBase
 
     protected override void OnCollisionWithPlayer(PictureBox enemy)
     {
-        enemyHandlerChain.Handle(enemy, base.Player!);
+        enemyHandlerChain.Handle(enemy, Form.player);
     }
 
     protected override void OnCollisionWithBullet(PictureBox enemy, PictureBox bullet)
@@ -42,7 +43,8 @@ public class EnemyInteractionHandler : InteractionHandlerBase
                 return;
         }
 
-        base.Player!.RegisterKill(bullet.Bounds.Location);
+        Form.player.RegisterKill(bullet.Bounds.Location);
+        Form.entityList.Remove(enemy);
 
         SpawnValuableDrop(enemy.Location);
         base.SpawnEntity();
@@ -70,7 +72,8 @@ public class EnemyInteractionHandler : InteractionHandlerBase
 
     protected sealed override PictureBox? GetSpawnEntity()
     {
-        IEnemy enemy = EntitySpawner!.CreateEnemy();
+        IEnemy enemy = Form.entitySpawner.CreateEnemy();
+        Form.entityList.Add(enemy);
 
         if (Rand.Next(0, 101) < Constants.MutatedEnemySpawnChance)
         {
@@ -103,7 +106,8 @@ public class EnemyInteractionHandler : InteractionHandlerBase
 
     private void SpawnValuableDrop(Point location)
     {
-        IDroppableItem valuableDrop = DropSpawner.CreateDrop(Constants.DropValuableTag, location);
+        IDroppableItem valuableDrop = Form.dropSpawner.CreateDrop(Constants.DropValuableTag, location);
+        Form.dropList.Add(valuableDrop);
 
         PictureBox valuablePictureBox = new ValuableDropBuilder()
             .SetTag(valuableDrop)
@@ -113,6 +117,8 @@ public class EnemyInteractionHandler : InteractionHandlerBase
             .SetSize(valuableDrop.Size)
             .SetSizeMode(Constants.SizeMode)
             .Build();
+
+        valuableDrop.PictureBox = valuablePictureBox;
 
         base.OnControlAdd(valuablePictureBox);
     }

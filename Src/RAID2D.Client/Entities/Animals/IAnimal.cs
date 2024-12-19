@@ -1,8 +1,6 @@
 ﻿namespace RAID2D.Client.Entities.Animals;
 
-public interface IAnimal
+public interface IAnimal : IEntity
 {
-    public PictureBox PictureBox { get; }
 
-    public PictureBox Create();
 }

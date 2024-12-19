@@ -1,21 +1,16 @@
-﻿using RAID2D.Client.Drops.Spawners;
-using RAID2D.Client.Effects;
-using RAID2D.Client.Entities.Spawners;
-using RAID2D.Client.Players;
+﻿using RAID2D.Client.Players;
 
 namespace RAID2D.Client.Interaction_Handlers;
 
 public abstract class InteractionHandlerBase
 {
-    public IEntitySpawner? EntitySpawner { get; set; }
-    public IDropSpawner? DropSpawner { get; set; }
-    public Player? Player { get; set; }
+    public MainForm? Form { get; set; }
 
     public void HandleInteractionWithPlayer(PictureBox entity)
     {
-        if (this.Player == null ||
+        if (this.Form == null ||
             !IsValidEntity(entity) ||
-            !Intersects(entity, this.Player))
+            !Intersects(entity, this.Form.player))
         {
             return;
         }
@@ -36,8 +31,8 @@ public abstract class InteractionHandlerBase
 
     public void HandleInteractionWithBullet(PictureBox entity, PictureBox bullet)
     {
-        if (this.Player == null ||
-            !IsValidEntity(entity) || 
+        if (this.Form == null ||
+            !IsValidEntity(entity) ||
             !IsValidBullet(bullet) ||
             !Intersects(entity, bullet))
         {
@@ -61,7 +56,7 @@ public abstract class InteractionHandlerBase
 
     public void SpawnEntity()
     {
-        if (EntitySpawner == null)
+        if (this.Form == null)
             return;
 
         PictureBox? entity = GetSpawnEntity();
@@ -79,12 +74,12 @@ public abstract class InteractionHandlerBase
 
     protected void OnControlAdd(PictureBox entity)
     {
-        Player?.AddControl(entity);
+        Form.AddControl(entity);
     }
 
     protected void OnControlRemove(PictureBox entity)
     {
-        Player?.RemoveControl(entity);
+        Form.RemoveControl(entity);
     }
 
     private bool Intersects(PictureBox box1, PictureBox box2)

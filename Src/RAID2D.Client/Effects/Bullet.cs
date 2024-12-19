@@ -3,11 +3,13 @@ using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.Effects;
 
-public static class Bullet
+public class Bullet
 {
-    public static void Create(Direction direction, Point location, Action<PictureBox> onBulletCreated, Action<PictureBox> onBulletExpired)
+    public PictureBox PictureBox { get; set; }
+
+    public void Create(Direction direction, Point location, Action<PictureBox> onBulletExpired)
     {
-        PictureBox picture = new()
+        PictureBox = new()
         {
             BackColor = Constants.BulletColor,
             Size = Constants.BulletSize,
@@ -34,32 +36,30 @@ public static class Bullet
             switch (direction)
             {
                 case Direction.Left:
-                    picture.Left -= deltaX;
+                    PictureBox.Left -= deltaX;
                     break;
                 case Direction.Right:
-                    picture.Left += deltaX;
+                    PictureBox.Left += deltaX;
                     break;
                 case Direction.Up:
-                    picture.Top -= deltaX;
+                    PictureBox.Top -= deltaX;
                     break;
                 case Direction.Down:
-                    picture.Top += deltaX;
+                    PictureBox.Top += deltaX;
                     break;
             }
 
-            if (picture.Left < Constants.FormBounds ||
-                picture.Left > UI.Resolution.Width - Constants.FormBounds ||
-                picture.Top < Constants.FormBounds ||
-                picture.Top > UI.Resolution.Height - Constants.FormBounds)
+            if (PictureBox.Left < Constants.FormBounds ||
+                PictureBox.Left > UI.Resolution.Width - Constants.FormBounds ||
+                PictureBox.Top < Constants.FormBounds ||
+                PictureBox.Top > UI.Resolution.Height - Constants.FormBounds)
             {
-                onBulletExpired(picture);
+                onBulletExpired(PictureBox);
 
                 timer.Stop();
                 timer.Dispose();
                 timer = null;
             }
         };
-
-        onBulletCreated(picture);
     }
 }

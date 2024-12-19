@@ -1,6 +1,4 @@
 ﻿using RAID2D.Client.Players;
-using System;
-using System.Collections.Generic;
 namespace RAID2D.Client.Handlers;
 
 public class PulsingEnemyHandler : InteractionHandler

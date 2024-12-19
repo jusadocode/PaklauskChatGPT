@@ -23,23 +23,6 @@ public class Player
     private IMovementStrategy? movementStrategy;
 
     private bool lowHealthTriggered = false;
-    public PlayerMemento SaveState()
-    {
-        return new PlayerMemento(PictureBox.Location, Health, Ammo, Kills);
-    }
-
-    public void RestoreState(PlayerMemento memento)
-    {
-        PictureBox.Location = memento.Position;
-        Health = memento.Health;
-        Ammo = memento.Ammo;
-        Kills = memento.Kills;
-
-        GUI ui = GUI.GetInstance();
-        ui.UpdateHealth(MaxHealth, Health);
-        ui.UpdateAmmo(Ammo);
-        ui.UpdateKills(Kills);
-    }
 
     public PictureBox Create()
     {
@@ -81,12 +64,32 @@ public class Player
         return newPlayer;
     }
 
+    public PlayerMemento SaveState()
+    {
+        return new PlayerMemento(PictureBox.Location, Health, Ammo, Kills);
+    }
+
+    public void RestoreState(PlayerMemento memento)
+    {
+        PictureBox.Location = memento.Position;
+        Health = memento.Health;
+        Ammo = memento.Ammo;
+        Kills = memento.Kills;
+
+        GUI ui = GUI.GetInstance();
+        ui.UpdateHealth(MaxHealth, Health);
+        ui.UpdateAmmo(Ammo);
+        ui.UpdateKills(Kills);
+    }
+
     public void TakeDamage(uint damage)
     {
         Health = (int)Math.Max(0, Health - damage);
 
         if (IsDead())
+        {
             PictureBox.Image = Assets.PlayerDead;
+        }
         else if (IsLowHealth() && !lowHealthTriggered)
         {
             lowHealthTriggered = true;
@@ -140,7 +143,7 @@ public class Player
         movementStrategy?.Move(this.PictureBox);
     }
 
-    public void ShootBullet(Action<PictureBox> onBulletCreated, Action<PictureBox> onBulletExpired)
+    public void ShootBullet(Action<Bullet> onBulletCreated, Action<PictureBox> onBulletExpired)
     {
         if (Ammo == 0)
             return;
@@ -150,8 +153,10 @@ public class Player
 
         if (Ammo == 0)
             OnEmptyMagazine?.Invoke();
-
-        Bullet.Create(Direction, this.PictureBox.Location + (this.PictureBox.Size / 2), onBulletCreated, onBulletExpired);
+        
+        Bullet bullet = new();
+        bullet.Create(Direction, this.PictureBox.Location + (this.PictureBox.Size / 2), onBulletExpired);
+        onBulletCreated(bullet);
     }
 
     public double DistanceTo(Control control)

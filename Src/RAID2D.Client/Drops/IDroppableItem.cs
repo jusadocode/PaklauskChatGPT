@@ -6,4 +6,5 @@ public interface IDroppableItem
     string Name { get; }
     Image Image { get; }
     Size Size { get; }
+    PictureBox PictureBox { get; set; }
 }

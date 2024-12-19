@@ -6,11 +6,11 @@ public class DropInteractionHandler : InteractionHandlerBase
 {
     protected override bool IsValidEntity(PictureBox drop)
     {
-        return 
-            drop.Tag as string is 
-            Constants.DropAmmoTag or 
-            Constants.DropAnimalTag or 
-            Constants.DropMedicalTag or 
+        return
+            drop.Tag as string is
+            Constants.DropAmmoTag or
+            Constants.DropAnimalTag or
+            Constants.DropMedicalTag or
             Constants.DropValuableTag;
     }
 
@@ -20,22 +20,24 @@ public class DropInteractionHandler : InteractionHandlerBase
         {
             case Constants.DropAmmoTag:
                 AmmoDropData ammoDrop = DropManager.GetAmmoDropData(drop.Name);
-                base.Player!.PickupAmmo(ammoDrop.AmmoAmount);
+                Form.player.PickupAmmo(ammoDrop.AmmoAmount);
                 break;
             case Constants.DropAnimalTag:
                 AnimalDropData animalDrop = DropManager.GetAnimalDropData(drop.Name);
-                base.Player!.PickupHealable(animalDrop.HealthAmount);
+                Form.player.PickupHealable(animalDrop.HealthAmount);
                 break;
             case Constants.DropMedicalTag:
                 MedicalDropData medicalDrop = DropManager.GetMedicalDropData(drop.Name);
-                base.Player!.PickupHealable(medicalDrop.HealthAmount);
+                Form.player.PickupHealable(medicalDrop.HealthAmount);
                 break;
             case Constants.DropValuableTag:
                 ValuableDropData valuableDrop = DropManager.GetValuableDropData(drop.Name);
-                base.Player!.PickupValuable(valuableDrop.CashAmount);
+                Form.player.PickupValuable(valuableDrop.CashAmount);
                 break;
             default:
                 throw new NotImplementedException();
         }
+
+        Form.dropList.Remove(drop);
     }
 }

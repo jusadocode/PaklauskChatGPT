@@ -6,7 +6,7 @@ public class Cow : IAnimal
 {
     public PictureBox PictureBox { get; private set; } = new();
 
-    PictureBox IAnimal.Create()
+    PictureBox IEntity.Create()
     {
         PictureBox = new()
         {

@@ -9,6 +9,7 @@ public class MedicalDrop : IDroppableItem
     public string Name { get; private set; }
     public Image Image { get; private set; }
     public Size Size => Constants.DropSize;
+    public PictureBox PictureBox { get; set; }
 
     public MedicalDrop()
     {

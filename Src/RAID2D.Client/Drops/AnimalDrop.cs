@@ -9,6 +9,7 @@ public class AnimalDrop : IDroppableItem
     public Image Image { get; private set; }
     public Size Size => Constants.DropSize;
     public string AnimalName { get; private set; }
+    public PictureBox PictureBox { get; set; }
 
     public AnimalDrop(Point location, string animalName)
     {
