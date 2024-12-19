@@ -1,5 +1,4 @@
-﻿using RAID2D.Client.Drops;
-using RAID2D.Client.Effects;
+﻿using RAID2D.Client.Effects;
 
 namespace RAID2D.Client.Iterators;
 

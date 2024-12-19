@@ -18,7 +18,6 @@ using RAID2D.Client.UI;
 using RAID2D.Client.Visitors;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
-using System;
 using System.Diagnostics;
 
 namespace RAID2D.Client;
@@ -54,7 +53,7 @@ public partial class MainForm : Form
 
     private readonly List<PlayerMemento?> savedStates = [null, null, null];
 
-    ScoreVisitor scoreVisitor = new ScoreVisitor();
+    readonly ScoreVisitor scoreVisitor = new();
 
     public MainForm() { Initialize(); }
 
@@ -343,7 +342,7 @@ public partial class MainForm : Form
             {
                 AddControl(bullet.PictureBox);
                 bulletList.Add(bullet);
-            }, 
+            },
             RemoveControl);
         }
     }
@@ -396,7 +395,7 @@ public partial class MainForm : Form
             uint fleeRadius = (entity is IEnemy) ? Constants.EnemyFleeRadius : Constants.AnimalFleeRadius;
             if (player.DistanceTo(entity.PictureBox) < fleeRadius)
             {
-                if ((entity is IAnimal))
+                if (entity is IAnimal)
                 {
                     context.SetState(StateFlyweightFactory.GetState("Flee"));
                 }

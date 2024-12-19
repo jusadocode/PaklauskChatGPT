@@ -5,7 +5,7 @@ namespace RAID2D.Client.Iterators;
 public class DropIterator : IIterator<IDroppableItem>
 {
     private readonly Dictionary<PictureBox, IDroppableItem> _drops;
-    private IEnumerator<KeyValuePair<PictureBox, IDroppableItem>> _enumerator;
+    private readonly IEnumerator<KeyValuePair<PictureBox, IDroppableItem>> _enumerator;
     private bool _hasMoreElements;
 
     public DropIterator(Dictionary<PictureBox, IDroppableItem> drops)

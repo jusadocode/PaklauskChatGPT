@@ -5,7 +5,7 @@ namespace RAID2D.Client.Effects;
 
 public class Bullet
 {
-    public PictureBox PictureBox { get; set; }
+    public required PictureBox PictureBox { get; set; }
 
     public void Create(Direction direction, Point location, Action<PictureBox> onBulletExpired)
     {

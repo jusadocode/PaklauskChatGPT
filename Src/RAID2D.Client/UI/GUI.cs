@@ -163,16 +163,16 @@ public class GUI
             ("Add 9999 Ammo", (s, e) => player.PickupAmmo(9999)),
             ("Add 9999 Health", (s, e) => player.SetMaxHealth(9999)),
             ("Spawn 6 Entities", (s, e) => onSpawnEntitiesClick?.Invoke()),
-            ("Send Player Data to Server", 
+            ("Send Player Data to Server",
             async (s, e) => await server.SendGameStateAsync(
                 new GameState(
-                    player.PictureBox.Location, 
-                    player.Direction, 
-                    player.IsDead(), 
-                    player.Kills, 
+                    player.PictureBox.Location,
+                    player.Direction,
+                    player.IsDead(),
+                    player.Kills,
                     player.Cash)
                 )
-            ),            
+            ),
             ("Undo daytime", (s, e) => onUndoClick?.Invoke())
         ];
 
@@ -313,7 +313,6 @@ public class GUI
             }
         }
     }
-
 
     public void SetScoreboardVisibility(bool isVisible)
     {

@@ -4,7 +4,7 @@ using RAID2D.Shared.Models;
 
 namespace RAID2D.Client.Players;
 
-public class ServerPlayer : IPlayerElement 
+public class ServerPlayer : IPlayerElement
 {
     public PictureBox? PictureBox { get; private set; } = null;
     public bool IsRendered = false;

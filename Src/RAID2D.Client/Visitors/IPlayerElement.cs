@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace RAID2D.Client.Visitors;
+﻿namespace RAID2D.Client.Visitors;
 public interface IPlayerElement
 {
     void Accept(IPlayerVisitor visitor);

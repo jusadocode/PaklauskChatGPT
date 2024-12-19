@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace RAID2D.Client.States;
 
-namespace RAID2D.Client.States;
 public static class StateFlyweightFactory
 {
-    private static readonly Dictionary<string, IEntityState> states = new();
+    private static readonly Dictionary<string, IEntityState> states = [];
 
     static StateFlyweightFactory()
     {

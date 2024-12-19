@@ -1,6 +1,5 @@
 ﻿using RAID2D.Client.Drops;
 using RAID2D.Client.Drops.Builders;
-using RAID2D.Client.Entities;
 using RAID2D.Client.Entities.Enemies;
 using RAID2D.Client.Entities.Enemies.Decorators;
 using RAID2D.Client.Handlers;
