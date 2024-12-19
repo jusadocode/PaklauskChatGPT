@@ -43,8 +43,6 @@ public partial class MainForm : Form
 
     public readonly Dictionary<PictureBox, EntityContext> entityContexts = [];
 
-    public readonly Stack<PlayerMemento> undoStack = new();
-
     public readonly InteractionHandlerBase animalInteractionHandler = new AnimalInteractionHandler();
     public readonly InteractionHandlerBase dropInteractionHandler = new DropInteractionHandler();
     public readonly InteractionHandlerBase enemyInteractionHandler = new EnemyInteractionHandler();
@@ -53,6 +51,7 @@ public partial class MainForm : Form
     public readonly DropList dropList = new();
     public readonly BulletList bulletList = new();
 
+    private readonly List<PlayerMemento?> savedStates = [null, null, null];
 
     public MainForm() { Initialize(); }
 
@@ -86,8 +85,6 @@ public partial class MainForm : Form
         HandleGUI(deltaTime);
         HandleDayTime(deltaTime);
 
-        SaveState();
-
         for (var it = entityList.GetIterator(); it.HasNext();)
         {
             IEntity entity = it.Next();
@@ -119,30 +116,30 @@ public partial class MainForm : Form
         enemyInteractionHandler.Form = this;
     }
 
-    public void SaveState()
+    private void SaveState(int checkPointIndex)
     {
-        undoStack.TryPeek(out PlayerMemento? last);
-
-        if (player.Kills % 10 == 0 &&
-            player.Kills != 0 &&
-            last != null && last.Kills != player.Kills)
-        {
-            undoStack.Push(player.SaveState());
-        }
+        var saveState = player.SaveState();
+        savedStates[checkPointIndex] = saveState;
+        Debug.WriteLine($"Saved state at position {saveState.Position}, health {saveState.Health}, ammo {saveState.Ammo}, kills {saveState.Kills}");
     }
 
-    public void Undo()
+    private void RestoreState(int saveIndex)
     {
-        if (undoStack.Count > 0)
+        if (saveIndex >= 0 && saveIndex < savedStates.Count)
         {
-            PlayerMemento lastState = undoStack.Pop();
-            player.RestoreState(lastState);
+            PlayerMemento? selectedState = savedStates[saveIndex];
+            if (selectedState != null)
+            {
+                player.RestoreState(selectedState);
+                Debug.WriteLine($"Restored state #{saveIndex}: position {selectedState.Position}, health {selectedState.Health}, ammo {selectedState.Ammo}, kills {selectedState.Kills}");
+            }
         }
         else
         {
-            Console.WriteLine("No saved states to undo.");
+            Console.WriteLine("Invalid save index.");
         }
     }
+
     public void InitializeDevTools()
     {
 #if DEBUG
@@ -179,9 +176,19 @@ public partial class MainForm : Form
             onConnectClick: server.Connect,
             onDisconnectClick: async () => await server.DisconnectAsync(),
             onQuitClick: Application.Exit,
-            onLastCheckpointClick: () =>
+            onCheckPointClick: (checkPointIndex) =>
             {
-                Undo();
+                if (UI.isSaveMode)
+                {
+                    SaveState(checkPointIndex);
+                    Debug.WriteLine("Checkpoint saved.");
+                }
+                else
+                {
+                    RestoreState(checkPointIndex);
+                    Debug.WriteLine("Checkpoint loaded.");
+                }
+
                 UI.SetPauseMenuVisibility(false);
             },
             onPanelCreate: AddControl
