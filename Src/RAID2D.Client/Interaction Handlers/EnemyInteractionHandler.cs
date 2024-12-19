@@ -23,19 +23,19 @@ public class EnemyInteractionHandler : InteractionHandlerBase
         enemyHandlerChain = enemyHandler;
     }
 
-    protected override bool IsValidEntity(PictureBox enemy)
+    protected sealed override bool IsValidEntity(PictureBox enemy)
     {
         return enemy.Tag is string tag && tag.Contains(Constants.EnemyTag);
     }
 
-    protected override bool OnCollisionWithPlayer(PictureBox enemy)
+    protected sealed override bool OnCollisionWithPlayer(PictureBox enemy)
     {
         enemyHandlerChain.Handle(enemy, Form.player);
 
         return false;
     }
 
-    protected override bool OnCollisionWithBullet(PictureBox enemy, PictureBox bullet)
+    protected sealed override bool OnCollisionWithBullet(PictureBox enemy, PictureBox bullet)
     {
         if (IsShieldedEnemy(enemy))
         {

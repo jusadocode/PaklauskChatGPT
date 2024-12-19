@@ -53,8 +53,8 @@ public abstract class InteractionHandlerBase
 
     protected abstract bool IsValidEntity(PictureBox entity);
 
-    protected virtual bool OnCollisionWithPlayer(PictureBox entity) { throw new NotImplementedException(); }
-    protected virtual bool OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { throw new NotImplementedException(); }
+    protected virtual bool OnCollisionWithPlayer(PictureBox entity) { return false; }
+    protected virtual bool OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { return false; }
     protected virtual PictureBox? GetSpawnEntity() { return null; }
 
     protected void OnControlAdd(PictureBox entity)

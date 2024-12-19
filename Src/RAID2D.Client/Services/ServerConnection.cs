@@ -4,7 +4,7 @@ using RAID2D.Shared.Models;
 
 namespace RAID2D.Client.Services;
 
-public class ServerConnection
+public class ServerConnection : IServerConnection
 {
     private HubConnection? connection;
     private Action<GameState>? onGameStateReceive;

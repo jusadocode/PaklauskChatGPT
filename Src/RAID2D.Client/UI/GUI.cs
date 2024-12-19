@@ -155,7 +155,7 @@ public class GUI
         onPanelCreate?.Invoke(pauseMenuPanel);
     }
 
-    public void CreateDevButtons(Player player, ServerConnection server, Action? onSpawnEntitiesClick, Action? onUndoClick, Action<Button>? onButtonCreate)
+    public void CreateDevButtons(Player player, IServerConnection server, Action? onSpawnEntitiesClick, Action? onUndoClick, Action<Button>? onButtonCreate)
     {
 #if DEBUG
         List<(string Text, EventHandler OnClick)> devButtons =

@@ -4,7 +4,7 @@ namespace RAID2D.Client.Interaction_Handlers;
 
 public class DropInteractionHandler : InteractionHandlerBase
 {
-    protected override bool IsValidEntity(PictureBox drop)
+    protected sealed override bool IsValidEntity(PictureBox drop)
     {
         return
             drop.Tag as string is
@@ -14,7 +14,7 @@ public class DropInteractionHandler : InteractionHandlerBase
             Constants.DropValuableTag;
     }
 
-    protected override bool OnCollisionWithPlayer(PictureBox drop)
+    protected sealed override bool OnCollisionWithPlayer(PictureBox drop)
     {
         switch (drop.Tag as string)
         {

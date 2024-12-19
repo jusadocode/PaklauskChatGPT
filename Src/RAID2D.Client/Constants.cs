@@ -43,7 +43,7 @@ public static class Constants
     public const string CloudServerPort = "8080";
     public const string LocalServerDefaultUrl = $"{LocalServerBaseUrl}:{LocalServerPort}/{SharedConstants.ServerHub}";
     public const string CloudServerDefaultUrl = $"{CloudServerBaseUrl}:{CloudServerPort}/{SharedConstants.ServerHub}";
-    public const string ServerUrl = LocalServerDefaultUrl;
+    public const string ServerUrl = CloudServerDefaultUrl;
 
     public const string PlayerTag = "Player";
     public const string ServerPlayerTag = "ServerPlayer";

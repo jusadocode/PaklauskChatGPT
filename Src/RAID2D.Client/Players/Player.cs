@@ -155,7 +155,11 @@ public class Player : IPlayerElement
         if (Ammo == 0)
             OnEmptyMagazine?.Invoke();
 
-        Bullet bullet = new();
+        Bullet bullet = new()
+        {
+            PictureBox = new PictureBox()
+        };
+
         bullet.Create(Direction, this.PictureBox.Location + (this.PictureBox.Size / 2), onBulletExpired);
         onBulletCreated(bullet);
     }

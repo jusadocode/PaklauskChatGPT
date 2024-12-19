@@ -25,7 +25,7 @@ namespace RAID2D.Client;
 public partial class MainForm : Form
 {
     public readonly GameState gameState = new(new Point(0, 0), Direction.Right, false, 0, 0);
-    public readonly ServerConnection server = new();
+    public readonly IServerConnection server = new ServerConnectionProxy();
     public readonly Dictionary<string, ServerPlayer> serverPlayers = [];
 
     public readonly Player player = new();
@@ -163,6 +163,11 @@ public partial class MainForm : Form
     public void InitializeServer()
     {
         server.SetCallbacks(GetDataFromServer);
+
+        if (server is ServerConnectionProxy proxy)
+        {
+            proxy.Authorize("valid_token");
+        }
     }
 
     public void InitializeGUI()
