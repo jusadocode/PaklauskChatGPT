@@ -7,14 +7,15 @@ public class EntityList : IAggregate<IEntity>
     private readonly List<IEntity> _entities = [];
 
     public void Add(IEntity entity) => _entities.Add(entity);
-    public void Remove(PictureBox box) 
+    public void Remove(PictureBox box)
     {
-        foreach (IEntity entity in _entities)
+        for (int i = 0; i < _entities.Count; i++)
         {
-            if (entity.PictureBox ==  box)
-                _entities.Remove(entity);
-
-            break;
+            if (_entities[i].PictureBox == box)
+            {
+                _entities.RemoveAt(i);
+                break;
+            }
         }
     }
 

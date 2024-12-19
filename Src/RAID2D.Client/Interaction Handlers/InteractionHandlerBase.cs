@@ -15,17 +15,9 @@ public abstract class InteractionHandlerBase
             return;
         }
 
-        try
+        if (OnCollisionWithPlayer(entity))
         {
-            OnCollisionWithPlayer(entity);
             OnControlRemove(entity);
-        }
-        catch (Exception e)
-        {
-            if (e is not NotImplementedException)
-            {
-                throw new Exception("This shouldnt happen");
-            }
         }
     }
 
@@ -39,19 +31,12 @@ public abstract class InteractionHandlerBase
             return;
         }
 
-        try
+        if (OnCollisionWithBullet(entity, bullet))
         {
-            OnCollisionWithBullet(entity, bullet);
             OnControlRemove(entity);
-            OnControlRemove(bullet);
         }
-        catch (Exception e)
-        {
-            if (e is not NotImplementedException)
-            {
-                throw new Exception("This shouldnt happen");
-            }
-        }
+
+        OnControlRemove(bullet);
     }
 
     public void SpawnEntity()
@@ -68,8 +53,8 @@ public abstract class InteractionHandlerBase
 
     protected abstract bool IsValidEntity(PictureBox entity);
 
-    protected virtual void OnCollisionWithPlayer(PictureBox entity) { throw new NotImplementedException(); }
-    protected virtual void OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { throw new NotImplementedException(); }
+    protected virtual bool OnCollisionWithPlayer(PictureBox entity) { throw new NotImplementedException(); }
+    protected virtual bool OnCollisionWithBullet(PictureBox entity, PictureBox bullet) { throw new NotImplementedException(); }
     protected virtual PictureBox? GetSpawnEntity() { return null; }
 
     protected void OnControlAdd(PictureBox entity)
@@ -79,6 +64,9 @@ public abstract class InteractionHandlerBase
 
     protected void OnControlRemove(PictureBox entity)
     {
+        Form.bulletList.Remove(entity);
+        Form.dropList.Remove(entity);
+        Form.entityList.Remove(entity);
         Form.RemoveControl(entity);
     }
 

@@ -1,23 +1,20 @@
 ﻿using RAID2D.Client.Drops;
-using RAID2D.Client.Entities;
 
 namespace RAID2D.Client.Iterators;
 
 public class DropList : IAggregate<IDroppableItem>
 {
-    private readonly List<IDroppableItem> _drops = [];
+    private readonly Dictionary<PictureBox, IDroppableItem> _drops = [];
 
-    public void Add(IDroppableItem drop) => _drops.Add(drop);
-    public void Remove(PictureBox box)
+    public void Add(IDroppableItem drop)
     {
-        foreach (IDroppableItem drop in _drops)
+        if (!_drops.TryAdd(drop.PictureBox, drop))
         {
-            if (drop.PictureBox == box)
-                _drops.Remove(drop);
-
-            break;
+            throw new InvalidOperationException("The key already exists in the dictionary.");
         }
     }
+
+    public void Remove(PictureBox box) => _drops.Remove(box);
 
     public IIterator<IDroppableItem> GetIterator() => new DropIterator(_drops);
 }

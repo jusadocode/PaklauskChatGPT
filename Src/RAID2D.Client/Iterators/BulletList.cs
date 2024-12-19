@@ -5,17 +5,19 @@ namespace RAID2D.Client.Iterators;
 
 public class BulletList : IAggregate<Bullet>
 {
-    private readonly List<Bullet> _bullets = [];
+    private readonly LinkedList<Bullet> _bullets = [];
 
-    public void Add(Bullet bullet) => _bullets.Add(bullet);
+    public void Add(Bullet bullet) => _bullets.AddFirst(bullet);
     public void Remove(PictureBox box)
     {
-        foreach (Bullet bullet in _bullets)
+        for (var node = _bullets.First; node != null;)
         {
-            if (bullet.PictureBox == box)
-                _bullets.Remove(bullet);
-
-            break;
+            var next = node.Next;
+            if (node.Value.PictureBox == box)
+            {
+                _bullets.Remove(node);
+            }
+            node = next;
         }
     }
 

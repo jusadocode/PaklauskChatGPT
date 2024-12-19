@@ -11,13 +11,14 @@ public class AnimalInteractionHandler : InteractionHandlerBase
         return (animal.Tag as string) == Constants.AnimalTag;
     }
 
-    protected sealed override void OnCollisionWithBullet(PictureBox animal, PictureBox bullet)
+    protected sealed override bool OnCollisionWithBullet(PictureBox animal, PictureBox bullet)
     {
         Form.player.RegisterKill(bullet.Bounds.Location);
-        Form.entityList.Remove(animal);
 
         SpawnAnimalDrop(animal.Location, animal.Name);
         base.SpawnEntity();
+
+        return true;
     }
 
     protected sealed override PictureBox? GetSpawnEntity()
@@ -31,9 +32,8 @@ public class AnimalInteractionHandler : InteractionHandlerBase
     private void SpawnAnimalDrop(Point location, string animalName)
     {
         IDroppableItem animalDrop = Form.dropSpawner.CreateDrop(Constants.DropAnimalTag, location, animalName);
-        Form.dropList.Add(animalDrop);
 
-        PictureBox animalPictureBox = new AnimalDropBuilder()
+        PictureBox animalDropPictureBox = new AnimalDropBuilder()
             .SetTag(animalDrop)
             .SetName(animalDrop.Name)
             .SetImage(animalDrop.Image)
@@ -42,8 +42,10 @@ public class AnimalInteractionHandler : InteractionHandlerBase
             .SetSizeMode(Constants.SizeMode)
             .Build();
 
-        animalDrop.PictureBox = animalPictureBox;
+        animalDrop.PictureBox = animalDropPictureBox;
 
-        base.OnControlAdd(animalPictureBox);
+        Form.dropList.Add(animalDrop);
+
+        base.OnControlAdd(animalDropPictureBox);
     }
 }

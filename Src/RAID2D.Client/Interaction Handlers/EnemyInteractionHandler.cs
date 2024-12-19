@@ -10,7 +10,6 @@ namespace RAID2D.Client.Interaction_Handlers;
 
 public class EnemyInteractionHandler : InteractionHandlerBase
 {
-
     private static readonly Dictionary<PictureBox, int> shieldedEnemiesHealth = [];
 
     private static InteractionHandler enemyHandlerChain = new EnemyHandler();
@@ -30,24 +29,27 @@ public class EnemyInteractionHandler : InteractionHandlerBase
         return enemy.Tag is string tag && tag.Contains(Constants.EnemyTag);
     }
 
-    protected override void OnCollisionWithPlayer(PictureBox enemy)
+    protected override bool OnCollisionWithPlayer(PictureBox enemy)
     {
         enemyHandlerChain.Handle(enemy, Form.player);
+
+        return false;
     }
 
-    protected override void OnCollisionWithBullet(PictureBox enemy, PictureBox bullet)
+    protected override bool OnCollisionWithBullet(PictureBox enemy, PictureBox bullet)
     {
         if (IsShieldedEnemy(enemy))
         {
             if (!ManageShieldedEnemyHealth(enemy))
-                return;
+                return false;
         }
 
         Form.player.RegisterKill(bullet.Bounds.Location);
-        Form.entityList.Remove(enemy);
 
         SpawnValuableDrop(enemy.Location);
         base.SpawnEntity();
+
+        return true;
     }
 
     private bool ManageShieldedEnemyHealth(PictureBox enemy)
@@ -107,7 +109,6 @@ public class EnemyInteractionHandler : InteractionHandlerBase
     private void SpawnValuableDrop(Point location)
     {
         IDroppableItem valuableDrop = Form.dropSpawner.CreateDrop(Constants.DropValuableTag, location);
-        Form.dropList.Add(valuableDrop);
 
         PictureBox valuablePictureBox = new ValuableDropBuilder()
             .SetTag(valuableDrop)
@@ -119,6 +120,8 @@ public class EnemyInteractionHandler : InteractionHandlerBase
             .Build();
 
         valuableDrop.PictureBox = valuablePictureBox;
+
+        Form.dropList.Add(valuableDrop);
 
         base.OnControlAdd(valuablePictureBox);
     }

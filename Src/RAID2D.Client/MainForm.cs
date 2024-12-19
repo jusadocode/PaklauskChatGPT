@@ -15,6 +15,7 @@ using RAID2D.Client.Players;
 using RAID2D.Client.Services;
 using RAID2D.Client.States;
 using RAID2D.Client.UI;
+using RAID2D.Client.Visitors;
 using RAID2D.Shared.Enums;
 using RAID2D.Shared.Models;
 using System;
@@ -24,7 +25,7 @@ namespace RAID2D.Client;
 
 public partial class MainForm : Form
 {
-    public readonly GameState gameState = new(new Point(0, 0), Direction.Right);
+    public readonly GameState gameState = new(new Point(0, 0), Direction.Right, false, 0, 0);
     public readonly ServerConnection server = new();
     public readonly Dictionary<string, ServerPlayer> serverPlayers = [];
 
@@ -53,6 +54,8 @@ public partial class MainForm : Form
 
     private readonly List<PlayerMemento?> savedStates = [null, null, null];
 
+    ScoreVisitor scoreVisitor = new ScoreVisitor();
+
     public MainForm() { Initialize(); }
 
     void Initialize()
@@ -60,9 +63,9 @@ public partial class MainForm : Form
         InitializeComponent();
 
         InitializeHandlers();
-        InitializeGUI();
         InitializeDayTime();
         InitializeServer();
+        InitializeGUI();
         InitializeDevTools();
         InitializeGameLoop();
         InitializePlayer();
@@ -74,13 +77,16 @@ public partial class MainForm : Form
     {
         SendDataToServer();
 
-        if (!IsFormFocused())
-            return;
+        if (!server.IsConnected())
+        {
+            if (player.IsDead() || UI.IsPaused())
+                return;
+
+            if (!IsFormFocused())
+                return;
+        }
 
         HandlePlayerInput();
-
-        if (player.IsDead() || UI.IsPaused())
-            return;
 
         HandleGUI(deltaTime);
         HandleDayTime(deltaTime);
@@ -107,6 +113,8 @@ public partial class MainForm : Form
 
             dropInteractionHandler.HandleInteractionWithPlayer(drop.PictureBox);
         }
+
+        RefreshScores();
     }
 
     public void InitializeHandlers()
@@ -167,7 +175,11 @@ public partial class MainForm : Form
 
         // Pause the game on alt-tab
         this.Activated += (s, e) => UI.SetPauseMenuVisibility(false);
-        this.Deactivate += (s, e) => UI.SetPauseMenuVisibility(true);
+        this.Deactivate += (s, e) =>
+        {
+            if (server.IsConnected())
+                UI.SetPauseMenuVisibility(true);
+        };
 
         // Initialize GUI elements
         UI.BindElements(FpsLabel, AmmoLabel, KillsLabel, CashLabel, HealthBar);
@@ -191,6 +203,10 @@ public partial class MainForm : Form
 
                 UI.SetPauseMenuVisibility(false);
             },
+            onPanelCreate: AddControl
+        );
+
+        UI.CreateScoreboard(
             onPanelCreate: AddControl
         );
     }
@@ -261,6 +277,9 @@ public partial class MainForm : Form
 
         gameState.Location = player.PictureBox.Location;
         gameState.Direction = player.Direction;
+        gameState.IsDead = player.IsDead();
+        gameState.Kills = player.Kills;
+        gameState.Cash = player.Cash;
 
         await server.SendGameStateAsync(gameState);
     }
@@ -285,6 +304,7 @@ public partial class MainForm : Form
                 this.Invoke((MethodInvoker)delegate
                 {
                     AddControl(newPlayer.PictureBox);
+                    UI.AddPlayerKillsEntry(gameState.ConnectionID, gameState.Kills);
                 });
 
                 Console.WriteLine($"added new player at loc={newPlayer.PictureBox.Location}");
@@ -295,6 +315,7 @@ public partial class MainForm : Form
             this.Invoke((MethodInvoker)delegate
             {
                 serverPlayer.Update(gameState);
+                UI.UpdatePlayersKills(gameState.ConnectionID, gameState.Kills);
             });
         }
     }
@@ -317,18 +338,19 @@ public partial class MainForm : Form
         player.Move();
 
         if (InputManager.IsKeyDownOnce(Keys.Space))
+        {
             player.ShootBullet((bullet) =>
             {
                 AddControl(bullet.PictureBox);
                 bulletList.Add(bullet);
             }, 
             RemoveControl);
+        }
     }
 
     public void SpawnAmmoDrop()
     {
         IDroppableItem ammoDrop = dropSpawner.CreateDrop(Constants.DropAmmoTag);
-        this.dropList.Add(ammoDrop);
 
         PictureBox ammoDropPictureBox = new AmmoDropBuilder()
             .SetTag(ammoDrop)
@@ -341,13 +363,13 @@ public partial class MainForm : Form
 
         ammoDrop.PictureBox = ammoDropPictureBox;
 
+        this.dropList.Add(ammoDrop);
         AddControl(ammoDropPictureBox);
     }
 
     public void SpawnMedicalDrop()
     {
         IDroppableItem medicalDrop = dropSpawner.CreateDrop(Constants.DropMedicalTag);
-        this.dropList.Add(medicalDrop);
 
         PictureBox medicalPictureBox = new MedicalDropBuilder()
             .SetTag(medicalDrop)
@@ -360,6 +382,8 @@ public partial class MainForm : Form
 
         medicalDrop.PictureBox = medicalPictureBox;
 
+        this.dropList.Add(medicalDrop);
+
         AddControl(medicalPictureBox);
     }
 
@@ -368,25 +392,25 @@ public partial class MainForm : Form
         if (!entityContexts.TryGetValue(entity.PictureBox, out EntityContext? context))
         {
             context = new EntityContext();
-            entityContexts[entity.PictureBox] = context;
-        }
 
-        uint fleeRadius = (entity is IEnemy) ? Constants.EnemyFleeRadius : Constants.AnimalFleeRadius;
-
-        if (player.DistanceTo(entity.PictureBox) < fleeRadius)
-        {
-            if ((entity is IAnimal))
+            uint fleeRadius = (entity is IEnemy) ? Constants.EnemyFleeRadius : Constants.AnimalFleeRadius;
+            if (player.DistanceTo(entity.PictureBox) < fleeRadius)
             {
-                context.SetState(new FleeState());
+                if ((entity is IAnimal))
+                {
+                    context.SetState(StateFlyweightFactory.GetState("Flee"));
+                }
+                else
+                {
+                    context.SetState(StateFlyweightFactory.GetState("Chase"));
+                }
             }
             else
             {
-                context.SetState(new ChaseState());
+                context.SetState(StateFlyweightFactory.GetState("Wander"));
             }
-        }
-        else
-        {
-            context.SetState(new IdleState());
+
+            entityContexts[entity.PictureBox] = context;
         }
 
         context.UpdateState(entity.PictureBox, player);
@@ -404,10 +428,28 @@ public partial class MainForm : Form
     public void RestartGame()
     {
         foreach (Control control in this.Controls.OfType<PictureBox>().ToList())
-            RemoveControl(control);
+        {
+            if (control.Tag as string is Constants.ServerPlayerTag)
+            {
+                continue;
+            }
+        }
 
         AddControl(player.Respawn());
         SpawnEntities();
+    }
+
+    private void RefreshScores()
+    {
+        foreach (ServerPlayer serverPlayer in serverPlayers.Values)
+        {
+            serverPlayer.Accept(scoreVisitor);
+        }
+
+        player.Accept(scoreVisitor);
+
+        UI.UpdateHighestScore(scoreVisitor.HighestScore);
+        UI.UpdateHighestCash(scoreVisitor.HighestCash);
     }
 
     public static bool IsEnemyOrAnimal(Control control) => IsAnimal(control) || IsEnemy(control);

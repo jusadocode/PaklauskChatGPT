@@ -3,11 +3,12 @@ using RAID2D.Client.Mementos;
 using RAID2D.Client.MovementStrategies;
 using RAID2D.Client.UI;
 using RAID2D.Client.Utils;
+using RAID2D.Client.Visitors;
 using RAID2D.Shared.Enums;
 
 namespace RAID2D.Client.Players;
 
-public class Player
+public class Player : IPlayerElement
 {
     public int Health { get; private set; } = Constants.PlayerMaxHealth;
     public int MaxHealth { get; private set; } = Constants.PlayerMaxHealth;
@@ -196,5 +197,10 @@ public class Player
 
         this.PictureBox.Parent.Controls.Remove(control);
         control.Dispose();
+    }
+
+    public void Accept(IPlayerVisitor visitor)
+    {
+        visitor.Visit(this);
     }
 }

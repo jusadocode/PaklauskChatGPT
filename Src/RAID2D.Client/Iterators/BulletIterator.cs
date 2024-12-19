@@ -4,17 +4,32 @@ namespace RAID2D.Client.Iterators;
 
 public class BulletIterator : IIterator<Bullet>
 {
-    private readonly List<Bullet> _bullets;
-    private int _position = 0;
+    private readonly LinkedList<Bullet> _bullets;
+    private LinkedListNode<Bullet>? _currentNode;
 
-    public BulletIterator(List<Bullet> bullets)
+    public BulletIterator(LinkedList<Bullet> bullets)
     {
         _bullets = bullets;
+        _currentNode = bullets.First;
     }
 
-    public bool HasNext() => _position < _bullets.Count;
+    public bool HasNext() => _currentNode != null;
 
-    public Bullet Next() => _bullets[_position++];
+    public Bullet Next()
+    {
+        if (_currentNode == null)
+            throw new InvalidOperationException("No more elements in the iterator.");
 
-    public Bullet Current => _bullets[_position];
+        var bullet = _currentNode.Value;
+        _currentNode = _currentNode.Next;
+        return bullet;
+    }
+
+    public Bullet Current
+    {
+        get
+        {
+            return _currentNode == null ? throw new InvalidOperationException("Iterator is not at a valid position.") : _currentNode.Value;
+        }
+    }
 }

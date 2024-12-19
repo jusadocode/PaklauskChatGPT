@@ -2,6 +2,7 @@
 using RAID2D.Client.Players;
 
 namespace RAID2D.Client.States;
+
 public class EntityContext
 {
     private IEntityState _currentState;
@@ -9,7 +10,7 @@ public class EntityContext
 
     public EntityContext()
     {
-        _currentState = new IdleState();
+        _currentState = new WanderState();
         MovementStrategy = new WanderMovement(Constants.AnimalSpeed / 2);
     }
 

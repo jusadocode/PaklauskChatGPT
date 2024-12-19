@@ -4,17 +4,36 @@ namespace RAID2D.Client.Iterators;
 
 public class DropIterator : IIterator<IDroppableItem>
 {
-    private readonly List<IDroppableItem> _drops;
-    private int _position = 0;
+    private readonly Dictionary<PictureBox, IDroppableItem> _drops;
+    private IEnumerator<KeyValuePair<PictureBox, IDroppableItem>> _enumerator;
+    private bool _hasMoreElements;
 
-    public DropIterator(List<IDroppableItem> drops)
+    public DropIterator(Dictionary<PictureBox, IDroppableItem> drops)
     {
         _drops = drops;
+        _enumerator = _drops.GetEnumerator();
+        _hasMoreElements = _enumerator.MoveNext();
     }
 
-    public bool HasNext() => _position < _drops.Count;
+    public bool HasNext() => _hasMoreElements;
 
-    public IDroppableItem Next() => _drops[_position++];
+    public IDroppableItem Next()
+    {
+        if (!_hasMoreElements)
+        {
+            throw new InvalidOperationException("No more elements in the iterator.");
+        }
 
-    public IDroppableItem Current => _drops[_position];
+        var currentItem = _enumerator.Current.Value;
+        _hasMoreElements = _enumerator.MoveNext();
+        return currentItem;
+    }
+
+    public IDroppableItem Current
+    {
+        get
+        {
+            return !_hasMoreElements ? throw new InvalidOperationException("Iterator is not at a valid position.") : _enumerator.Current.Value;
+        }
+    }
 }

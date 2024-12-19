@@ -14,7 +14,7 @@ public class DropInteractionHandler : InteractionHandlerBase
             Constants.DropValuableTag;
     }
 
-    protected override void OnCollisionWithPlayer(PictureBox drop)
+    protected override bool OnCollisionWithPlayer(PictureBox drop)
     {
         switch (drop.Tag as string)
         {
@@ -38,6 +38,6 @@ public class DropInteractionHandler : InteractionHandlerBase
                 throw new NotImplementedException();
         }
 
-        Form.dropList.Remove(drop);
+        return true;
     }
 }
